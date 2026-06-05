@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "buildCommand": "pnpm run build --filter=playr",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": "nextjs",
+  "outputDirectory": "apps/playr/.next"
+}

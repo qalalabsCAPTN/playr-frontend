@@ -11,7 +11,7 @@ export function Header() {
   const { cartItems, wishlistItems, setIsCartDrawerOpen } = useCommerce()
   
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-[#fdf9f0]/95 backdrop-blur supports-[backdrop-filter]:bg-[#fdf9f0]/80">
+    <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/90 backdrop-blur-md supports-[backdrop-filter]:bg-white/70 transition-all duration-300">
       <div className="container max-w-7xl mx-auto flex items-center justify-between px-4 h-20">
         
         {/* Left: Mobile Nav Toggle & Logo */}

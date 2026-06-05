@@ -46,13 +46,27 @@ export const CartDrawer = React.forwardRef<HTMLDivElement, CartDrawerProps>(
           {...props}
         >
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-on-surface/10">
-            <h2 className="font-headline-lg text-headline-md uppercase tracking-tighter">
-              Your Cart ({items.length})
-            </h2>
-            <button onClick={onClose} className="p-2 hover:bg-surface-container rounded-full transition-colors" aria-label="Close cart">
-              <span className="material-symbols-outlined">close</span>
-            </button>
+          <div className="p-6 border-b border-zinc-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-black text-2xl uppercase tracking-tighter">
+                Your Cart ({items.length})
+              </h2>
+              <button onClick={onClose} className="p-2 hover:bg-zinc-100 rounded-full transition-colors" aria-label="Close cart">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            {/* Free Shipping Progress */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                <span>{subtotal >= 10000 ? "✨ You've unlocked free shipping!" : `₹${(10000 - subtotal).toLocaleString('en-IN')} away from free shipping`}</span>
+              </div>
+              <div className="h-1.5 w-full bg-zinc-200 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-black transition-all duration-500 ease-out" 
+                  style={{ width: `${Math.min((subtotal / 10000) * 100, 100)}%` }}
+                />
+              </div>
+            </div>
           </div>
 
           {/* Items */}
@@ -103,13 +117,13 @@ export const CartDrawer = React.forwardRef<HTMLDivElement, CartDrawerProps>(
               <p className="text-label-sm text-secondary mb-6">Shipping and taxes calculated at checkout.</p>
               <button 
                 onClick={onCheckout}
-                className="w-full py-4 bg-primary-container text-on-surface font-headline-md uppercase rounded-full hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-[0.98] transition-all"
+                className="w-full py-4 bg-black text-white font-bold text-sm tracking-[0.2em] uppercase rounded-full hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
               >
                 Checkout
               </button>
               <button 
                 onClick={onClose}
-                className="w-full mt-4 py-4 bg-transparent border border-on-surface text-on-surface font-headline-md uppercase rounded-full hover:bg-surface-container transition-all"
+                className="w-full mt-4 py-4 bg-transparent border-2 border-black text-black font-bold text-sm tracking-[0.2em] uppercase rounded-full hover:bg-zinc-50 transition-all"
               >
                 Continue Shopping
               </button>
