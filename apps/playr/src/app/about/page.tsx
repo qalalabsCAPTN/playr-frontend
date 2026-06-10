@@ -33,12 +33,12 @@ export default function AboutPage() {
     }
   }, [data])
 
-  if (!data) return <div className="min-h-screen bg-[#fdf9f0]"></div>;
+  if (!data) return <div className="min-h-screen bg-background"></div>;
 
   const { hero, brandStory } = data;
 
   return (
-    <div className="bg-[#fdf9f0] min-h-screen">
+    <div className="bg-background min-h-screen">
       {/* Hero Section */}
       <section className="relative w-full h-[80vh] flex items-center overflow-hidden bg-on-surface">
         <div className="absolute inset-0 z-0">

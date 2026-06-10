@@ -4,10 +4,12 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useCommerce } from "@/components/commerce/CommerceProvider"
+import { useAccount } from "@/components/account/AccountProvider"
 import { EmptyState } from "@playr/ui"
 
 export default function CartPage() {
   const { cartItems, cartSubtotal, updateCartQuantity, removeFromCart } = useCommerce()
+  const { xpState } = useAccount()
 
   if (cartItems.length === 0) {
     return (
@@ -66,7 +68,7 @@ export default function CartPage() {
 
         {/* Order Summary Sidebar */}
         <aside className="lg:col-span-4">
-          <div className="p-8 rounded-xl border border-on-surface sticky top-28 bg-[#e5e3e2]">
+          <div className="p-8 rounded-xl border border-on-surface sticky top-28 bg-surface-container">
             <h2 className="font-headline-lg text-headline-lg uppercase mb-8">Summary</h2>
             <div className="space-y-4 mb-8">
               <div className="flex justify-between items-center font-body-lg text-body-lg">
@@ -99,6 +101,31 @@ export default function CartPage() {
               </div>
             </div>
             
+            {/* XP teaser — reads from NECTAR via AccountContext, no calculations */}
+            {xpState ? (
+              <div className="mb-4 bg-primary-container/20 border border-primary-container/40 rounded-xl p-4 flex items-center gap-3">
+                <span className="material-symbols-outlined text-primary text-xl">bolt</span>
+                <div>
+                  <p className="font-bold text-on-surface text-sm">Earn XP on this order</p>
+                  <p className="text-on-surface-variant text-xs mt-0.5">
+                    {xpState.currentTier.name} members earn bonus XP •{' '}
+                    <Link href="/rewards" className="text-primary hover:underline">View rewards</Link>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4 bg-surface-container rounded-xl p-4 flex items-center gap-3">
+                <span className="material-symbols-outlined text-on-surface-variant text-xl">bolt</span>
+                <div>
+                  <p className="font-bold text-on-surface text-sm">Sign in to earn XP</p>
+                  <p className="text-on-surface-variant text-xs mt-0.5">
+                    <Link href="/account" className="text-primary hover:underline">Log in</Link>
+                    {' '}to track your XP on this purchase.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <button className="w-full py-5 bg-primary-container text-on-surface font-headline-md uppercase rounded-full hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-[0.98] transition-all">
               Checkout
             </button>

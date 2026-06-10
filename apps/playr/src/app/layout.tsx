@@ -4,7 +4,7 @@ import { Chivo, Inter } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { CommerceProvider } from '@/components/commerce/CommerceProvider';
+import { Providers } from '@/components/layout/Providers';
 
 const chivo = Chivo({ subsets: ['latin'], variable: '--font-chivo' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -45,13 +45,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
       </head>
       <body className={`${chivo.variable} ${inter.variable} font-body-md min-h-screen flex flex-col bg-surface text-on-surface`}>
-        <CommerceProvider>
+        <Providers>
           <Header />
           <main className="flex-1">
             {children}
           </main>
           <Footer />
-        </CommerceProvider>
+        </Providers>
       </body>
     </html>
   );

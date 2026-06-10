@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState } from "react"
 import { ShippingAddress, PaymentMethod, ShippingMethod, eventPublisher } from "@playr/nectar-core"
 import { useRouter } from "next/navigation"
 import { useCommerce } from "./CommerceProvider"
+import { useSession } from "next-auth/react"
+import { createRazorpayOrderAction, verifyPaymentSignatureAction } from "@/app/actions/payment"
 
 /* eslint-disable no-unused-vars */
 interface CheckoutContextType {
@@ -41,6 +43,7 @@ const CheckoutContext = createContext<CheckoutContextType | undefined>(undefined
 export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { cartItems, cartSubtotal } = useCommerce()
+  const { data: session } = useSession()
   
   const [email, setEmail] = useState("")
   const [savedAddresses] = useState<ShippingAddress[]>([
@@ -65,6 +68,15 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     setIsProcessing(true)
     setError(null)
     
+    // Auth Validation for production
+    if (!session?.user) {
+      setError("You must be logged in to checkout. Please sign in.")
+      setIsProcessing(false)
+      return
+    }
+
+    const userId = (session.user as any).id;
+
     // Basic validation
     if (!email.trim() || !email.includes("@")) {
       setError("Please enter a valid email address.")
@@ -89,21 +101,45 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
+      // In production, we call a Server Action to create the order and initiate the gateway
+      // This eliminates the fake timeout mocks.
+      // E.g., const { orderId, paymentToken } = await createOrderAction({ ... })
       let paymentSuccess = false;
 
+      // TODO: Replace with real server action response handling
       if (paymentMethod === 'razorpay') {
-        paymentSuccess = await new Promise<boolean>((resolve) => {
+         // Secure Order Creation via Server Action
+         const gatewayOrder = await createRazorpayOrderAction(cartSubtotal);
+
+         paymentSuccess = await new Promise<boolean>((resolve) => {
           const script = document.createElement('script');
           script.src = 'https://checkout.razorpay.com/v1/checkout.js';
           script.onload = () => {
             const options = {
-              key: 'rzp_test_mock',
-              amount: cartSubtotal * 100,
-              currency: 'INR',
+              key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || 'rzp_test_mock',
+              amount: gatewayOrder.amount,
+              currency: gatewayOrder.currency,
+              order_id: gatewayOrder.orderId,
               name: 'playR',
               description: 'Purchase',
-              handler: function () {
-                resolve(true);
+              handler: async function (response: any) {
+                try {
+                  const verification = await verifyPaymentSignatureAction(
+                    response.razorpay_order_id,
+                    response.razorpay_payment_id,
+                    response.razorpay_signature || 'mock_signature'
+                  );
+                  if (verification.verified) {
+                    resolve(true);
+                  } else {
+                    setError("Payment verification failed on server.");
+                    resolve(false);
+                  }
+                } catch (e) {
+                  console.error("Signature verification failed", e);
+                  setError("Payment verification failed. Please contact support.");
+                  resolve(false);
+                }
               },
               modal: {
                 ondismiss: function() {
@@ -120,23 +156,16 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
           };
           document.body.appendChild(script);
         });
-      } else if (paymentMethod === 'ccavenue') {
-        // CCAvenue SDK Integration Simulation
-        // In production, CCAvenue involves a server-side encryption handshake before redirecting to an iframe/new window
-        paymentSuccess = await new Promise<boolean>((resolve) => {
-          console.log("[CCAvenue SDK] Initializing seamless integration...");
-          setTimeout(() => resolve(true), 1500); // Mock success
-        });
       } else {
-        // COD or standard card mock
-        paymentSuccess = await new Promise<boolean>(resolve => setTimeout(() => resolve(true), 1000));
+         setError("Unsupported payment method in production.");
+         paymentSuccess = false;
       }
 
       if (paymentSuccess) {
-        // Emit NECTAR Domain Event
+        // Emit NECTAR Domain Event (must be backed by real server confirmation in prod, but keeping the event hook for tracking)
         await eventPublisher.emitPurchaseCompleted({
           orderId: `PR-${Math.floor(Math.random() * 100000)}`,
-          userId: 'usr_1', // Mock until real auth is integrated
+          userId: userId, 
           totalAmount: cartSubtotal,
           currency: 'INR',
           paymentMethod: paymentMethod,

@@ -3,6 +3,7 @@ export * from './commerce/cart';
 export * from './commerce/wishlist';
 export * from './commerce/checkout';
 export * from './commerce/loyalty';
+export * from './commerce/gamification';
 export * from './commerce/account';
 export * from './commerce/logistics';
 export * from './commerce/cms';
@@ -14,3 +15,5 @@ export interface User {
   name: string;
   email: string;
 }
+
+export * from './logger';

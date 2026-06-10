@@ -2,47 +2,70 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="bg-zinc-950 text-zinc-300 py-16 border-t border-zinc-900">
-      <div className="container max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
-        <div className="col-span-1 md:col-span-1">
-          <span className="font-extrabold text-3xl tracking-tighter text-white font-[var(--font-sora)] mb-4 block">playR</span>
-          <p className="text-sm text-zinc-500 mb-6 max-w-xs">Engineered for elite performance. Designed for everyday greatness.</p>
+    <footer className="bg-inverse-surface text-inverse-on-surface pt-24 pb-12 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-container/5 rounded-full blur-[150px] pointer-events-none" />
+
+      <div className="container max-w-[1400px] mx-auto px-4 grid grid-cols-1 md:grid-cols-12 gap-12 relative z-10">
+
+        {/* Brand + Newsletter */}
+        <div className="md:col-span-4 pr-8">
+          <span className="font-black text-5xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-inverse-on-surface to-inverse-on-surface/50 mb-6 block">
+            playR
+          </span>
+          <p className="text-inverse-on-surface/50 mb-8 max-w-sm leading-relaxed">
+            Engineered for elite performance. Designed for everyday greatness. Join the movement of champions.
+          </p>
+          <div className="flex gap-4">
+            <input
+              type="email"
+              placeholder="Join the newsletter"
+              className="bg-inverse-on-surface/5 border border-inverse-on-surface/15 rounded-full px-6 py-3 w-full text-sm text-inverse-on-surface placeholder:text-inverse-on-surface/30 focus:outline-none focus:ring-1 focus:ring-primary-container transition-all"
+            />
+            <button className="bg-inverse-on-surface text-inverse-surface font-bold uppercase text-xs tracking-widest px-6 py-3 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-colors whitespace-nowrap">
+              Subscribe
+            </button>
+          </div>
         </div>
-        
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Shop</h4>
-          <ul className="space-y-3 text-sm">
-            <li><Link href="/collections/new" className="hover:text-white transition">New Arrivals</Link></li>
-            <li><Link href="/collections/men" className="hover:text-white transition">Men&apos;s Gear</Link></li>
-            <li><Link href="/collections/women" className="hover:text-white transition">Women&apos;s Gear</Link></li>
-            <li><Link href="/collections/accessories" className="hover:text-white transition">Accessories</Link></li>
+
+        {/* Shop */}
+        <div className="md:col-span-2 md:col-start-6">
+          <h4 className="text-inverse-on-surface font-bold mb-6 uppercase tracking-widest text-xs">Shop</h4>
+          <ul className="space-y-4 text-sm font-medium text-inverse-on-surface/40">
+            <li><Link href="/collections/new" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">New Arrivals</Link></li>
+            <li><Link href="/collections/men" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Men&apos;s Gear</Link></li>
+            <li><Link href="/collections/women" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Women&apos;s Gear</Link></li>
+            <li><Link href="/collections/accessories" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Accessories</Link></li>
           </ul>
         </div>
 
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Support</h4>
-          <ul className="space-y-3 text-sm">
-            <li><Link href="/pages/faq" className="hover:text-white transition">FAQ & Help</Link></li>
-            <li><Link href="/account/tracking" className="hover:text-white transition">Track Order</Link></li>
-            <li><Link href="/pages/returns" className="hover:text-white transition">Returns Policy</Link></li>
-            <li><Link href="/pages/contact" className="hover:text-white transition">Contact Us</Link></li>
+        {/* Support */}
+        <div className="md:col-span-2">
+          <h4 className="text-inverse-on-surface font-bold mb-6 uppercase tracking-widest text-xs">Support</h4>
+          <ul className="space-y-4 text-sm font-medium text-inverse-on-surface/40">
+            <li><Link href="/pages/faq" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">FAQ &amp; Help</Link></li>
+            <li><Link href="/account/tracking" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Track Order</Link></li>
+            <li><Link href="/pages/returns" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Returns Policy</Link></li>
+            <li><Link href="/contact" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Contact Us</Link></li>
           </ul>
         </div>
 
-        <div>
-          <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Corporate</h4>
-          <ul className="space-y-3 text-sm">
-            <li><Link href="/b2b" className="hover:text-white transition">B2B & Teamwear</Link></li>
-            <li><Link href="/pages/about" className="hover:text-white transition">Our Story</Link></li>
-            <li><Link href="/pages/careers" className="hover:text-white transition">Careers</Link></li>
+        {/* Corporate */}
+        <div className="md:col-span-2">
+          <h4 className="text-inverse-on-surface font-bold mb-6 uppercase tracking-widest text-xs">Corporate</h4>
+          <ul className="space-y-4 text-sm font-medium text-inverse-on-surface/40">
+            <li><Link href="/b2b" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">B2B &amp; Teamwear</Link></li>
+            <li><Link href="/about" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Our Story</Link></li>
+            <li><Link href="/media" className="hover:text-inverse-on-surface hover:translate-x-1 inline-block transition-all">Media</Link></li>
           </ul>
         </div>
       </div>
-      <div className="container max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-zinc-900 text-xs text-zinc-600 flex flex-col md:flex-row justify-between items-center">
-        <p>© 2026 playR. Powered by NECTAR Ecosystem.</p>
-        <div className="flex gap-4 mt-4 md:mt-0">
-          <Link href="/pages/privacy" className="hover:text-white">Privacy Policy</Link>
-          <Link href="/pages/terms" className="hover:text-white">Terms of Service</Link>
+
+      {/* Bottom bar */}
+      <div className="container max-w-[1400px] mx-auto px-4 mt-20 pt-8 border-t border-inverse-on-surface/10 text-xs text-inverse-on-surface/30 flex flex-col md:flex-row justify-between items-center relative z-10">
+        <p className="font-medium tracking-wide">© 2026 playR. Powered by NECTAR Ecosystem.</p>
+        <div className="flex gap-8 mt-6 md:mt-0 font-medium tracking-wide">
+          <Link href="/pages/privacy" className="hover:text-inverse-on-surface transition-colors">Privacy Policy</Link>
+          <Link href="/pages/terms" className="hover:text-inverse-on-surface transition-colors">Terms of Service</Link>
         </div>
       </div>
     </footer>

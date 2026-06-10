@@ -3,9 +3,10 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { NectarCommerce, NECTARAnalytics } from "@playr/nectar-core"
+import { NectarCommerce, NECTARAnalytics, loyaltyAdapter } from "@playr/nectar-core"
+import type { GamificationProductContext } from "@playr/nectar-core"
 import { useCommerce } from "@/components/commerce/CommerceProvider"
-import { StockMeter } from "@playr/ui"
+import { StockMeter, ProductCard } from "@playr/ui"
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
@@ -15,6 +16,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [activeImage, setActiveImage] = React.useState("")
   const [activeAccordion, setActiveAccordion] = React.useState("desc")
   const { addToCart } = useCommerce()
+  const [relatedProducts, setRelatedProducts] = React.useState<any[]>([])
+  const [gamificationCtx, setGamificationCtx] = React.useState<GamificationProductContext | null>(null)
 
   React.useEffect(() => {
     NectarCommerce.getProduct(resolvedParams.slug).then(p => {
@@ -22,11 +25,38 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         setProduct(p)
         setActiveImage(p.imageSrc)
         NECTARAnalytics.trackProductView(p)
+        NectarCommerce.getRelatedProducts(p.specifications).then(related => setRelatedProducts(related))
+        // Fetch XP context from NECTAR — never compute on frontend
+        loyaltyAdapter.getProductGamificationContext(p.id).then(ctx => setGamificationCtx(ctx))
       }
     })
   }, [resolvedParams.slug])
 
-  if (!product) return <div className="p-24 text-center">Loading...</div>
+  if (!product) return (
+    <main className="max-w-screen-2xl mx-auto px-4 md:px-container-margin-desktop pt-32 pb-24 animate-pulse">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+        <div className="lg:col-span-7 space-y-4">
+          <div className="aspect-square bg-surface-container rounded-2xl" />
+          <div className="flex gap-4">
+            {[1,2,3,4].map(i => <div key={i} className="w-24 h-24 bg-surface-container rounded-xl shrink-0" />)}
+          </div>
+        </div>
+        <div className="lg:col-span-5 space-y-6">
+          <div className="h-4 bg-surface-container rounded w-24" />
+          <div className="h-10 bg-surface-container rounded w-3/4" />
+          <div className="h-8 bg-surface-container rounded w-32" />
+          <div className="flex gap-3">
+            {[1,2,3,4].map(i => <div key={i} className="w-10 h-10 rounded-full bg-surface-container" />)}
+          </div>
+          <div className="flex gap-3">
+            {[1,2,3,4,5].map(i => <div key={i} className="w-14 h-14 rounded-full bg-surface-container" />)}
+          </div>
+          <div className="h-14 bg-surface-container rounded-full" />
+          <div className="h-14 bg-surface-container rounded-full" />
+        </div>
+      </div>
+    </main>
+  )
 
   return (
     <main className="max-w-screen-2xl mx-auto px-container-margin-mobile md:px-container-margin-desktop py-section-gap-md pt-32">
@@ -42,7 +72,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-section-gap-md items-start">
         {/* Left Column: Image Gallery */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <div className="aspect-square bg-white rounded-lg overflow-hidden shadow-sm group relative">
+          <div className="aspect-square bg-surface-container-low rounded-lg overflow-hidden shadow-sm group relative">
             {activeImage && (
               <Image
                 fill
@@ -56,7 +86,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             {product.gallery.map((img: string, idx: number) => (
               <button
                 key={idx}
-                className={`relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-white shadow-sm border-2 transition-all ${
+                className={`relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-surface-container-low shadow-sm border-2 transition-all ${
                   activeImage === img ? "border-primary" : "border-transparent"
                 }`}
                 onClick={() => setActiveImage(img)}
@@ -133,15 +163,32 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
           {/* CTAs */}
           <div className="flex flex-col gap-4 pt-4">
-            <div className="bg-surface-container-low border border-primary/20 rounded-lg p-4 flex items-center justify-between mb-2">
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-primary">card_membership</span>
-                <span className="font-label-md text-on-surface">
-                  Earn <span className="font-bold text-primary">{product.loyaltyPoints}</span> Loyalty Points on this purchase
-                </span>
+            {/* XP context from NECTAR — render only, no calculations */}
+            {gamificationCtx && gamificationCtx.totalXPEarned > 0 && (
+              <div className="bg-surface-container-low border border-primary/20 rounded-lg p-4 flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-primary">card_membership</span>
+                  <span className="font-label-md text-on-surface">
+                    Earn{' '}
+                    <span className="font-bold text-primary">{gamificationCtx.totalXPEarned.toLocaleString()} XP</span>
+                    {gamificationCtx.tierBonus > 0 && (
+                      <span className="text-on-surface-variant text-xs ml-1">
+                        (incl. {gamificationCtx.tierBonus} tier bonus)
+                      </span>
+                    )}
+                    {' '}on this purchase
+                  </span>
+                </div>
+                <Link href="/rewards" className="material-symbols-outlined text-on-surface-variant text-[20px] hover:text-primary transition-colors">help</Link>
               </div>
-              <span className="material-symbols-outlined text-on-surface-variant text-[20px]">help</span>
-            </div>
+            )}
+            {/* Loading state */}
+            {!gamificationCtx && (
+              <div className="bg-surface-container-low border border-outline-variant/20 rounded-lg p-4 flex items-center gap-3 mb-2 animate-pulse">
+                <span className="material-symbols-outlined text-on-surface-variant/40">card_membership</span>
+                <div className="h-3 bg-surface-container rounded w-48" />
+              </div>
+            )}
             <button 
               onClick={() => {
                 addToCart({
@@ -218,7 +265,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       <section className="mt-section-gap-lg pt-section-gap-md border-t border-outline/10">
         <h2 className="font-headline-lg text-headline-lg mb-8">Customer Reviews</h2>
         <div className="flex flex-col md:flex-row gap-12 items-start">
-          <div className="w-full md:w-1/3 p-8 bg-white rounded-lg shadow-sm border border-outline/10">
+          <div className="w-full md:w-1/3 p-8 bg-surface-container-low rounded-lg shadow-sm border border-outline/10">
             <div className="text-center space-y-4">
               <div className="text-headline-xl font-bold">0.0</div>
               <div className="flex justify-center text-primary">
@@ -264,13 +311,19 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           </div>
           
           <div className="space-y-gutter">
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-outline/5 hover:shadow-lg transition-all cursor-pointer group">
-              <div className="aspect-square overflow-hidden rounded-lg mb-4">
-                <img alt="playR Performance Tee" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida/ADBb0ujSsqF9vOypHhQr_vRvmlnyoetXrYYPC8a3qmnKF3LQiwNmSiP7NJDyZiFwS47XcoysS71JfyaHIxfFFpifnvj1U7zzaqKwntFYmbMjxiqzkJMics6lX1J3AIeZ7w1sfu18nxksmfmgavSl2fPjxF3LaZWMinIAKixrNsdUK1YCGJxD0sDQ3sIuOE9XFS6gM2GmoOmZpw7Mw_p1cUVEwuyG0SRbDKHRyDXQqRrvsROd3aHm_NjQ-_W9-Xs" />
-              </div>
-              <h4 className="font-headline-sm text-headline-sm mb-1 uppercase tracking-wide">Impact Tee</h4>
-              <p className="font-body-md text-on-surface-variant font-bold">₹ 899.00</p>
-            </div>
+            {relatedProducts.slice(0, 1).map((related) => (
+              <ProductCard
+                key={related.id}
+                id={related.id}
+                title={related.title}
+                price={related.price}
+                compareAtPrice={related.compareAtPrice}
+                imageSrc={related.imageSrc}
+                hoverImageSrc={related.hoverImageSrc}
+                colors={related.colors}
+                badge={related.badge}
+              />
+            ))}
             <div className="bg-primary-container p-8 rounded-lg flex flex-col justify-between h-[180px]">
               <h4 className="font-headline-sm text-headline-sm text-on-primary-container leading-tight">
                 Join playR Elite for 15% off your first order.

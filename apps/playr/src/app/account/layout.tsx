@@ -3,7 +3,7 @@
 import React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { AccountProvider } from "@/components/account/AccountProvider"
+// AccountProvider is now in root layout (Providers) — no local wrapper needed
 
 function AccountSidebar() {
   const pathname = usePathname();
@@ -65,13 +65,11 @@ function AccountSidebar() {
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
   return (
-    <AccountProvider>
-      <div className="max-w-7xl mx-auto px-gutter py-stack-lg flex flex-col md:flex-row gap-stack-lg min-h-[calc(100vh-88px)]">
-        <AccountSidebar />
-        <div className="flex-1 space-y-stack-lg min-w-0">
-          {children}
-        </div>
+    <div className="max-w-7xl mx-auto px-gutter py-stack-lg flex flex-col md:flex-row gap-stack-lg min-h-[calc(100vh-88px)]">
+      <AccountSidebar />
+      <div className="flex-1 space-y-stack-lg min-w-0">
+        {children}
       </div>
-    </AccountProvider>
+    </div>
   )
 }

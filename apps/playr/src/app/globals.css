@@ -2,23 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Ticker Animation ─── */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ─── Utilities ─── */
 @layer utilities {
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
-  .bento-card { background: #DCD5C4; border: 1px solid rgba(0,0,0,0.1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-  .bento-card:hover { border-color: rgba(0,0,0,0.2); transform: translateY(-4px); }
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .bento-card {
+    background: #DCD5C4;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .bento-card:hover {
+    border-color: rgba(0,0,0,0.2);
+    transform: translateY(-4px);
+  }
+
   .quick-add { opacity: 0; transform: translateY(10px); transition: all 0.3s ease; }
   .bento-card:hover .quick-add { opacity: 1; transform: translateY(0); }
+
   .custom-scrollbar::-webkit-scrollbar { width: 4px; }
   .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
   .custom-scrollbar::-webkit-scrollbar-thumb { background: #7b7767; border-radius: 10px; }
-  .glass-header { background: rgba(255, 249, 237, 0.8); backdrop-filter: blur(12px); }
+
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .glass-header { background: rgba(254, 249, 239, 0.8); backdrop-filter: blur(12px); }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Ticker scroll */
+  .ticker-container {
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  .ticker-wrapper {
+    display: flex;
+    animation: ticker-scroll 30s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* XP progress bar shimmer */
+  @keyframes shimmer {
+    0% { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .xp-bar-fill {
+    background: linear-gradient(90deg, #ebde87 0%, #d4c874 40%, #f1e48d 60%, #d4c874 100%);
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
 }
 
+/* ─── Base ─── */
 @layer base {
   :root {
-    --background: 44 68% 96%; /* #fdf9f0 */
-    --foreground: 0 0% 10%; /* #1a1a1a */
-    --primary: 44 18% 44%; /* #867b5d */
+    --background: 44 68% 96%;
+    --foreground: 0 0% 10%;
+    --primary: 44 18% 44%;
     --primary-foreground: 44 68% 96%;
     --radius: 0.5rem;
   }
@@ -28,12 +84,9 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: var(--font-chivo), sans-serif;
+    font-family: var(--font-inter), sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-sora), sans-serif;
-  }
-  .font-playfair {
-    font-family: var(--font-playfair), serif;
+    font-family: var(--font-chivo), sans-serif;
   }
 }

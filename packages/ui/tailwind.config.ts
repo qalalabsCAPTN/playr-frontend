@@ -51,14 +51,14 @@ const config: Omit<Config, 'content'> = {
         "on-tertiary": "#ffffff",
         "on-surface": "#1d1c16",
         "on-primary-fixed-variant": "#4f4700",
-        // Keeping legacy accent for older components temporarily until they are swapped out
+        // Legacy aliases — migrate components away from these
         "accent": "#867b5d",
-        "action-yellow": "#685f15", // mapping to primary
-        "onyx-gray": "#7b7767", // mapping to outline
-        "parchment-base": "#f8f3e9", // mapping to surface-container-low
+        "action-yellow": "#685f15",
+        "onyx-gray": "#7b7767",
+        "parchment-base": "#f8f3e9",
       },
       boxShadow: {
-        'block': '4px 4px 0px 0px rgba(29, 28, 22, 1)', // block-shadow using on-surface color
+        'block': '4px 4px 0px 0px rgba(29, 28, 22, 1)',
       },
       borderRadius: {
         DEFAULT: "0.5rem",
@@ -77,31 +77,62 @@ const config: Omit<Config, 'content'> = {
         xs: "4px",
         "margin-desktop": "48px",
         xl: "64px",
-        lg: "40px"
+        lg: "40px",
+        // Section rhythm
+        "section-gap-sm": "48px",
+        "section-gap-md": "80px",
+        "section-gap-lg": "128px",
+        // Container margin aliases (matches margin-mobile/desktop)
+        "container-margin-mobile": "16px",
+        "container-margin-desktop": "48px",
+        // Stack tokens for account / dashboard layouts
+        "stack-xs": "8px",
+        "stack-sm": "12px",
+        "stack-md": "24px",
+        "stack-lg": "40px",
+        "stack-xl": "64px",
+      },
+      maxWidth: {
+        "max-width": "1440px",
+        "container-max": "1440px",
       },
       fontFamily: {
+        "headline-xl": ["Chivo", "sans-serif"],
         "headline-md": ["Chivo", "sans-serif"],
-        "label-md": ["Inter", "sans-serif"],
         "headline-lg": ["Chivo", "sans-serif"],
+        "headline-sm": ["Chivo", "sans-serif"],
+        "display-xl": ["Chivo", "sans-serif"],
         "display-lg": ["Chivo", "sans-serif"],
+        "display": ["Chivo", "sans-serif"],
+        "headline": ["Chivo", "sans-serif"],
+        "label-xl": ["Inter", "sans-serif"],
+        "label-lg": ["Inter", "sans-serif"],
+        "label-md": ["Inter", "sans-serif"],
         "label-sm": ["Inter", "sans-serif"],
-        "headline-lg-mobile": ["Chivo", "sans-serif"],
+        "label-bold": ["Inter", "sans-serif"],
         "body-lg": ["Inter", "sans-serif"],
         "body-md": ["Inter", "sans-serif"],
-        "headline": ["Chivo", "sans-serif"],
-        "display": ["Chivo", "sans-serif"],
+        "body-sm": ["Inter", "sans-serif"],
         "body": ["Inter", "sans-serif"],
-        "label": ["Inter", "sans-serif"]
+        "label": ["Inter", "sans-serif"],
       },
       fontSize: {
-        "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "700"}],
-        "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}],
-        "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "800"}],
+        "display-xl": ["72px", {lineHeight: "1.0", letterSpacing: "-0.03em", fontWeight: "900"}],
         "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "900"}],
-        "label-sm": ["12px", {lineHeight: "1.2", fontWeight: "500"}],
+        "headline-xl": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "900"}],
+        "headline-xl-mobile": ["36px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "900"}],
+        "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "800"}],
         "headline-lg-mobile": ["28px", {lineHeight: "1.2", fontWeight: "800"}],
+        "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "700"}],
+        "headline-sm": ["20px", {lineHeight: "1.3", letterSpacing: "-0.01em", fontWeight: "700"}],
         "body-lg": ["18px", {lineHeight: "1.6", fontWeight: "400"}],
-        "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}]
+        "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
+        "body-sm": ["14px", {lineHeight: "1.5", fontWeight: "400"}],
+        "label-xl": ["18px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "700"}],
+        "label-lg": ["16px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}],
+        "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}],
+        "label-sm": ["12px", {lineHeight: "1.2", fontWeight: "500"}],
+        "label-bold": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "700"}],
       }
     },
   },
