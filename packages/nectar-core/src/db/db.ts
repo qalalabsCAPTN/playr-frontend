@@ -11,39 +11,12 @@ export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-// Local JSON File DB config dynamically resolved relative to the monorepo root
-function findDbPath(): string {
-  // Traverse up from __dirname to find the monorepo root
-  try {
-    let dir = __dirname;
-    for (let i = 0; i < 6; i++) {
-      if (fs.existsSync(path.join(dir, 'pnpm-workspace.yaml')) || fs.existsSync(path.join(dir, 'turbo.json'))) {
-        return path.join(dir, 'db_store.json');
-      }
-      const parent = path.dirname(dir);
-      if (parent === dir) break;
-      dir = parent;
-    }
-  } catch {}
-
-  // Traverse up from process.cwd() as fallback
-  try {
-    let cwd = process.cwd();
-    for (let i = 0; i < 4; i++) {
-      if (fs.existsSync(path.join(cwd, 'pnpm-workspace.yaml')) || fs.existsSync(path.join(cwd, 'turbo.json'))) {
-        return path.join(cwd, 'db_store.json');
-      }
-      const parent = path.dirname(cwd);
-      if (parent === cwd) break;
-      cwd = parent;
-    }
-  } catch {}
-
-  // Ultimate fallback to current working directory
-  return path.join(process.cwd(), 'db_store.json');
-}
-
-const DB_FILE_PATH = findDbPath();
+// Local JSON File DB config - statically analyzable to prevent Next.js node-file-trace from bundling the whole project
+const DB_FILE_PATH = process.env.VERCEL
+  ? path.resolve(process.cwd(), '..', '..', 'db_store.json')
+  : fs.existsSync(path.resolve(process.cwd(), 'db_store.json'))
+    ? path.resolve(process.cwd(), 'db_store.json')
+    : path.join('c:', 'Users', 'pc', 'Desktop', 'playR', 'db_store.json');
 
 // Default Seed Data
 const DEFAULT_PRODUCTS = [
