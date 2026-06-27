@@ -11,8 +11,39 @@ export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseKey)
   : null;
 
-// Local JSON File DB config
-const DB_FILE_PATH = path.join('c:', 'Users', 'pc', 'Desktop', 'playR', 'db_store.json');
+// Local JSON File DB config dynamically resolved relative to the monorepo root
+function findDbPath(): string {
+  // Traverse up from __dirname to find the monorepo root
+  try {
+    let dir = __dirname;
+    for (let i = 0; i < 6; i++) {
+      if (fs.existsSync(path.join(dir, 'pnpm-workspace.yaml')) || fs.existsSync(path.join(dir, 'turbo.json'))) {
+        return path.join(dir, 'db_store.json');
+      }
+      const parent = path.dirname(dir);
+      if (parent === dir) break;
+      dir = parent;
+    }
+  } catch {}
+
+  // Traverse up from process.cwd() as fallback
+  try {
+    let cwd = process.cwd();
+    for (let i = 0; i < 4; i++) {
+      if (fs.existsSync(path.join(cwd, 'pnpm-workspace.yaml')) || fs.existsSync(path.join(cwd, 'turbo.json'))) {
+        return path.join(cwd, 'db_store.json');
+      }
+      const parent = path.dirname(cwd);
+      if (parent === cwd) break;
+      cwd = parent;
+    }
+  } catch {}
+
+  // Ultimate fallback to current working directory
+  return path.join(process.cwd(), 'db_store.json');
+}
+
+const DB_FILE_PATH = findDbPath();
 
 // Default Seed Data
 const DEFAULT_PRODUCTS = [
