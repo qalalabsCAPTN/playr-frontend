@@ -842,23 +842,53 @@ const INITIAL_DB_STATE = {
   community_feed: DEFAULT_COMMUNITY_FEED
 };
 
+// Memory cache for DB state to prevent read/write cycles and support read-only platforms
+let memoryDbState: typeof INITIAL_DB_STATE | null = null;
+
 // Initialize database
 function loadDbData(): typeof INITIAL_DB_STATE {
+  if (memoryDbState) {
+    return memoryDbState;
+  }
+
+  const isReadOnlyEnv = !!process.env.VERCEL;
+
   if (!fs.existsSync(DB_FILE_PATH)) {
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+    if (isReadOnlyEnv) {
+      memoryDbState = INITIAL_DB_STATE;
+      return INITIAL_DB_STATE;
+    }
+    try {
+      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+    } catch (e) {
+      console.warn("Failed to write db_store.json in read-only environment, using memory fallback", e);
+    }
+    memoryDbState = INITIAL_DB_STATE;
     return INITIAL_DB_STATE;
   }
+
   try {
     const content = fs.readFileSync(DB_FILE_PATH, 'utf-8');
-    return JSON.parse(content);
+    memoryDbState = JSON.parse(content);
+    return memoryDbState!;
   } catch (e) {
     console.error("Failed to parse db_store.json, resetting to defaults", e);
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+    if (!isReadOnlyEnv) {
+      try {
+        fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+      } catch (err) {}
+    }
+    memoryDbState = INITIAL_DB_STATE;
     return INITIAL_DB_STATE;
   }
 }
 
 function saveDbData(data: typeof INITIAL_DB_STATE) {
+  memoryDbState = data;
+  if (process.env.VERCEL) {
+    // Return early in read-only Vercel environment
+    return;
+  }
   try {
     fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2));
   } catch (e) {
