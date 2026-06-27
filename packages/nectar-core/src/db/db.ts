@@ -12,11 +12,16 @@ export const supabase = isSupabaseConfigured
   : null;
 
 // Local JSON File DB config - statically analyzable to prevent Next.js node-file-trace from bundling the whole project
-const DB_FILE_PATH = process.env.VERCEL
-  ? path.resolve(process.cwd(), '..', '..', 'db_store.json')
-  : fs.existsSync(path.resolve(process.cwd(), 'db_store.json'))
-    ? path.resolve(process.cwd(), 'db_store.json')
-    : path.join('c:', 'Users', 'pc', 'Desktop', 'playR', 'db_store.json');
+function getDbFilePath(): string {
+  if (typeof window !== 'undefined') {
+    return 'db_store.json';
+  }
+  return process.env.VERCEL
+    ? path.resolve(process.cwd(), '..', '..', 'db_store.json')
+    : fs.existsSync(path.resolve(process.cwd(), 'db_store.json'))
+      ? path.resolve(process.cwd(), 'db_store.json')
+      : path.join('c:', 'Users', 'pc', 'Desktop', 'playR', 'db_store.json');
+}
 
 // Default Seed Data
 const DEFAULT_PRODUCTS = [
@@ -852,14 +857,15 @@ function loadDbData(): typeof INITIAL_DB_STATE {
   }
 
   const isReadOnlyEnv = !!process.env.VERCEL;
+  const dbPath = getDbFilePath();
 
-  if (!fs.existsSync(DB_FILE_PATH)) {
+  if (!fs.existsSync(dbPath)) {
     if (isReadOnlyEnv) {
       memoryDbState = INITIAL_DB_STATE;
       return INITIAL_DB_STATE;
     }
     try {
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+      fs.writeFileSync(dbPath, JSON.stringify(INITIAL_DB_STATE, null, 2));
     } catch (e) {
       console.warn("Failed to write db_store.json in read-only environment, using memory fallback", e);
     }
@@ -868,14 +874,14 @@ function loadDbData(): typeof INITIAL_DB_STATE {
   }
 
   try {
-    const content = fs.readFileSync(DB_FILE_PATH, 'utf-8');
+    const content = fs.readFileSync(dbPath, 'utf-8');
     memoryDbState = JSON.parse(content);
     return memoryDbState!;
   } catch (e) {
     console.error("Failed to parse db_store.json, resetting to defaults", e);
     if (!isReadOnlyEnv) {
       try {
-        fs.writeFileSync(DB_FILE_PATH, JSON.stringify(INITIAL_DB_STATE, null, 2));
+        fs.writeFileSync(dbPath, JSON.stringify(INITIAL_DB_STATE, null, 2));
       } catch (err) {}
     }
     memoryDbState = INITIAL_DB_STATE;
@@ -890,7 +896,7 @@ function saveDbData(data: typeof INITIAL_DB_STATE) {
     return;
   }
   try {
-    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2));
+    fs.writeFileSync(getDbFilePath(), JSON.stringify(data, null, 2));
   } catch (e) {
     console.error("Failed to write db_store.json", e);
   }
