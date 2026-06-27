@@ -126,9 +126,11 @@ export default function CartPage() {
               </div>
             )}
 
-            <button className="w-full py-5 bg-primary-container text-on-surface font-headline-md uppercase rounded-full hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-[0.98] transition-all">
-              Checkout
-            </button>
+            <Link href="/checkout" className="block w-full">
+              <button className="w-full py-5 bg-primary-container text-on-surface font-headline-md uppercase rounded-full hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:scale-[0.98] transition-all">
+                Checkout
+              </button>
+            </Link>
           </div>
         </aside>
       </div>

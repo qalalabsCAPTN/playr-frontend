@@ -16,65 +16,67 @@ export default function TrackingDashboard() {
   }
 
   return (
-    <div className="space-y-stack-lg">
-      <div className="flex justify-between items-center px-2">
-        <h3 className="font-headline-md text-headline-md uppercase tracking-tight">Track Your Shipment</h3>
+    <div className="space-y-8">
+      <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4">
+        <h1 className="font-black text-3xl uppercase tracking-tighter text-on-surface">Track Shipment</h1>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative w-full h-[300px] rounded-xl flex flex-col items-center justify-center text-center px-4 overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-on-surface">
-          {/* We use a solid color here, mimicking the athletic brand identity */}
+      <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden relative">
+        {/* Background Graphic */}
+        <div className="absolute right-0 top-0 w-1/2 h-full opacity-5 pointer-events-none overflow-hidden">
+          <span className="material-symbols-outlined text-[400px] absolute -right-20 -top-20">local_shipping</span>
         </div>
-        <div className="relative z-10 text-white">
-          <p className="font-body-lg text-body-lg text-surface-variant max-w-lg mx-auto">Get real-time updates on your high-performance gear. Enter your details below to see where your journey stands.</p>
-        </div>
-        <div className="absolute -right-10 -bottom-10 opacity-10">
-          <span className="material-symbols-outlined text-[200px]" data-icon="local_shipping">local_shipping</span>
-        </div>
-      </section>
 
-      {/* Tracking Form Section */}
-      <section className="max-w-2xl mx-auto -mt-16 relative z-20">
-        <div className="bg-surface-container-lowest p-8 md:p-10 rounded-xl border border-accent-grey/20 shadow-sm h-full">
-          <h2 className="font-headline-md text-headline-md mb-8">Search Details</h2>
+        <div className="p-8 md:p-12 relative z-10 max-w-2xl">
+          <div className="bg-primary-container text-on-primary-container w-16 h-16 rounded-2xl flex items-center justify-center mb-8">
+            <span className="material-symbols-outlined text-3xl">location_on</span>
+          </div>
+          
+          <h2 className="font-black text-3xl uppercase tracking-tight text-on-surface mb-3">Where is my order?</h2>
+          <p className="font-medium text-sm text-on-surface-variant mb-10 leading-relaxed">
+            Enter your tracking number or order ID below to get real-time updates on your high-performance gear.
+          </p>
+
           <form className="space-y-6" onSubmit={handleTrack}>
             <div className="space-y-2">
-              <label className="font-label-bold text-label-bold block uppercase">Order ID / Tracking Number</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Order ID / Tracking Number</label>
               <input 
                 value={orderId}
                 onChange={(e) => setOrderId(e.target.value)}
-                className="w-full bg-surface px-6 py-4 rounded-lg border border-accent-grey/30 focus:border-on-surface focus:ring-0 transition-all outline-none font-body-md" 
+                className="w-full bg-surface-container/50 border border-outline-variant/30 rounded-2xl px-5 py-4 text-sm font-medium focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
                 placeholder="e.g. PR-882931" 
                 type="text"
                 required
               />
             </div>
             <div className="space-y-2">
-              <label className="font-label-bold text-label-bold block uppercase">Email or Phone Number</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">Email or Phone Number</label>
               <input 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-surface px-6 py-4 rounded-lg border border-accent-grey/30 focus:border-on-surface focus:ring-0 transition-all outline-none font-body-md" 
+                className="w-full bg-surface-container/50 border border-outline-variant/30 rounded-2xl px-5 py-4 text-sm font-medium focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all" 
                 placeholder="athlete@playr.com" 
                 type="text"
               />
             </div>
-            <button 
-              className="w-full bg-action-yellow text-on-surface font-label-bold text-label-bold py-5 rounded-lg hover:scale-[1.01] active:scale-95 transition-all shadow-md uppercase tracking-widest" 
-              type="submit"
-            >
-              Track Shipment
-            </button>
+            <div className="pt-4">
+              <button 
+                className="w-full bg-primary text-on-primary py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity" 
+                type="submit"
+              >
+                Track Shipment
+              </button>
+            </div>
           </form>
-          <div className="mt-8 pt-8 border-t border-outline-variant/30">
-            <p className="font-label-sm text-label-sm text-secondary flex items-center gap-2">
-              <span className="material-symbols-outlined text-sm">info</span>
-              Need help? Contact our support team at support@playr.athletics
+
+          <div className="mt-10 pt-8 border-t border-outline-variant/30">
+            <p className="text-xs font-medium text-on-surface-variant flex items-center gap-2">
+              <span className="material-symbols-outlined text-sm">support_agent</span>
+              Need help? Contact our support team at <strong className="text-on-surface">support@playr.athletics</strong>
             </p>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
+import { cn } from '@playr/ui';
+
 const MEGA_MENU_DATA = [
   {
     title: 'Category',
@@ -36,17 +38,28 @@ const MEGA_MENU_DATA = [
   }
 ];
 
-export function MegaMenu() {
+export function MegaMenu({ scrolled }: { scrolled: boolean }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
   return (
     <nav className="hidden lg:flex items-center h-full gap-8 relative" onMouseLeave={() => setActiveMenu(null)}>
       {MEGA_MENU_DATA.map((item) => (
         <div key={item.title} className="h-full flex items-center" onMouseEnter={() => setActiveMenu(item.title)}>
-          <button className="text-sm font-semibold tracking-wide uppercase hover:text-[#867b5d] transition-colors py-6 relative">
+          <button className={cn(
+            "text-sm font-semibold tracking-wide uppercase transition-colors py-6 relative duration-300",
+            scrolled
+              ? "text-on-surface hover:text-[#867b5d]"
+              : "text-white/80 hover:text-white"
+          )}>
             {item.title}
             {activeMenu === item.title && (
-              <motion.div layoutId="nav-indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#867b5d]" />
+              <motion.div
+                layoutId="nav-indicator"
+                className={cn(
+                  "absolute bottom-0 left-0 right-0 h-0.5",
+                  scrolled ? "bg-[#867b5d]" : "bg-white"
+                )}
+              />
             )}
           </button>
         </div>

@@ -42,4 +42,5 @@ yarn-error.log*
 # Vercel
 .vercel
 
-.vercel
+# Local Database Store
+db_store.json

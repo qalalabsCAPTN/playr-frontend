@@ -18,14 +18,18 @@ function CheckoutForm() {
     paymentMethod, setPaymentMethod,
     walletBalance, applyWallet, setApplyWallet,
     rewardsPoints, applyRewards, setApplyRewards,
-    isProcessing, error, submitCheckout 
+    isProcessing, error, submitCheckout,
+    discount, appliedCoupon, applyPromoCode,
+    promoCode, setPromoCode
   } = useCheckout()
 
   // Calculate actual total based on checkout state
   const shippingCost = shippingMethod === 'express' ? 150 : 0;
-  let finalTotal = cartSubtotal + shippingCost;
+  let finalTotal = cartSubtotal + shippingCost - discount;
+  if (finalTotal < 0) finalTotal = 0;
   if (applyWallet) finalTotal -= Math.min(walletBalance, finalTotal);
   if (applyRewards) finalTotal -= Math.min(rewardsPoints / 10, finalTotal);
+  if (finalTotal < 0) finalTotal = 0;
 
   return (
     <main className="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-12">
@@ -401,12 +405,27 @@ function CheckoutForm() {
                 </div>
               ))}
             </div>
-            
-            <div className="border-t border-secondary/10 pt-6">
+                      <div className="border-t border-secondary/10 pt-6">
               <div className="flex gap-2">
-                <input className="flex-grow bg-surface-container border border-secondary/30 rounded-xl px-4 py-3 text-body-md outline-none" placeholder="Discount code" type="text" />
-                <button className="bg-secondary text-on-secondary px-6 rounded-xl font-label-lg hover:bg-secondary/90 transition-colors uppercase tracking-wider">Apply</button>
+                <input 
+                  className="flex-grow bg-surface-container border border-secondary/30 rounded-xl px-4 py-3 text-body-md outline-none" 
+                  placeholder="Discount code" 
+                  type="text" 
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value)}
+                />
+                <button 
+                  onClick={() => applyPromoCode(promoCode)}
+                  className="bg-secondary text-on-secondary px-6 rounded-xl font-label-lg hover:bg-secondary/90 transition-colors uppercase tracking-wider"
+                >
+                  Apply
+                </button>
               </div>
+              {appliedCoupon && (
+                <p className="text-xs text-green-200 font-medium mt-2">
+                  Coupon <span className="font-bold">{appliedCoupon}</span> applied (₹{discount} off)
+                </p>
+              )}
             </div>
             
             <div className="space-y-3 pt-4">
@@ -414,6 +433,12 @@ function CheckoutForm() {
                 <span className="text-white">Subtotal</span>
                 <span className="font-bold text-white">₹{cartSubtotal.toLocaleString('en-IN')}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-body-md">
+                  <span className="text-white">Discount</span>
+                  <span className="font-bold text-green-200">- ₹{discount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div className="flex justify-between text-body-md">
                 <span className="text-white">Shipping</span>
                 <span className={`font-bold ${shippingMethod === 'standard' ? 'text-primary-container bg-primary/10 px-2 py-0.5 rounded text-sm' : 'text-white'}`}>

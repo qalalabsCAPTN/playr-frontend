@@ -33,26 +33,41 @@ export function Header() {
 
         {/* Left: Mobile Nav Toggle & Logo */}
         <div className="flex items-center gap-4 lg:gap-12 h-full">
-          <MobileNav />
+          <MobileNav scrolled={scrolled} />
           <Link href="/" className="flex items-center space-x-2 shrink-0 group">
-            <span className="font-black text-4xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-on-surface to-on-surface/60 group-hover:from-primary group-hover:to-primary-container transition-all duration-300">
+            <span className={cn(
+              "font-black text-4xl tracking-tighter bg-clip-text text-transparent bg-gradient-to-r transition-all duration-300",
+              scrolled
+                ? "from-on-surface to-on-surface/60 group-hover:from-primary group-hover:to-primary-container"
+                : "from-white to-white/80 group-hover:from-white group-hover:to-white/60"
+            )}>
               playR
             </span>
           </Link>
           <div className="hidden lg:block">
-            <MegaMenu />
+            <MegaMenu scrolled={scrolled} />
           </div>
         </div>
 
         {/* Centre: XP progress (logged-in users, desktop only) */}
         <div className="hidden lg:flex items-center">
-          <XPHeader />
+          <XPHeader scrolled={scrolled} />
         </div>
 
         {/* Right: Actions */}
         <div className="flex items-center gap-3 sm:gap-6">
           <Link href="/wishlist" className="hidden sm:flex">
-            <Button variant="ghost" size="icon" className="hover:text-primary relative hover:bg-surface-container rounded-full transition-colors" aria-label="Wishlist">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "relative rounded-full transition-all duration-300",
+                scrolled
+                  ? "text-on-surface hover:text-primary hover:bg-surface-container"
+                  : "text-white hover:text-white/80 hover:bg-white/10"
+              )}
+              aria-label="Wishlist"
+            >
               <Heart className="w-5 h-5" />
               {wishlistItems.length > 0 && (
                 <span className="absolute top-0 right-0 bg-error text-on-error text-[10px] font-bold w-4 h-4 flex items-center justify-center rounded-full ring-2 ring-surface">
@@ -62,7 +77,17 @@ export function Header() {
             </Button>
           </Link>
           <Link href="/account">
-            <Button variant="ghost" size="icon" className="hover:text-primary hover:bg-surface-container rounded-full transition-colors" aria-label="Account">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "rounded-full transition-all duration-300",
+                scrolled
+                  ? "text-on-surface hover:text-primary hover:bg-surface-container"
+                  : "text-white hover:text-white/80 hover:bg-white/10"
+              )}
+              aria-label="Account"
+            >
               <User className="w-5 h-5" />
             </Button>
           </Link>

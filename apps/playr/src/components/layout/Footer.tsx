@@ -1,6 +1,39 @@
+"use client"
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 
 export function Footer() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    setLoading(true);
+    setStatus('');
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setStatus('Subscribed successfully!');
+        setEmail('');
+      } else {
+        const data = await res.json();
+        setStatus(data.error || 'Failed to subscribe.');
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <footer className="bg-inverse-surface text-inverse-on-surface pt-24 pb-12 relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-container/5 rounded-full blur-[150px] pointer-events-none" />
@@ -15,16 +48,28 @@ export function Footer() {
           <p className="text-inverse-on-surface/50 mb-8 max-w-sm leading-relaxed">
             Engineered for elite performance. Designed for everyday greatness. Join the movement of champions.
           </p>
-          <div className="flex gap-4">
-            <input
-              type="email"
-              placeholder="Join the newsletter"
-              className="bg-inverse-on-surface/5 border border-inverse-on-surface/15 rounded-full px-6 py-3 w-full text-sm text-inverse-on-surface placeholder:text-inverse-on-surface/30 focus:outline-none focus:ring-1 focus:ring-primary-container transition-all"
-            />
-            <button className="bg-inverse-on-surface text-inverse-surface font-bold uppercase text-xs tracking-widest px-6 py-3 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-colors whitespace-nowrap">
-              Subscribe
-            </button>
-          </div>
+          <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
+            <div className="flex gap-4">
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Join the newsletter"
+                className="bg-inverse-on-surface/5 border border-inverse-on-surface/15 rounded-full px-6 py-3 w-full text-sm text-inverse-on-surface placeholder:text-inverse-on-surface/30 focus:outline-none focus:ring-1 focus:ring-primary-container transition-all"
+              />
+              <button 
+                type="submit"
+                disabled={loading}
+                className="bg-inverse-on-surface text-inverse-surface font-bold uppercase text-xs tracking-widest px-6 py-3 rounded-full hover:bg-primary-container hover:text-on-primary-container transition-colors whitespace-nowrap disabled:opacity-50"
+              >
+                {loading ? 'Subscribing...' : 'Subscribe'}
+              </button>
+            </div>
+            {status && (
+              <p className="text-xs text-primary-container font-medium mt-1">{status}</p>
+            )}
+          </form>
         </div>
 
         {/* Shop */}

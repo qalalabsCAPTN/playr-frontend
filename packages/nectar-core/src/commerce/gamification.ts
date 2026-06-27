@@ -295,15 +295,60 @@ export class NectarLoyaltyAdapter {
     this.client = client;
   }
 
+  private calculateXPState(userId: string, xp: number): XPState {
+    let currentTier = DEV_TIERS.bronze;
+    let nextTier: XPTier | null = DEV_TIERS.silver;
+    let xpToNextTier: number | null = 500 - xp;
+    let progressPercent = Math.min(100, Math.max(0, (xp / 500) * 100));
+
+    if (xp >= 5000) {
+      currentTier = DEV_TIERS.elite;
+      nextTier = null;
+      xpToNextTier = null;
+      progressPercent = 100;
+    } else if (xp >= 2000) {
+      currentTier = DEV_TIERS.gold;
+      nextTier = DEV_TIERS.elite;
+      xpToNextTier = 5000 - xp;
+      progressPercent = Math.min(100, Math.max(0, ((xp - 2000) / 3000) * 100));
+    } else if (xp >= 500) {
+      currentTier = DEV_TIERS.silver;
+      nextTier = DEV_TIERS.gold;
+      xpToNextTier = 2000 - xp;
+      progressPercent = Math.min(100, Math.max(0, ((xp - 500) / 1500) * 100));
+    }
+
+    return {
+      userId,
+      totalXP: xp,
+      currentTier,
+      nextTier,
+      xpToNextTier,
+      progressPercent
+    };
+  }
+
   /**
    * Get the authenticated user's full XP/tier state.
-   * NECTAR backend owns all calculations — frontend renders only.
    */
   async getUserXP(userId: string): Promise<XPState> {
+    if (typeof window === 'undefined') {
+      const { getDbUserById } = require('../db/db');
+      const user = await getDbUserById(userId);
+      if (user) {
+        return this.calculateXPState(userId, user.xp || 0);
+      }
+    }
+
     try {
       return await this.client.get<XPState>(`/api/loyalty/users/${userId}/xp`);
     } catch {
-      console.warn('[NECTAR Loyalty] getUserXP: BFF unavailable, using dev fallback');
+      console.warn('[NECTAR Loyalty] getUserXP: BFF unavailable, using db fallback');
+      const { getDbUserById } = require('../db/db');
+      const user = await getDbUserById(userId);
+      if (user) {
+        return this.calculateXPState(userId, user.xp || 0);
+      }
       return { ...DEV_FALLBACK_XP, userId };
     }
   }
@@ -313,24 +358,180 @@ export class NectarLoyaltyAdapter {
    * With userId = personalized progress + status included.
    */
   async getChallenges(userId?: string): Promise<Challenge[]> {
+    let ordersCount = 0;
+    let reviewsCount = 0;
+    let userXP = 0;
+    let userWalletTransactions: any[] = [];
+
+    if (typeof window === 'undefined' && userId) {
+      const { getDbOrdersByUserId, getDbUserById } = require('../db/db');
+      try {
+        const orders = await getDbOrdersByUserId(userId);
+        ordersCount = orders.length;
+        
+        const user = await getDbUserById(userId);
+        if (user) {
+          userXP = user.xp || 0;
+          userWalletTransactions = user.walletTransactions || [];
+          const { getDbAuditLogs } = require('../db/db');
+          const logs = await getDbAuditLogs();
+          reviewsCount = logs.filter((l: any) => l.userId === userId && l.action === 'write_review').length;
+        }
+      } catch (e) {}
+    }
+
+    const resolveChallenges = (ordersQty: number, reviewsQty: number, xp: number, walletTxns: any[]): Challenge[] => {
+      const hasTopup = walletTxns.some((t: any) => t.type === 'credit' && t.amount >= 1000 && t.description.toLowerCase().includes('topup'));
+      return [
+        {
+          id: 'ch_first_purchase',
+          title: 'First Purchase',
+          description: 'Complete your first order and unlock Silver status bonus XP.',
+          xpReward: 500,
+          type: 'purchase',
+          status: ordersQty >= 1 ? 'completed' : 'active',
+          badgeIcon: 'shopping_bag',
+          progressCurrent: ordersQty >= 1 ? 1 : 0,
+          progressTotal: 1,
+          isPersonalized: true
+        },
+        {
+          id: 'ch_review',
+          title: 'Leave a Review',
+          description: 'Write an honest product review and help the community.',
+          xpReward: 200,
+          type: 'review',
+          status: reviewsQty >= 1 ? 'completed' : 'active',
+          badgeIcon: 'reviews',
+          progressCurrent: reviewsQty >= 1 ? 1 : 0,
+          progressTotal: 1,
+          isPersonalized: true
+        },
+        {
+          id: 'ch_refer_friend',
+          title: 'Refer a Friend',
+          description: 'Invite a teammate — you both unlock bonus XP.',
+          xpReward: 1000,
+          type: 'referral',
+          status: 'active',
+          badgeIcon: 'group_add',
+          progressCurrent: 0,
+          progressTotal: 1,
+          isPersonalized: true
+        },
+        {
+          id: 'ch_triple_purchase',
+          title: '3-Order Streak',
+          description: 'Complete 3 orders in a single season.',
+          xpReward: 750,
+          type: 'streak',
+          status: ordersQty >= 3 ? 'completed' : 'active',
+          progressCurrent: Math.min(3, ordersQty),
+          progressTotal: 3,
+          badgeIcon: 'local_fire_department',
+          isPersonalized: true
+        },
+        {
+          id: 'ch_elite_club',
+          title: 'Join the Elite Club',
+          description: 'Achieve Elite status on the playR XP loyalty program.',
+          xpReward: 1000,
+          type: 'milestone',
+          status: xp >= 5000 ? 'completed' : 'active',
+          progressCurrent: xp >= 5000 ? 1 : 0,
+          progressTotal: 1,
+          badgeIcon: 'workspace_premium',
+          isPersonalized: true
+        },
+        {
+          id: 'ch_wallet_topup',
+          title: 'Wallet Power-Up',
+          description: 'Top up your NECTAR wallet with ₹1000+ in a single transaction.',
+          xpReward: 500,
+          type: 'milestone',
+          status: hasTopup ? 'completed' : 'active',
+          progressCurrent: hasTopup ? 1 : 0,
+          progressTotal: 1,
+          badgeIcon: 'account_balance_wallet',
+          isPersonalized: true
+        },
+        {
+          id: 'ch_share_look',
+          title: 'Share Your Look',
+          description: 'Post your playR kit on social media and tag us.',
+          xpReward: 300,
+          type: 'social',
+          status: 'upcoming',
+          badgeIcon: 'share',
+          isPersonalized: false
+        },
+        {
+          id: 'ch_ipl_bundle',
+          title: 'IPL Fan Bundle',
+          description: 'Purchase any IPL official jersey + accessories in one order.',
+          xpReward: 1500,
+          type: 'milestone',
+          status: 'active',
+          badgeIcon: 'sports_cricket',
+          isPersonalized: false
+        }
+      ];
+    };
+
+    if (typeof window === 'undefined') {
+      return resolveChallenges(ordersCount, reviewsCount, userXP, userWalletTransactions);
+    }
+
     try {
       const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
       return await this.client.get<Challenge[]>(`/api/loyalty/challenges${qs}`);
     } catch {
-      console.warn('[NECTAR Loyalty] getChallenges: BFF unavailable, using dev fallback');
-      return DEV_FALLBACK_CHALLENGES;
+      console.warn('[NECTAR Loyalty] getChallenges: BFF unavailable, using db fallback');
+      return resolveChallenges(ordersCount, reviewsCount, userXP, userWalletTransactions);
     }
   }
 
   /**
-   * Get available rewards for a user (availability depends on their tier + XP balance).
+   * Get available rewards for a user.
    */
   async getRewards(userId: string): Promise<Reward[]> {
+    let userXP = 0;
+    let userTier = 'bronze';
+    if (typeof window === 'undefined') {
+      const { getDbUserById } = require('../db/db');
+      const user = await getDbUserById(userId);
+      if (user) {
+        userXP = user.xp || 0;
+        userTier = user.tier || 'bronze';
+      }
+    }
+
+    const resolveRewards = (xp: number, tier: string): Reward[] => {
+      const tierLevels: Record<string, number> = { bronze: 0, silver: 1, gold: 2, elite: 3 };
+      const currentLevel = tierLevels[tier.toLowerCase()] || 0;
+
+      return DEV_FALLBACK_REWARDS.map(r => {
+        const minTierRequired = r.minTier ? r.minTier.toLowerCase() : 'bronze';
+        const minLevel = tierLevels[minTierRequired] || 0;
+        const hasPoints = xp >= r.xpCost;
+        const meetsTier = currentLevel >= minLevel;
+
+        return {
+          ...r,
+          isAvailable: hasPoints && meetsTier
+        };
+      });
+    };
+
+    if (typeof window === 'undefined') {
+      return resolveRewards(userXP, userTier);
+    }
+
     try {
       return await this.client.get<Reward[]>(`/api/loyalty/rewards?userId=${encodeURIComponent(userId)}`);
     } catch {
-      console.warn('[NECTAR Loyalty] getRewards: BFF unavailable, using dev fallback');
-      return DEV_FALLBACK_REWARDS;
+      console.warn('[NECTAR Loyalty] getRewards: BFF unavailable, using db fallback');
+      return resolveRewards(userXP, userTier);
     }
   }
 
@@ -339,57 +540,131 @@ export class NectarLoyaltyAdapter {
    */
   async getLeaderboard(
     period: 'all' | 'monthly' | 'weekly' = 'all',
-    limit = 50
+    limit = 50,
+    currentUserId?: string
   ): Promise<LeaderboardEntry[]> {
+    if (typeof window === 'undefined') {
+      const { getDbUsers } = require('../db/db');
+      const users = await getDbUsers();
+      const sorted = [...users].sort((a: any, b: any) => (b.xp || 0) - (a.xp || 0));
+      return sorted.slice(0, limit).map((u: any, idx: number) => ({
+        rank: idx + 1,
+        userId: u.id,
+        displayName: u.firstName + ' ' + u.lastName[0] + '.',
+        totalXP: u.xp || 0,
+        tierName: u.tier.charAt(0).toUpperCase() + u.tier.slice(1),
+        isCurrentUser: u.id === currentUserId
+      }));
+    }
+
     try {
+      const qs = currentUserId ? `&userId=${encodeURIComponent(currentUserId)}` : '';
       return await this.client.get<LeaderboardEntry[]>(
-        `/api/loyalty/leaderboard?period=${period}&limit=${limit}`
+        `/api/loyalty/leaderboard?period=${period}&limit=${limit}${qs}`
       );
     } catch {
-      console.warn('[NECTAR Loyalty] getLeaderboard: BFF unavailable, using dev fallback');
-      return DEV_FALLBACK_LEADERBOARD;
+      console.warn('[NECTAR Loyalty] getLeaderboard: BFF unavailable, using db fallback');
+      const { getDbUsers } = require('../db/db');
+      const users = require('../db/db').loadDbData().users; // read synchronous fallback
+      const sorted = [...users].sort((a: any, b: any) => (b.xp || 0) - (a.xp || 0));
+      return sorted.slice(0, 10).map((u: any, idx: number) => ({
+        rank: idx + 1,
+        userId: u.id,
+        displayName: u.firstName + ' ' + u.lastName[0] + '.',
+        totalXP: u.xp || 0,
+        tierName: u.tier.charAt(0).toUpperCase() + u.tier.slice(1),
+        isCurrentUser: u.id === currentUserId
+      }));
     }
   }
 
   /**
    * Get gamification context for a product page.
-   * NECTAR computes how much XP this product earns and which challenges it counts toward.
    */
   async getProductGamificationContext(
     productId: string,
     userId?: string
   ): Promise<GamificationProductContext> {
+    let userTier = 'bronze';
+    if (typeof window === 'undefined' && userId) {
+      const { getDbUserById } = require('../db/db');
+      const user = await getDbUserById(userId);
+      if (user) {
+        userTier = user.tier || 'bronze';
+      }
+    }
+
+    const resolveContext = (tier: string): GamificationProductContext => {
+      const multiplier = tier === 'elite' ? 0.15 : tier === 'gold' ? 0.10 : tier === 'silver' ? 0.05 : 0.0;
+      const baseXP = 150; // Standard reward base XP for product
+      const bonus = Math.round(baseXP * multiplier);
+      return {
+        productId,
+        xpEarned: baseXP,
+        tierBonus: bonus,
+        totalXPEarned: baseXP + bonus,
+        challengeContributions: [
+          { challengeId: 'ch_first_purchase', challengeTitle: 'First Purchase', contribution: '1 order' }
+        ]
+      };
+    };
+
+    if (typeof window === 'undefined') {
+      return resolveContext(userTier);
+    }
+
     try {
       const qs = userId ? `?userId=${encodeURIComponent(userId)}` : '';
       return await this.client.get<GamificationProductContext>(
         `/api/loyalty/products/${productId}/context${qs}`
       );
     } catch {
-      console.warn('[NECTAR Loyalty] getProductGamificationContext: BFF unavailable');
-      return {
-        productId,
-        xpEarned: 0,
-        tierBonus: 0,
-        totalXPEarned: 0,
-        challengeContributions: [],
-      };
+      return resolveContext(userTier);
     }
   }
 
   /**
    * Redeem a reward (consumes XP).
-   * Returns true on success.
    */
   async redeemReward(userId: string, rewardId: string): Promise<boolean> {
+    if (typeof window === 'undefined') {
+      const { getDbUserById, updateDbUser, addDbAuditLog } = require('../db/db');
+      const user = await getDbUserById(userId);
+      const reward = DEV_FALLBACK_REWARDS.find(r => r.id === rewardId);
+      if (user && reward && user.xp >= reward.xpCost) {
+        const newXP = user.xp - reward.xpCost;
+        // Re-calculate tier
+        let newTier = 'bronze';
+        if (newXP >= 5000) newTier = 'elite';
+        else if (newXP >= 2000) newTier = 'gold';
+        else if (newXP >= 500) newTier = 'silver';
+        
+        // Update user
+        await updateDbUser(userId, { xp: newXP, tier: newTier });
+        await addDbAuditLog(userId, 'redeem_reward', `Redeemed reward: ${reward.title} for ${reward.xpCost} XP.`);
+        return true;
+      }
+      return false;
+    }
+
     try {
       await this.client.post(`/api/loyalty/rewards/${rewardId}/redeem`, { userId });
       return true;
     } catch {
-      console.error('[NECTAR Loyalty] redeemReward: failed');
+      console.error('[NECTAR Loyalty] redeemReward: failed, running db fallback');
+      const { getDbUserById, updateDbUser, addDbAuditLog } = require('../db/db');
+      const user = await getDbUserById(userId);
+      const reward = DEV_FALLBACK_REWARDS.find(r => r.id === rewardId);
+      if (user && reward && user.xp >= reward.xpCost) {
+        await updateDbUser(userId, { xp: user.xp - reward.xpCost });
+        await addDbAuditLog(userId, 'redeem_reward', `Redeemed reward: ${reward.title}`);
+        return true;
+      }
       return false;
     }
   }
 }
+
 
 export const loyaltyAdapter = new NectarLoyaltyAdapter();
 

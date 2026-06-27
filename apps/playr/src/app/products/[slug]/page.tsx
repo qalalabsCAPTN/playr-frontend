@@ -6,31 +6,151 @@ import Image from "next/image"
 import { NectarCommerce, NECTARAnalytics, loyaltyAdapter } from "@playr/nectar-core"
 import type { GamificationProductContext } from "@playr/nectar-core"
 import { useCommerce } from "@/components/commerce/CommerceProvider"
-import { StockMeter, ProductCard } from "@playr/ui"
+import { StockMeter } from "@playr/ui"
+import { InteractiveProductCard } from "@/components/commerce/InteractiveProductCard"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
+import { cn } from "@playr/ui"
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
-  // We use React.use function for un-wrapping promises in Next.js 15 client components when fetching data this way, 
-  // but to keep it simple and avoid async in use-client for this phase, we mock the fetch in useEffect.
+  const router = useRouter();
+  const { data: session } = useSession();
   const [product, setProduct] = React.useState<any>(null)
   const [activeImage, setActiveImage] = React.useState("")
   const [activeAccordion, setActiveAccordion] = React.useState("desc")
-  const { addToCart } = useCommerce()
+  const { addToCart, wishlistItems, addToWishlist, removeFromWishlist } = useCommerce()
   const [relatedProducts, setRelatedProducts] = React.useState<any[]>([])
   const [gamificationCtx, setGamificationCtx] = React.useState<GamificationProductContext | null>(null)
+  const [recentlyViewed, setRecentlyViewed] = React.useState<any[]>([])
+
+  // Selection states
+  const [selectedColor, setSelectedColor] = React.useState<any>(null)
+  const [selectedSize, setSelectedSize] = React.useState<string>("")
+
+  // Reviews states
+  const [reviews, setReviews] = React.useState<any[]>([])
+  const [showReviewForm, setShowReviewForm] = React.useState(false)
+  const [reviewName, setReviewName] = React.useState("")
+  const [reviewRating, setReviewRating] = React.useState(5)
+  const [reviewComment, setReviewComment] = React.useState("")
+
+  const fetchReviews = React.useCallback((prodIdOrSlug: string) => {
+    fetch(`/api/products/${prodIdOrSlug}/reviews`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) {
+          setReviews(data)
+        }
+      })
+      .catch(err => console.error("Error fetching reviews", err))
+  }, [])
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!reviewName.trim() || !reviewComment.trim()) {
+      alert("Please fill in all fields.")
+      return
+    }
+
+    try {
+      const res = await fetch(`/api/products/${product.id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName: reviewName,
+          rating: reviewRating,
+          comment: reviewComment,
+          userId: (session?.user as any)?.id || null
+        })
+      })
+
+      if (res.ok) {
+        setReviewName("")
+        setReviewRating(5)
+        setReviewComment("")
+        setShowReviewForm(false)
+        fetchReviews(product.id)
+        // Refresh XP context
+        loyaltyAdapter.getProductGamificationContext(product.id).then(ctx => setGamificationCtx(ctx))
+        alert("Review submitted successfully! You earned +200 XP.")
+      } else {
+        const err = await res.json()
+        alert(err.error || "Failed to submit review")
+      }
+    } catch (err) {
+      console.error(err)
+      alert("Error submitting review")
+    }
+  }
 
   React.useEffect(() => {
     NectarCommerce.getProduct(resolvedParams.slug).then(p => {
       if (p) {
         setProduct(p)
         setActiveImage(p.imageSrc)
+        if (p.colors && p.colors.length > 0) {
+          setSelectedColor(p.colors[0])
+        }
+        if (p.sizes && p.sizes.length > 0) {
+          setSelectedSize(p.sizes[0])
+        }
         NECTARAnalytics.trackProductView(p)
         NectarCommerce.getRelatedProducts(p.specifications).then(related => setRelatedProducts(related))
         // Fetch XP context from NECTAR — never compute on frontend
         loyaltyAdapter.getProductGamificationContext(p.id).then(ctx => setGamificationCtx(ctx))
+        fetchReviews(p.id)
+
+        // Save to recently viewed
+        try {
+          const stored = localStorage.getItem("recently_viewed");
+          let list: string[] = stored ? JSON.parse(stored) : [];
+          list = [p.slug, ...list.filter(item => item !== p.slug)].slice(0, 5);
+          localStorage.setItem("recently_viewed", JSON.stringify(list));
+        } catch(e) {
+          console.error("Error saving recently viewed", e);
+        }
       }
     })
-  }, [resolvedParams.slug])
+  }, [resolvedParams.slug, fetchReviews])
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem("recently_viewed");
+      if (stored) {
+        const list: string[] = JSON.parse(stored);
+        const fetchOthers = list.filter(slug => slug !== resolvedParams.slug);
+        Promise.all(fetchOthers.map(slug => NectarCommerce.getProduct(slug)))
+          .then(res => setRecentlyViewed(res.filter(Boolean)));
+      }
+    } catch(e) {
+      console.error("Error loading recently viewed", e);
+    }
+  }, [resolvedParams.slug]);
+
+  // Reviews calculations
+  const totalReviews = reviews.length
+  const averageRating = totalReviews > 0
+    ? (reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews).toFixed(1)
+    : "0.0"
+
+  const starPercentages = [5, 4, 3, 2, 1].map(star => {
+    const count = reviews.filter(r => r.rating === star).length
+    const percentage = totalReviews > 0 ? Math.round((count / totalReviews) * 100) : 0
+    return { star, count, percentage }
+  })
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex text-primary gap-0.5">
+        {[1, 2, 3, 4, 5].map(i => (
+          <span key={i} className="material-symbols-outlined text-[18px]">
+            {i <= rating ? "star" : "star_outline"}
+          </span>
+        ))}
+      </div>
+    )
+  }
 
   if (!product) return (
     <main className="max-w-screen-2xl mx-auto px-4 md:px-container-margin-desktop pt-32 pb-24 animate-pulse">
@@ -125,13 +245,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           {/* Color Selection */}
           <div className="space-y-4">
             <span className="font-label-md text-on-surface font-bold uppercase tracking-wider">
-              Color: <span className="font-normal opacity-60">Blue Melange</span>
+              Color: <span className="font-normal opacity-60">{selectedColor?.name || "Default"}</span>
             </span>
             <div className="flex gap-3">
               {product.colors.map((c: any, i: number) => (
                 <button
                   key={i}
-                  className="w-10 h-10 rounded-full border-2 border-surface ring-2 ring-transparent transition-all hover:scale-110 active:scale-95 focus:ring-primary"
+                  onClick={() => setSelectedColor(c)}
+                  className={cn(
+                    "w-10 h-10 rounded-full border-2 transition-all hover:scale-110 active:scale-95",
+                    selectedColor?.name === c.name ? "border-primary ring-2 ring-primary-container" : "border-surface"
+                  )}
                   style={{ backgroundColor: c.hex }}
                   title={c.name}
                 />
@@ -149,9 +273,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
               {product.sizes.map((s: string, i: number) => (
                 <button
                   key={i}
-                  className={`w-14 h-14 rounded-full border-2 font-bold transition-all active:scale-95 flex items-center justify-center ${
-                    i === 2 ? "border-primary bg-primary text-on-primary" : "border-outline/20 hover:border-primary hover:text-primary"
-                  }`}
+                  onClick={() => setSelectedSize(s)}
+                  className={cn(
+                    "w-14 h-14 rounded-full border-2 font-bold transition-all active:scale-95 flex items-center justify-center",
+                    selectedSize === s ? "border-primary bg-primary text-on-primary" : "border-outline/20 hover:border-primary hover:text-primary"
+                  )}
                 >
                   {s}
                 </button>
@@ -189,27 +315,104 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 <div className="h-3 bg-surface-container rounded w-48" />
               </div>
             )}
+            <div className="flex gap-4">
+              <button 
+                onClick={() => {
+                  if (!selectedSize) {
+                    alert("Please select a size first.");
+                    return;
+                  }
+                  addToCart({
+                    id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
+                    productId: product.id,
+                    variantId: "default",
+                    title: product.title,
+                    price: product.price,
+                    imageSrc: product.imageSrc,
+                    colorName: selectedColor?.name || "Default",
+                    size: selectedSize,
+                    quantity: 1
+                  })
+                }}
+                className="flex-grow bg-primary-container text-on-primary-container font-bold text-headline-sm py-5 rounded-full shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all duration-200"
+              >
+                Add to Cart
+              </button>
+              {(() => {
+                const isWishlisted = wishlistItems.some(item => item.productId === product.id);
+                return (
+                  <button
+                    onClick={() => {
+                      if (isWishlisted) {
+                        removeFromWishlist(product.id);
+                      } else {
+                        addToWishlist({
+                          productId: product.id,
+                          title: product.title,
+                          price: product.price,
+                          imageSrc: product.imageSrc,
+                          category: product.category
+                        });
+                      }
+                    }}
+                    className={cn(
+                      "px-6 border-2 rounded-full flex items-center justify-center transition-all active:scale-95",
+                      isWishlisted 
+                        ? "border-red-500/20 bg-red-50/50 text-red-500" 
+                        : "border-secondary text-on-surface hover:bg-surface-container"
+                    )}
+                    aria-label="Toggle Wishlist"
+                  >
+                    <span 
+                      className="material-symbols-outlined text-[24px]" 
+                      style={{ fontVariationSettings: isWishlisted ? "'FILL' 1" : "'FILL' 0" }}
+                    >
+                      favorite
+                    </span>
+                  </button>
+                );
+              })()}
+            </div>
             <button 
               onClick={() => {
+                if (!selectedSize) {
+                  alert("Please select a size first.");
+                  return;
+                }
                 addToCart({
-                  id: `${product.id}-default`,
+                  id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
                   productId: product.id,
                   variantId: "default",
                   title: product.title,
                   price: product.price,
                   imageSrc: product.imageSrc,
-                  colorName: "Blue Melange",
-                  size: "M",
+                  colorName: selectedColor?.name || "Default",
+                  size: selectedSize,
                   quantity: 1
-                })
+                });
+                router.push('/checkout');
               }}
-              className="bg-primary-container text-on-primary-container font-bold text-headline-sm py-5 rounded-full shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all duration-200"
+              className="w-full bg-transparent border-2 border-secondary text-on-surface font-bold text-headline-sm py-5 rounded-full hover:bg-surface-container transition-all active:scale-95 duration-200"
             >
-              Add to Cart
-            </button>
-            <button className="bg-transparent border-2 border-secondary text-on-surface font-bold text-headline-sm py-5 rounded-full hover:bg-surface-container transition-all active:scale-95 duration-200">
               Buy Now
             </button>
+            <div className="flex items-center gap-4 text-sm text-on-surface-variant pt-4 border-t border-outline/10">
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert("Product link copied to clipboard!");
+                }}
+                className="flex items-center gap-2 hover:text-primary transition-colors font-bold uppercase tracking-wider text-xs"
+              >
+                <span className="material-symbols-outlined text-[18px]">share</span>
+                Share
+              </button>
+              <span className="opacity-20">|</span>
+              <span className="flex items-center gap-1.5 text-success font-bold uppercase tracking-wider text-xs">
+                <span className="material-symbols-outlined text-[18px]">local_shipping</span>
+                Free Shipping &amp; Returns
+              </span>
+            </div>
           </div>
 
           {/* Accordions */}
@@ -257,38 +460,151 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 </div>
               )}
             </div>
+
+            <div className="py-4">
+              <button className="flex justify-between items-center w-full group" onClick={() => setActiveAccordion(activeAccordion === "shipping" ? "" : "shipping")}>
+                <span className="font-label-md font-bold text-on-surface uppercase tracking-wider">Shipping & Returns</span>
+                <span className="material-symbols-outlined transition-transform duration-300" style={{ transform: activeAccordion === "shipping" ? "rotate(180deg)" : "rotate(0deg)" }}>expand_more</span>
+              </button>
+              {activeAccordion === "shipping" && (
+                <div className="mt-4 text-on-surface-variant font-body-md space-y-2 leading-relaxed">
+                  <p><strong>Shipping:</strong> Free standard shipping across India. Orders are processed within 24-48 hours and typically delivered in 3-5 business days. Express shipping option is available at checkout.</p>
+                  <p><strong>Returns:</strong> We offer a hassle-free 7-day return and exchange policy. Items must be unused, unwashed, and in their original packaging with tags intact.</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Related Products / Upsell Bento Grid */}
+      {/* Customer Reviews Section */}
       <section className="mt-section-gap-lg pt-section-gap-md border-t border-outline/10">
         <h2 className="font-headline-lg text-headline-lg mb-8">Customer Reviews</h2>
-        <div className="flex flex-col md:flex-row gap-12 items-start">
-          <div className="w-full md:w-1/3 p-8 bg-surface-container-low rounded-lg shadow-sm border border-outline/10">
+        <div className="flex flex-col lg:flex-row gap-12 items-start">
+          <div className="w-full lg:w-1/3 p-8 bg-surface-container-low rounded-lg shadow-sm border border-outline/10">
             <div className="text-center space-y-4">
-              <div className="text-headline-xl font-bold">0.0</div>
+              <div className="text-headline-xl font-bold">{averageRating}</div>
               <div className="flex justify-center text-primary">
-                {[1, 2, 3, 4, 5].map(i => <span key={i} className="material-symbols-outlined">star</span>)}
+                {[1, 2, 3, 4, 5].map(i => (
+                  <span key={i} className="material-symbols-outlined" style={{ fontVariationSettings: i <= Math.round(Number(averageRating)) ? "'FILL' 1" : "'FILL' 0" }}>
+                    star
+                  </span>
+                ))}
               </div>
-              <p className="text-on-surface-variant font-label-md uppercase tracking-wider">0 Reviews</p>
-              <button className="w-full bg-on-surface text-surface py-4 rounded-full font-bold hover:opacity-90 transition-opacity mt-4">
-                Be the first to write a review
+              <p className="text-on-surface-variant font-label-md uppercase tracking-wider">{totalReviews} Reviews</p>
+              <button 
+                onClick={() => {
+                  if (session) {
+                    setShowReviewForm(!showReviewForm)
+                  } else {
+                    alert("Please log in to write a review and earn XP.")
+                  }
+                }}
+                className="w-full bg-on-surface text-surface py-4 rounded-full font-bold hover:opacity-90 transition-opacity mt-4"
+              >
+                {showReviewForm ? "Cancel Review" : "Write a Review"}
               </button>
             </div>
           </div>
+          
           <div className="flex-1 space-y-4 w-full">
-            {[5, 4, 3, 2, 1].map(star => (
+            {starPercentages.map(({ star, percentage }) => (
               <div key={star} className="flex items-center gap-4 w-full">
                 <span className="font-label-md w-4">{star}</span>
                 <span className="material-symbols-outlined text-primary text-[16px]">star</span>
                 <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden">
-                  <div className="h-full bg-primary/20 w-0"></div>
+                  <div className="h-full bg-primary" style={{ width: `${percentage}%` }}></div>
                 </div>
-                <span className="font-label-md w-8 text-right opacity-40">0%</span>
+                <span className="font-label-md w-8 text-right opacity-40">{percentage}%</span>
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Review Form */}
+        {showReviewForm && (
+          <form onSubmit={handleSubmitReview} className="mt-8 p-6 bg-surface-container-low rounded-lg border border-outline/10 max-w-2xl space-y-4">
+            <h3 className="font-headline-sm text-headline-sm">Write an Honest Review</h3>
+            <p className="text-sm text-on-surface-variant">Reviewing purchases earns you <span className="text-primary font-bold">+200 XP</span> loyalty rewards!</p>
+            
+            <div className="space-y-2">
+              <label className="block text-label-md font-bold uppercase tracking-wider">Your Name</label>
+              <input 
+                type="text" 
+                value={reviewName} 
+                onChange={(e) => setReviewName(e.target.value)} 
+                className="w-full bg-surface-container border border-outline/25 rounded-md p-3 text-on-surface"
+                placeholder="Enter your name" 
+                required 
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-label-md font-bold uppercase tracking-wider">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((val) => (
+                  <button
+                    type="button"
+                    key={val}
+                    onClick={() => setReviewRating(val)}
+                    className="text-primary focus:outline-none"
+                  >
+                    <span className="material-symbols-outlined text-[32px]" style={{ fontVariationSettings: val <= reviewRating ? "'FILL' 1" : "'FILL' 0" }}>
+                      star
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-label-md font-bold uppercase tracking-wider">Comment</label>
+              <textarea 
+                value={reviewComment} 
+                onChange={(e) => setReviewComment(e.target.value)} 
+                className="w-full bg-surface-container border border-outline/25 rounded-md p-3 text-on-surface h-32"
+                placeholder="Share your thoughts about this product..." 
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="bg-primary text-on-primary px-6 py-3 rounded-full font-bold hover:opacity-95 transition-opacity"
+            >
+              Submit Review
+            </button>
+          </form>
+        )}
+
+        {/* Reviews List */}
+        <div className="mt-12 space-y-6">
+          <h3 className="font-headline-sm text-headline-sm border-b border-outline/10 pb-4">Customer Feedback</h3>
+          {reviews.length === 0 ? (
+            <p className="text-on-surface-variant italic">No reviews yet. Be the first to write a review!</p>
+          ) : (
+            <div className="divide-y divide-outline/10">
+              {reviews.map((r) => (
+                <div key={r.id} className="py-6 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
+                        {r.userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="font-bold text-on-surface">{r.userName}</div>
+                        <div className="text-xs text-on-surface-variant">
+                          {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                    </div>
+                    {renderStars(r.rating)}
+                  </div>
+                  <p className="text-on-surface-variant leading-relaxed pl-13">{r.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -312,7 +628,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           
           <div className="space-y-gutter">
             {relatedProducts.slice(0, 1).map((related) => (
-              <ProductCard
+              <InteractiveProductCard
                 key={related.id}
                 id={related.id}
                 title={related.title}
@@ -322,6 +638,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
                 hoverImageSrc={related.hoverImageSrc}
                 colors={related.colors}
                 badge={related.badge}
+                slug={related.slug}
               />
             ))}
             <div className="bg-primary-container p-8 rounded-lg flex flex-col justify-between h-[180px]">
@@ -335,6 +652,28 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
           </div>
         </div>
       </section>
+
+      {recentlyViewed.length > 0 && (
+        <section className="mt-section-gap-lg pt-section-gap-md border-t border-outline/10">
+          <h2 className="font-headline-lg text-headline-lg mb-12 text-center">Recently Viewed Products</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-gutter">
+            {recentlyViewed.map((prod) => (
+              <InteractiveProductCard
+                key={prod.id}
+                id={prod.id}
+                title={prod.title}
+                price={prod.price}
+                compareAtPrice={prod.compareAtPrice}
+                imageSrc={prod.imageSrc}
+                hoverImageSrc={prod.hoverImageSrc}
+                colors={prod.colors}
+                badge={prod.badge}
+                slug={prod.slug}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }

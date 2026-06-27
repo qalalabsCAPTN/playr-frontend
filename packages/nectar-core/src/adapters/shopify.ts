@@ -117,9 +117,9 @@ function mapShopifyProduct(data: any): Product {
 }
 
 // Global fetch config for aggressive caching to prevent duplicate API hits
-const FETCH_CONFIG: RequestInit = {
+const FETCH_CONFIG = {
   next: { revalidate: 3600 } // Cache for 1 hour
-}
+} as any
 
 export async function fetchShopifyProduct(slug: string): Promise<Product | null> {
   try {

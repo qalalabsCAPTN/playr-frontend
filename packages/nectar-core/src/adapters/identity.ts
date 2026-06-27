@@ -1,5 +1,6 @@
 import { NectarTenantClient, nectarClient } from './tenant';
 import { UserProfile, Order } from '../commerce/account';
+import { getDbUserById, getDbOrdersByUserId } from '../db/db';
 
 export class NectarIdentityAdapter {
   private client: NectarTenantClient;
@@ -9,28 +10,33 @@ export class NectarIdentityAdapter {
   }
 
   async getProfile(userId: string): Promise<UserProfile> {
+    if (typeof window === 'undefined') {
+      const user = await getDbUserById(userId);
+      if (user) return user;
+    }
+
     try {
       return await this.client.get<UserProfile>(`/api/identity/users/${userId}`);
     } catch (e) {
-      console.warn("NectarIdentityAdapter.getProfile failed, returning fallback for dev", e);
-      // Fallback for development since we don't have a live NECTAR backend yet
-      return {
-        id: userId,
-        firstName: "Test",
-        lastName: "User",
-        email: "test@example.com",
-        phone: "+91 9876543210",
-        memberSince: new Date().getFullYear()
-      };
+      console.warn("NectarIdentityAdapter.getProfile failed, returning db fallback", e);
+      const user = await getDbUserById(userId);
+      if (user) return user;
+      
+      const { DemoConfig } = await import('../demo/config');
+      return DemoConfig.identity.getProfile();
     }
   }
 
   async getOrders(userId: string): Promise<Order[]> {
+    if (typeof window === 'undefined') {
+      return (await getDbOrdersByUserId(userId)) as Order[];
+    }
+
     try {
       return await this.client.get<Order[]>(`/api/identity/users/${userId}/orders`);
     } catch (e) {
-      console.warn("NectarIdentityAdapter.getOrders failed, returning fallback for dev", e);
-      return [];
+      console.warn("NectarIdentityAdapter.getOrders failed, returning db fallback", e);
+      return (await getDbOrdersByUserId(userId)) as Order[];
     }
   }
 }

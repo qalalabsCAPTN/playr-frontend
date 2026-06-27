@@ -30,12 +30,42 @@ export interface Product {
 }
 
 import { fetchShopifyProduct, fetchShopifyCollection, searchShopifyProducts } from "../adapters/shopify"
+import { getDbProducts, getDbProductBySlug } from '../db/db'
 
 export const NectarCommerce = {
   getCollection: async (slug: string) => {
-    const products = await fetchShopifyCollection(slug)
+    let shopifyProducts = await fetchShopifyCollection(slug)
     
-    // Format the title nicely
+    // If shopify fails or returns empty, fetch all
+    if (!shopifyProducts || shopifyProducts.length === 0) {
+      shopifyProducts = await fetchShopifyCollection('all')
+    }
+
+    // Merge with DB products
+    let dbProducts: Product[] = [];
+    if (typeof window === 'undefined') {
+      try {
+        dbProducts = await getDbProducts() as any[];
+      } catch (e) {}
+    } else {
+      try {
+        const res = await fetch('/api/products');
+        if (res.ok) {
+          dbProducts = await res.json();
+        }
+      } catch (e) {}
+    }
+
+    // Filter DB products by collection/category if slug is specific
+    let filteredDb = dbProducts;
+    if (slug && slug !== 'all' && slug !== 'new-arrivals' && slug !== 'new') {
+      filteredDb = dbProducts.filter(p => 
+        p.category.toLowerCase().includes(slug.toLowerCase().replace('-', ' '))
+      );
+    }
+
+    const mergedProducts = [...filteredDb, ...shopifyProducts];
+
     const formatTitle = (s: string) => {
       if (s === 'all') return "All Products"
       return s.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -43,20 +73,38 @@ export const NectarCommerce = {
 
     return {
       title: formatTitle(slug),
-      productCount: products.length,
-      products
+      productCount: mergedProducts.length,
+      products: mergedProducts
     }
   },
 
   getProduct: async (slug: string): Promise<Product | null> => {
-    return await fetchShopifyProduct(slug)
+    // Check DB first
+    if (typeof window === 'undefined') {
+      const dbProduct = await getDbProductBySlug(slug);
+      if (dbProduct) return dbProduct as any;
+    } else {
+      try {
+        const res = await fetch(`/api/products/${slug}`);
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (e) {}
+    }
+
+    // Fallback to Shopify
+    const shopifyProduct = await fetchShopifyProduct(slug);
+    if (shopifyProduct) return shopifyProduct;
+
+    // Check DB final
+    const dbProduct = await getDbProductBySlug(slug);
+    return dbProduct as any;
   },
 
   getRelatedProducts: async (tags: string[] = []): Promise<Product[]> => {
-    // For related products, fetch all and return a random subset to simulate recommendations
-    const allProducts = await fetchShopifyCollection('all')
+    const coll = await NectarCommerce.getCollection('all');
+    const allProducts = coll.products;
     
-    // If we have tags, try to prioritize products with matching tags
     let related = allProducts
     if (tags.length > 0) {
       const tagged = allProducts.filter(p => p.specifications.some(t => tags.includes(t)))
@@ -65,12 +113,26 @@ export const NectarCommerce = {
       }
     }
 
-    // Shuffle and pick 4
     const shuffled = related.sort(() => 0.5 - Math.random())
     return shuffled.slice(0, 4)
   },
 
   searchProducts: async (query: string): Promise<Product[]> => {
-    return await searchShopifyProducts(query)
+    // Query Shopify
+    const shopifySearch = await searchShopifyProducts(query);
+
+    // Query DB
+    let dbProducts: Product[] = [];
+    if (typeof window === 'undefined') {
+      try {
+        const all = await getDbProducts();
+        dbProducts = all.filter((p: any) => 
+          p.title.toLowerCase().includes(query.toLowerCase()) || 
+          p.description.toLowerCase().includes(query.toLowerCase())
+        ) as any[];
+      } catch (e) {}
+    }
+
+    return [...dbProducts, ...shopifySearch];
   }
 }

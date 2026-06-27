@@ -4,15 +4,19 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@playr/ui';
 
-export function MobileNav() {
+export function MobileNav({ scrolled }: { scrolled: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="lg:hidden">
       <button 
         onClick={() => setIsOpen(true)}
-        className="p-2 -ml-2 text-zinc-900"
+        className={cn(
+          "p-2 -ml-2 transition-colors duration-300",
+          scrolled ? "text-zinc-900" : "text-white"
+        )}
         aria-label="Open Menu"
       >
         <Menu className="w-6 h-6" />

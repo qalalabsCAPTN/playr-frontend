@@ -11,6 +11,8 @@
 
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { useSession } from 'next-auth/react'
 import { loyaltyAdapter, getTierColor, getTierBg } from '@playr/nectar-core'
 import type { LeaderboardEntry } from '@playr/nectar-core'
 
@@ -67,7 +69,7 @@ function LeaderboardRow({ entry, index }: { entry: LeaderboardEntry; index: numb
       {/* Avatar placeholder */}
       <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 overflow-hidden">
         {entry.avatarUrl ? (
-          <img src={entry.avatarUrl} alt={entry.displayName} className="w-full h-full object-cover" />
+          <Image src={entry.avatarUrl} alt={entry.displayName} width={40} height={40} className="w-full h-full object-cover" />
         ) : (
           <span className="material-symbols-outlined text-on-surface-variant text-xl">account_circle</span>
         )}
@@ -98,17 +100,19 @@ function LeaderboardRow({ entry, index }: { entry: LeaderboardEntry; index: numb
 }
 
 export default function LeaderboardPage() {
+  const { data: session } = useSession()
+  const userId = (session?.user as any)?.id
   const [period, setPeriod] = useState<Period>('all')
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     setIsLoading(true)
-    loyaltyAdapter.getLeaderboard(period, 50).then(data => {
+    loyaltyAdapter.getLeaderboard(period, 50, userId).then(data => {
       setEntries(data)
       setIsLoading(false)
     })
-  }, [period])
+  }, [period, userId])
 
   return (
     <main className="min-h-screen bg-background pt-32 pb-24">

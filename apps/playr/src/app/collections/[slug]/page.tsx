@@ -2,7 +2,8 @@ import * as React from "react"
 import Image from "next/image"
 import type { Metadata } from "next"
 import { NectarCommerce } from "@playr/nectar-core"
-import { ProductCard, ProductGrid } from "@playr/ui"
+import { ProductGrid } from "@playr/ui"
+import { InteractiveProductCard } from "../../../components/commerce/InteractiveProductCard"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
@@ -141,7 +142,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
             {/* Bento Grid */}
             <ProductGrid>
               {collection.products.map((product) => (
-                <ProductCard
+                <InteractiveProductCard
                   key={product.id}
                   id={product.id}
                   title={product.title}
@@ -151,6 +152,7 @@ export default async function CollectionPage({ params }: { params: Promise<{ slu
                   hoverImageSrc={product.hoverImageSrc}
                   colors={product.colors}
                   badge={product.badge}
+                  slug={product.slug}
                 />
               ))}
             </ProductGrid>

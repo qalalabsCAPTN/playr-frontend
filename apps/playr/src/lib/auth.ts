@@ -10,8 +10,15 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (credentials?.email === "user@playr.in" && credentials.password === "password") {
-          return { id: "real_usr_8f92a", name: "PlayR User", email: "user@playr.in" };
+        if (!credentials?.email || !credentials?.password) return null;
+        try {
+          const { getDbUserByEmail } = require('@playr/nectar-core');
+          const user = await getDbUserByEmail(credentials.email);
+          if (user && user.password === credentials.password) {
+            return { id: user.id, name: `${user.firstName} ${user.lastName}`, email: user.email };
+          }
+        } catch (e) {
+          console.error("NextAuth authorize DB error", e);
         }
         return null;
       }

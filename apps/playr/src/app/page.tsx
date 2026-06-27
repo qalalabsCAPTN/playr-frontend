@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CMSService, NectarCommerce, loyaltyAdapter } from '@playr/nectar-core';
-import { ProductCard } from '@playr/ui';
+import { InteractiveProductCard } from '../components/commerce/InteractiveProductCard';
 import { HeroWrapper as Hero } from '../components/home/HeroWrapper';
 import { AnimatedSection } from '../components/home/AnimatedSection';
 
@@ -36,7 +36,7 @@ export default async function HomePage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           {newArrivals.map((product) => (
-            <ProductCard
+            <InteractiveProductCard
               key={product.id}
               id={product.id}
               title={product.title}
@@ -46,6 +46,7 @@ export default async function HomePage() {
               hoverImageSrc={product.hoverImageSrc}
               colors={product.colors}
               badge={product.badge}
+              slug={product.slug}
             />
           ))}
         </div>
@@ -264,10 +265,10 @@ export default async function HomePage() {
       {/* Visual Banner */}
       <AnimatedSection className="w-full h-[80vh] min-h-[600px] bg-on-surface relative group overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=2070&auto=format&fit=crop"
+          src="/images/homepage-banner.webp"
           alt="Action Shot"
           fill
-          className="object-cover opacity-50 group-hover:scale-105 transition-transform duration-[3s] ease-out"
+          className="object-cover opacity-80 group-hover:scale-105 transition-transform duration-[3s] ease-out"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-on-surface via-on-surface/40 to-transparent" />
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4">

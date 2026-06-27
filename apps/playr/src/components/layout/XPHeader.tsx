@@ -14,16 +14,17 @@ import React from "react"
 import Link from "next/link"
 import { useAccount } from "@/components/account/AccountProvider"
 import { getTierColor, getTierBg } from "@playr/nectar-core"
+import { cn } from "@playr/ui"
 
-export function XPHeader() {
+export function XPHeader({ scrolled }: { scrolled: boolean }) {
   const { xpState, isLoading } = useAccount()
 
   // Not loaded yet — render compact skeleton
   if (isLoading) {
     return (
       <div className="hidden md:flex items-center gap-2 animate-pulse">
-        <div className="w-20 h-3 bg-on-surface/10 rounded-full" />
-        <div className="w-14 h-3 bg-on-surface/10 rounded-full" />
+        <div className={cn("w-20 h-3 rounded-full", scrolled ? "bg-on-surface/10" : "bg-white/10")} />
+        <div className={cn("w-14 h-3 rounded-full", scrolled ? "bg-on-surface/10" : "bg-white/10")} />
       </div>
     )
   }
@@ -50,16 +51,25 @@ export function XPHeader() {
       {/* XP progress bar */}
       <div className="flex flex-col gap-0.5 shrink-0">
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-on-surface tabular-nums whitespace-nowrap">
+          <span className={cn(
+            "text-xs font-bold tabular-nums whitespace-nowrap transition-colors duration-300",
+            scrolled ? "text-on-surface" : "text-white"
+          )}>
             {xpState.totalXP.toLocaleString()} XP
           </span>
           {xpState.nextTier && xpState.xpToNextTier !== null && (
-            <span className="text-[10px] text-on-surface-variant tabular-nums whitespace-nowrap">
+            <span className={cn(
+              "text-[10px] tabular-nums whitespace-nowrap transition-colors duration-300",
+              scrolled ? "text-on-surface-variant" : "text-white/60"
+            )}>
               {xpState.xpToNextTier.toLocaleString()} to {xpState.nextTier.name}
             </span>
           )}
         </div>
-        <div className="w-28 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+        <div className={cn(
+          "w-28 h-1.5 rounded-full overflow-hidden transition-colors duration-300",
+          scrolled ? "bg-surface-container-high" : "bg-white/10"
+        )}>
           <div
             className="xp-bar-fill h-full rounded-full transition-all duration-700"
             style={{ width: `${xpState.progressPercent}%` }}

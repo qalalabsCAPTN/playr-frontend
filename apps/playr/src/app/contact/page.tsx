@@ -3,11 +3,41 @@
 import React, { useState } from "react"
 
 export default function ContactPage() {
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [email, setEmail] = useState("")
+  const [subject, setSubject] = useState("")
+  const [message, setMessage] = useState("")
   const [status, setStatus] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus("Thanks! Your message has been sent to our elite support team.")
+    setLoading(true)
+    setStatus("")
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, email, subject, message })
+      })
+      if (res.ok) {
+        setStatus("Thanks! Your message has been sent to our support team.")
+        setFirstName("")
+        setLastName("")
+        setEmail("")
+        setSubject("")
+        setMessage("")
+      } else {
+        const data = await res.json()
+        setStatus(data.error || "Failed to submit inquiry. Please try again.")
+      }
+    } catch (e) {
+      console.error(e)
+      setStatus("An error occurred. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -96,31 +126,64 @@ export default function ContactPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">First Name</label>
-                    <input type="text" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={firstName} 
+                      onChange={(e) => setFirstName(e.target.value)} 
+                      className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
+                    />
                   </div>
                   <div className="space-y-2">
                     <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Last Name</label>
-                    <input type="text" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
+                    <input 
+                      type="text" 
+                      required 
+                      value={lastName} 
+                      onChange={(e) => setLastName(e.target.value)} 
+                      className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Email Address</label>
-                  <input type="email" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
+                  <input 
+                    type="email" 
+                    required 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Subject / Order ID</label>
-                  <input type="text" className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
+                  <input 
+                    type="text" 
+                    value={subject} 
+                    onChange={(e) => setSubject(e.target.value)} 
+                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Message</label>
-                  <textarea rows={5} required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all resize-none"></textarea>
+                  <textarea 
+                    rows={5} 
+                    required 
+                    value={message} 
+                    onChange={(e) => setMessage(e.target.value)} 
+                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all resize-none"
+                  ></textarea>
                 </div>
 
-                <button type="submit" className="w-full bg-on-surface text-white font-label-bold text-lg uppercase tracking-widest px-8 py-4 rounded-lg hover:bg-primary transition-colors shadow-lg">
-                  Submit Request
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-on-surface text-white font-label-bold text-lg uppercase tracking-widest px-8 py-4 rounded-lg hover:bg-primary transition-colors shadow-lg disabled:opacity-50"
+                >
+                  {loading ? "Submitting..." : "Submit Request"}
                 </button>
               </form>
             </div>

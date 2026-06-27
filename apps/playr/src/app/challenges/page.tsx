@@ -8,6 +8,8 @@
 
 import React from 'react'
 import Link from 'next/link'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '../../lib/auth'
 import { loyaltyAdapter } from '@playr/nectar-core'
 import type { Challenge, ChallengeType } from '@playr/nectar-core'
 
@@ -29,59 +31,51 @@ const STATUS_STYLES = {
 }
 
 function ChallengeCard({ challenge }: { challenge: Challenge }) {
-  const statusStyle = STATUS_STYLES[challenge.status] ?? STATUS_STYLES.active
-  const hasProgress = challenge.progressTotal !== undefined && challenge.progressCurrent !== undefined
-  const progressPct = hasProgress
-    ? Math.round((challenge.progressCurrent! / challenge.progressTotal!) * 100)
-    : null
-
+  const styles = STATUS_STYLES[challenge.status] ?? STATUS_STYLES.active
+  
   return (
-    <Link
-      href={`/challenges/${challenge.id}`}
-      className="group flex flex-col gap-5 rounded-2xl border border-outline-variant/20 bg-surface-container-lowest p-6 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5 transition-all duration-300"
-    >
-      {/* Top row */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="w-12 h-12 rounded-xl bg-surface-container flex items-center justify-center shrink-0">
-          <span className="material-symbols-outlined text-primary text-xl">{challenge.badgeIcon}</span>
+    <Link href={`/challenges/${challenge.id}`} className="group block bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-6 md:p-8 hover:border-primary/20 transition-all duration-300">
+      <div className="flex items-start justify-between gap-6 mb-6">
+        <div className="bg-surface-container-high text-primary w-14 h-14 rounded-2xl flex items-center justify-center group-hover:bg-primary-container group-hover:text-on-primary-container transition-all">
+          <span className="material-symbols-outlined text-2xl">{challenge.badgeIcon}</span>
         </div>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <span className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full ${statusStyle.bg} ${statusStyle.text}`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.dot}`} />
-            {challenge.status}
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full bg-surface-container text-on-surface-variant">
-            {TYPE_LABELS[challenge.type]}
-          </span>
+        <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${styles.bg} ${styles.text}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${styles.dot}`} />
+          {challenge.status}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 space-y-2">
-        <h3 className="font-bold text-lg text-on-surface leading-tight group-hover:text-primary transition-colors">
-          {challenge.title}
-        </h3>
-        <p className="text-on-surface-variant text-sm leading-relaxed line-clamp-2">{challenge.description}</p>
-      </div>
+      <span className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant block mb-2">{TYPE_LABELS[challenge.type]}</span>
+      <h3 className="font-black text-xl uppercase tracking-tight text-on-surface font-headline leading-snug mb-3">
+        {challenge.title}
+      </h3>
+      <p className="text-xs text-on-surface-variant font-medium leading-relaxed mb-6">
+        {challenge.description}
+      </p>
 
-      {/* Progress (personalized, shown if NECTAR returns it) */}
-      {hasProgress && progressPct !== null && (
-        <div className="space-y-1.5">
-          <div className="flex justify-between text-xs font-bold text-on-surface-variant">
+      {/* Progress */}
+      {challenge.progressTotal !== undefined && challenge.progressCurrent !== undefined && (
+        <div className="mb-6 space-y-2">
+          <div className="flex justify-between text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
+            <span>Progress</span>
             <span>{challenge.progressCurrent} / {challenge.progressTotal}</span>
-            <span>{progressPct}%</span>
           </div>
-          <div className="h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div className="xp-bar-fill h-full rounded-full" style={{ width: `${progressPct}%` }} />
+          <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-500" 
+              style={{ width: `${(challenge.progressCurrent / challenge.progressTotal) * 100}%` }}
+            />
           </div>
         </div>
       )}
 
-      {/* Reward */}
-      <div className="flex items-center justify-between pt-4 border-t border-outline-variant/15">
-        <span className="font-black text-xl text-primary">+{challenge.xpReward.toLocaleString()} XP</span>
-        {challenge.expiresAt && (
-          <span className="text-xs text-on-surface-variant">
+      <div className="flex justify-between items-center border-t border-outline-variant/10 pt-5">
+        <span className="flex items-center gap-1.5 text-primary text-xs font-black uppercase tracking-widest">
+          <span className="material-symbols-outlined text-base">bolt</span>
+          +{challenge.xpReward} XP
+        </span>
+        {challenge.status === 'active' && challenge.expiresAt && (
+          <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">
             Expires {new Date(challenge.expiresAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
           </span>
         )}
@@ -92,7 +86,9 @@ function ChallengeCard({ challenge }: { challenge: Challenge }) {
 }
 
 export default async function ChallengesPage() {
-  const challenges = await loyaltyAdapter.getChallenges()
+  const session = await getServerSession(authOptions)
+  const userId = (session?.user as any)?.id
+  const challenges = await loyaltyAdapter.getChallenges(userId)
 
   const active = challenges.filter(c => c.status === 'active')
   const upcoming = challenges.filter(c => c.status === 'upcoming')

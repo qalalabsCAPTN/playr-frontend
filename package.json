@@ -7,7 +7,8 @@
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "db:reseed": "node scripts/reseed.js"
   },
   "devDependencies": {
     "next": "^15.0.0",
@@ -18,5 +19,8 @@
   "packageManager": "pnpm@9.1.0",
   "engines": {
     "node": ">=20.0.0 <23.0.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.108.2"
   }
 }

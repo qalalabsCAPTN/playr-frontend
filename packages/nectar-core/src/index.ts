@@ -17,3 +17,4 @@ export interface User {
 }
 
 export * from './logger';
+export * from './db/db';
