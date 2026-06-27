@@ -56,11 +56,10 @@ export const MockLoyaltyService = {
       const res = await fetch(`/api/loyalty/users/${userId}/wallet`);
       if (res.ok) return await res.json();
     } catch (e) {
-      console.warn("MockLoyaltyService.getWalletBalance fetch failed, returning db fallback");
+      console.warn("MockLoyaltyService.getWalletBalance fetch failed, returning client fallback");
     }
 
-    const user = await getDbUserById(userId);
-    return resolveWallet(user ? user.walletBalance : balance);
+    return resolveWallet(balance);
   },
 
   getRewardsPoints: async (userId: string = 'real_usr_8f92a'): Promise<RewardsState> => {
@@ -92,11 +91,10 @@ export const MockLoyaltyService = {
       const res = await fetch(`/api/loyalty/users/${userId}/rewards`);
       if (res.ok) return await res.json();
     } catch (e) {
-      console.warn("MockLoyaltyService.getRewardsPoints fetch failed, returning db fallback");
+      console.warn("MockLoyaltyService.getRewardsPoints fetch failed, returning client fallback");
     }
 
-    const user = await getDbUserById(userId);
-    return resolveRewards(user ? user.rewardsPoints : points, (user ? user.tier : tier) as any);
+    return resolveRewards(points, tier);
   },
 
   redeemWalletBalance: async (amount: number, userId: string = 'real_usr_8f92a'): Promise<boolean> => {

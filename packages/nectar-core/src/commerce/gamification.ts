@@ -563,18 +563,8 @@ export class NectarLoyaltyAdapter {
         `/api/loyalty/leaderboard?period=${period}&limit=${limit}${qs}`
       );
     } catch {
-      console.warn('[NECTAR Loyalty] getLeaderboard: BFF unavailable, using db fallback');
-      const { getDbUsers } = require('../db/db');
-      const users = require('../db/db').loadDbData().users; // read synchronous fallback
-      const sorted = [...users].sort((a: any, b: any) => (b.xp || 0) - (a.xp || 0));
-      return sorted.slice(0, 10).map((u: any, idx: number) => ({
-        rank: idx + 1,
-        userId: u.id,
-        displayName: u.firstName + ' ' + u.lastName[0] + '.',
-        totalXP: u.xp || 0,
-        tierName: u.tier.charAt(0).toUpperCase() + u.tier.slice(1),
-        isCurrentUser: u.id === currentUserId
-      }));
+      console.warn('[NECTAR Loyalty] getLeaderboard: BFF unavailable, returning empty client fallback');
+      return [];
     }
   }
 
@@ -651,15 +641,7 @@ export class NectarLoyaltyAdapter {
       await this.client.post(`/api/loyalty/rewards/${rewardId}/redeem`, { userId });
       return true;
     } catch {
-      console.error('[NECTAR Loyalty] redeemReward: failed, running db fallback');
-      const { getDbUserById, updateDbUser, addDbAuditLog } = require('../db/db');
-      const user = await getDbUserById(userId);
-      const reward = DEV_FALLBACK_REWARDS.find(r => r.id === rewardId);
-      if (user && reward && user.xp >= reward.xpCost) {
-        await updateDbUser(userId, { xp: user.xp - reward.xpCost });
-        await addDbAuditLog(userId, 'redeem_reward', `Redeemed reward: ${reward.title}`);
-        return true;
-      }
+      console.error('[NECTAR Loyalty] redeemReward: failed on client side');
       return false;
     }
   }

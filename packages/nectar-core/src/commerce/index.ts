@@ -96,9 +96,12 @@ export const NectarCommerce = {
     const shopifyProduct = await fetchShopifyProduct(slug);
     if (shopifyProduct) return shopifyProduct;
 
-    // Check DB final
-    const dbProduct = await getDbProductBySlug(slug);
-    return dbProduct as any;
+    // Check DB final if on server
+    if (typeof window === 'undefined') {
+      const dbProduct = await getDbProductBySlug(slug);
+      return dbProduct as any;
+    }
+    return null;
   },
 
   getRelatedProducts: async (tags: string[] = []): Promise<Product[]> => {

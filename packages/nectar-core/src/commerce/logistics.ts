@@ -42,11 +42,9 @@ export const MockLogisticsService = {
         return await res.json();
       }
     } catch (e) {
-      console.warn("MockLogisticsService.getShipment fetch failed, using local db fallback", e);
+      console.warn("MockLogisticsService.getShipment fetch failed, returning client fallback", e);
     }
     
-    // Final DB fallback
-    const shipment = await getDbShipmentByOrderId(id);
-    return shipment as any;
+    return null;
   }
 };
