@@ -343,12 +343,7 @@ export class NectarLoyaltyAdapter {
     try {
       return await this.client.get<XPState>(`/api/loyalty/users/${userId}/xp`);
     } catch {
-      console.warn('[NECTAR Loyalty] getUserXP: BFF unavailable, using db fallback');
-      const { getDbUserById } = require('../db/db');
-      const user = await getDbUserById(userId);
-      if (user) {
-        return this.calculateXPState(userId, user.xp || 0);
-      }
+      console.warn('[NECTAR Loyalty] getUserXP: BFF unavailable, returning client fallback');
       return { ...DEV_FALLBACK_XP, userId };
     }
   }
