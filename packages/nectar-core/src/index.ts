@@ -1,4 +1,5 @@
 export * from './commerce';
+export * from './commerce/personalization';
 export * from './commerce/cart';
 export * from './commerce/wishlist';
 export * from './commerce/checkout';

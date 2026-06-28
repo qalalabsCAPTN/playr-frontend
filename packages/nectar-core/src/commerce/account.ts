@@ -16,6 +16,10 @@ export interface OrderItem {
   quantity: number;
   colorName: string;
   size: string;
+  isPersonalized?: boolean;
+  playerName?: string;
+  playerNumber?: string;
+  previewImageUrl?: string;
 }
 
 export interface Order {

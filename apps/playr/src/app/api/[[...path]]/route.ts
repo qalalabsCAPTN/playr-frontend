@@ -28,7 +28,11 @@ import {
   updateDbOrderStatus,
   updateDbProduct,
   updateDbSupportTicket,
-  updateDbShipmentMilestones
+  updateDbShipmentMilestones,
+  getDbPersonalizations,
+  getDbPersonalizationByOrderId,
+  createDbPersonalization,
+  updateDbPersonalization
 } from '@playr/nectar-core';
 
 function calculateXPState(userId: string, xp: number) {
@@ -211,7 +215,26 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
     // 11. GET /api/products
     if (path[0] === 'products' && !path[1]) {
       const products = await getDbProducts();
-      return NextResponse.json(products);
+      const { getDbPersonalizationTemplateByProductId } = require('@playr/nectar-core');
+      const mapped = await Promise.all(products.map(async (p: any) => {
+        const template = await getDbPersonalizationTemplateByProductId(p.id);
+        return { ...p, personalizationTemplate: template };
+      }));
+      return NextResponse.json(mapped);
+    }
+
+    // GET /api/personalization-templates
+    if (path[0] === 'personalization-templates' && !path[1]) {
+      const { getDbPersonalizationTemplates } = require('@playr/nectar-core');
+      const templates = await getDbPersonalizationTemplates();
+      return NextResponse.json(templates);
+    }
+
+    // GET /api/personalization-templates/product/{productId}
+    if (path[0] === 'personalization-templates' && path[1] === 'product' && path[2]) {
+      const { getDbPersonalizationTemplateByProductId } = require('@playr/nectar-core');
+      const template = await getDbPersonalizationTemplateByProductId(path[2]);
+      return NextResponse.json(template);
     }
 
     // 12. GET /api/products/{slug}/reviews
@@ -227,7 +250,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
     if (path[0] === 'products' && path[1] && !path[2]) {
       const product = await getDbProductBySlug(path[1]);
       if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
-      return NextResponse.json(product);
+      const { getDbPersonalizationTemplateByProductId } = require('@playr/nectar-core');
+      const template = await getDbPersonalizationTemplateByProductId(product.id);
+      return NextResponse.json({
+        ...product,
+        personalizationTemplate: template
+      });
     }
 
     // 13. GET /api/community/feed
@@ -281,12 +309,24 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
       return NextResponse.json(coupon);
     }
 
-    // 21. GET /api/orders/{orderId}
+    // GET /api/orders/{orderId}
     if (path[0] === 'orders' && path[1] && !path[2]) {
       const orders = await getDbOrders();
       const order = orders.find((o: any) => o.displayId === path[1] || o.id === path[1]);
       if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
       return NextResponse.json(order);
+    }
+
+    // GET /api/personalizations
+    if (path[0] === 'personalizations' && !path[1]) {
+      const list = await getDbPersonalizations();
+      return NextResponse.json(list);
+    }
+
+    // GET /api/personalizations/order/{orderId}
+    if (path[0] === 'personalizations' && path[1] === 'order' && path[2]) {
+      const list = await getDbPersonalizationByOrderId(path[2]);
+      return NextResponse.json(list);
     }
 
     return NextResponse.json({ error: "API Endpoint not found" }, { status: 404 });
@@ -300,7 +340,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
   try {
     const resolvedParams = await params;
     const path = resolvedParams.path || [];
-    const body = await req.json();
+    
+    const contentType = req.headers.get('content-type') || '';
+    let body: any = null;
+    if (contentType.includes('application/json')) {
+      body = await req.json();
+    }
 
     // Register User
     if (path[0] === 'register') {
@@ -578,11 +623,67 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
       return NextResponse.json(order);
     }
 
+    // POST /api/admin/orders/{id}/personalize
+    if (path[0] === 'admin' && path[1] === 'orders' && path[2] && path[3] === 'personalize') {
+      const { loadDbData, saveDbData, addDbAuditLog } = require('@playr/nectar-core');
+      const db = loadDbData();
+      const orderIdx = db.orders.findIndex((o: any) => o.id === path[2] || o.displayId === path[2]);
+      if (orderIdx !== -1) {
+        const order = db.orders[orderIdx];
+        const itemIdx = order.items.findIndex((i: any) => i.id === body.itemId);
+        if (itemIdx !== -1) {
+          const item = order.items[itemIdx];
+          
+          // Update order item fields
+          order.items[itemIdx] = {
+            ...item,
+            playerName: body.playerName,
+            playerNumber: body.playerNumber,
+            previewImageUrl: body.previewImageUrl,
+            imageSrc: body.previewImageUrl
+          };
+          
+          // Update personalization table record
+          const persIdx = db.personalizations.findIndex((p: any) => p.orderId === order.displayId && p.productId === item.productId);
+          if (persIdx !== -1) {
+            const current = db.personalizations[persIdx];
+            if (!current.versions) current.versions = [];
+            current.versions.push({
+              playerName: current.playerName,
+              playerNumber: current.playerNumber,
+              previewImageUrl: current.previewImageUrl,
+              createdAt: current.updatedAt || new Date().toISOString()
+            });
+            db.personalizations[persIdx] = {
+              ...current,
+              playerName: body.playerName,
+              playerNumber: body.playerNumber,
+              previewImageUrl: body.previewImageUrl,
+              updatedAt: new Date().toISOString()
+            };
+          }
+          
+          saveDbData(db);
+          await addDbAuditLog('admin', 'edit_personalization', `Admin updated personalization for order: ${order.displayId}`);
+          return NextResponse.json(order);
+        }
+      }
+      return NextResponse.json({ error: "Order or item not found" }, { status: 404 });
+    }
+
     // 11. POST /api/admin/products/{id}/update
     if (path[0] === 'admin' && path[1] === 'products' && path[2] && path[3] === 'update') {
       const product = await updateDbProduct(path[2], body);
       await addDbAuditLog('admin', 'update_product', `Updated product ID ${path[2]} details.`);
       return NextResponse.json(product);
+    }
+
+    // POST /api/admin/products/{id}/personalization-template
+    if (path[0] === 'admin' && path[1] === 'products' && path[2] && path[3] === 'personalization-template') {
+      const { updateDbPersonalizationTemplate, addDbAuditLog } = require('@playr/nectar-core');
+      const template = await updateDbPersonalizationTemplate(path[2], body);
+      await addDbAuditLog('admin', 'update_product_template', `Updated personalization template for product ID ${path[2]}.`);
+      return NextResponse.json(template);
     }
 
     // 12. POST /api/admin/tickets/{id}/reply
@@ -609,6 +710,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
     if (path[0] === 'orders' && !path[1]) {
       const { createDbOrder, updateDbUser, getDbUserById } = require('@playr/nectar-core');
       const result = await createDbOrder(body);
+
+      // Auto-save personalization records
+      const { createDbPersonalization } = require('@playr/nectar-core');
+      for (const item of (body.items || [])) {
+        if (item.isPersonalized) {
+          await createDbPersonalization({
+            orderId: result.order.displayId,
+            productId: item.productId,
+            customerId: body.userId || 'guest',
+            productVariantId: item.variantId || 'default',
+            playerName: item.playerName,
+            playerNumber: item.playerNumber,
+            previewImageUrl: item.previewImageUrl,
+            status: 'placed'
+          });
+        }
+      }
       
       // Update user wallet/loyalty points if they were deducted or if they earned points
       if (body.userId && body.userId !== 'guest') {
@@ -691,6 +809,68 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
         }
       }
       return NextResponse.json(review);
+    }
+
+    // POST /api/personalizations/upload
+    if (path[0] === 'personalizations' && path[1] === 'upload') {
+      try {
+        const formData = await req.formData();
+        const file = formData.get('file') as File;
+        if (!file) {
+          return NextResponse.json({ error: "No file provided" }, { status: 400 });
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.png`;
+        const filePath = `personalization/${fileName}`;
+
+        const { supabase } = require('@playr/nectar-core');
+        if (supabase) {
+          const { data, error } = await supabase.storage
+            .from('personalizations')
+            .upload(filePath, buffer, {
+              contentType: 'image/png',
+              upsert: true
+            });
+
+          if (!error && data) {
+            const { data: urlData } = supabase.storage
+              .from('personalizations')
+              .getPublicUrl(filePath);
+
+            return NextResponse.json({ url: urlData.publicUrl });
+          } else {
+            console.warn("Supabase upload error, falling back to local storage:", error);
+          }
+        }
+
+        const fs = require('fs');
+        const pathLib = require('path');
+        const dirPath = pathLib.join(process.cwd(), 'public', 'personalization');
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true });
+        }
+        fs.writeFileSync(pathLib.join(dirPath, fileName), buffer);
+        
+        const localUrl = `/personalization/${fileName}`;
+        return NextResponse.json({ url: localUrl });
+
+      } catch (e: any) {
+        console.error("Upload handler failed:", e);
+        return NextResponse.json({ error: e.message || "Upload failed" }, { status: 500 });
+      }
+    }
+
+    // POST /api/personalizations
+    if (path[0] === 'personalizations' && !path[1]) {
+      const record = await createDbPersonalization(body);
+      return NextResponse.json(record);
+    }
+
+    // POST /api/personalizations/{id}/update
+    if (path[0] === 'personalizations' && path[1] && path[2] === 'update') {
+      const record = await updateDbPersonalization(path[1], body);
+      return NextResponse.json(record);
     }
 
     return NextResponse.json({ error: "API Endpoint not found" }, { status: 404 });

@@ -54,6 +54,11 @@ export default function OrdersPage() {
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-lg text-on-surface mb-2">{order.items[0].title}</h4>
+                    {order.items[0].isPersonalized && (
+                      <p className="text-[11px] text-green-600 font-bold uppercase tracking-wider mb-2">
+                        Personalized: {order.items[0].playerName} ({order.items[0].playerNumber})
+                      </p>
+                    )}
                     {order.items.length > 1 && (
                       <p className="text-sm text-on-surface-variant font-medium">+{order.items.length - 1} more items</p>
                     )}

@@ -53,6 +53,7 @@ const DEFAULT_PRODUCTS = [
     price: 1799,
     compareAtPrice: 2199,
     badge: '18% OFF',
+    isPersonalized: true,
     imageSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA',
     gallery: [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA'
@@ -90,6 +91,7 @@ const DEFAULT_PRODUCTS = [
     price: 1799,
     compareAtPrice: 2199,
     badge: 'NEW',
+    isPersonalized: true,
     imageSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA',
     gallery: [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA'
@@ -108,6 +110,7 @@ const DEFAULT_PRODUCTS = [
     category: 'Club',
     price: 1799,
     compareAtPrice: 2199,
+    isPersonalized: true,
     imageSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA',
     gallery: [
       'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA'
@@ -395,7 +398,7 @@ const DEFAULT_ORDERS = [
     status: 'shipped',
     total: 1799,
     items: [
-      { id: 'item_d2', productId: 'prod_csk_jersey', title: 'CSK Match Jersey 2026', imageSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA', price: 1799, quantity: 1, colorName: 'CSK Yellow', size: 'L' }
+      { id: 'item_d2', productId: 'prod_csk_jersey', title: 'CSK Match Jersey 2026', imageSrc: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA', price: 1799, quantity: 1, colorName: 'CSK Yellow', size: 'L', isPersonalized: true, playerName: 'DEV KARAN', playerNumber: '10', previewImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA' }
     ],
     shippingAddress: { firstName: 'Dev', lastName: 'Karan', address: 'B-12, Green Park Extension, New Delhi - 110016', phone: '+91 9998887776' },
     paymentMethod: 'wallet',
@@ -832,6 +835,215 @@ const DEFAULT_COMMUNITY_FEED = [
   { id: 'feed_5', userId: 'user_lb_1', displayName: 'Rohit Sharma', avatarUrl: null, action: 'challenge_complete', metadata: { challengeTitle: '3-Order Streak', xpEarned: 750 }, createdAt: '1 day ago' }
 ];
 
+const DEFAULT_PERSONALIZATIONS = [
+  {
+    id: "pers_1",
+    orderId: "PR-55101",
+    productId: "prod_csk_jersey",
+    customerId: "demo_usr_qa123",
+    productVariantId: "default",
+    playerName: "DEV KARAN",
+    playerNumber: "10",
+    previewImageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA",
+    status: "shipped",
+    createdAt: "2026-06-20T11:00:00Z",
+    updatedAt: "2026-06-20T11:00:00Z",
+    versions: [] as any[]
+  }
+];
+
+const DEFAULT_PERSONALIZATION_TEMPLATES = [
+  {
+    id: "temp_prod_csk_jersey",
+    productId: "prod_csk_jersey",
+    enabled: true,
+    renderImageId: "0",
+    renderImageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuBh3ZMCBCd_Uj0ifR9UADSnepsSwxo-06o4Vbn28EjxTL2-fJMAUUc-Nt0mHP1DLbZj944R9QOdUknhY371dNaRQ3_FxVInE2O0yb59bpGyEV0Nle3tsJM5UJhRrv3QBlLdMpodxVFFszrKW77WoN49kdy5VVstlMP02A093vbCzrj-385NRyVWmmIdoLNdyspeObPc4MgMhmsKDpFlAe4zbHwaaFVfGziKFjGcVE4Ba_NYi7OHZIhEeeFtCjwisNkqwCAoheH4rPA",
+    canvasWidth: 600,
+    canvasHeight: 600,
+    nameSettings: {
+      x: 300,
+      y: 160,
+      width: 400,
+      height: 50,
+      maxCharacters: 18,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 38,
+      lineHeight: 1,
+      letterSpacing: 2,
+      alignment: "center",
+      textTransform: "uppercase",
+      rotation: 0,
+      color: "#005ea6",
+      enableOutline: true,
+      outlineWidth: 3,
+      outlineColor: "#ffffff",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 4,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
+      opacity: 1
+    },
+    numberSettings: {
+      x: 300,
+      y: 310,
+      width: 300,
+      height: 150,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 120,
+      alignment: "center",
+      rotation: 0,
+      color: "#005ea6",
+      enableOutline: true,
+      outlineWidth: 6,
+      outlineColor: "#ffffff",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 6,
+      shadowOffsetX: 3,
+      shadowOffsetY: 3,
+      opacity: 1
+    },
+    safeArea: {
+      x: 50,
+      y: 50,
+      width: 500,
+      height: 500
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "temp_prod_rr_jersey",
+    productId: "prod_rr_jersey",
+    enabled: true,
+    renderImageId: "0",
+    renderImageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuCjouFQ28x8bApWh17osf6EXy609J0xjqv0bAUoW8Don2jNiASe2nKXvZemMWFNGASPDoSOfyaeME5THgNINutFeTQfn165pFBf_JdLRG8KPljU6lo9nCajaRGNP-WpO_PMR1L-KLe-6xUXRWq-isuDd3Fznxy3ZtL9TsifYAc9L4KiEY_a4_3bYEwPVbwOnyDoF-9T-3GKBHBPgkT-026mCbJjXCCEK6K8mu1B1voPtj-QAEABZmm0zdW2CjzdqW-sNzxhX7AflHI",
+    canvasWidth: 600,
+    canvasHeight: 600,
+    nameSettings: {
+      x: 300,
+      y: 160,
+      width: 400,
+      height: 50,
+      maxCharacters: 18,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 38,
+      lineHeight: 1,
+      letterSpacing: 2,
+      alignment: "center",
+      textTransform: "uppercase",
+      rotation: 0,
+      color: "#ffffff",
+      enableOutline: true,
+      outlineWidth: 3,
+      outlineColor: "#111e38",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 4,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
+      opacity: 1
+    },
+    numberSettings: {
+      x: 300,
+      y: 310,
+      width: 300,
+      height: 150,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 120,
+      alignment: "center",
+      rotation: 0,
+      color: "#ffffff",
+      enableOutline: true,
+      outlineWidth: 6,
+      outlineColor: "#111e38",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 6,
+      shadowOffsetX: 3,
+      shadowOffsetY: 3,
+      opacity: 1
+    },
+    safeArea: {
+      x: 50,
+      y: 50,
+      width: 500,
+      height: 500
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: "temp_prod_mi_jersey",
+    productId: "prod_mi_jersey",
+    enabled: true,
+    renderImageId: "0",
+    renderImageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuCjouFQ28x8bApWh17osf6EXy609J0xjqv0bAUoW8Don2jNiASe2nKXvZemMWFNGASPDoSOfyaeME5THgNINutFeTQfn165pFBf_JdLRG8KPljU6lo9nCajaRGNP-WpO_PMR1L-KLe-6xUXRWq-isuDd3Fznxy3ZtL9TsifYAc9L4KiEY_a4_3bYEwPVbwOnyDoF-9T-3GKBHBPgkT-026mCbJjXCCEK6K8mu1B1voPtj-QAEABZmm0zdW2CjzdqW-sNzxhX7AflHI",
+    canvasWidth: 600,
+    canvasHeight: 600,
+    nameSettings: {
+      x: 300,
+      y: 160,
+      width: 400,
+      height: 50,
+      maxCharacters: 18,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 38,
+      lineHeight: 1,
+      letterSpacing: 2,
+      alignment: "center",
+      textTransform: "uppercase",
+      rotation: 0,
+      color: "#e0a96d",
+      enableOutline: true,
+      outlineWidth: 3,
+      outlineColor: "#003b7a",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 4,
+      shadowOffsetX: 2,
+      shadowOffsetY: 2,
+      opacity: 1
+    },
+    numberSettings: {
+      x: 300,
+      y: 310,
+      width: 300,
+      height: 150,
+      fontFamily: "Impact",
+      fontWeight: "900",
+      fontSize: 120,
+      alignment: "center",
+      rotation: 0,
+      color: "#e0a96d",
+      enableOutline: true,
+      outlineWidth: 6,
+      outlineColor: "#003b7a",
+      enableShadow: false,
+      shadowColor: "rgba(0,0,0,0.5)",
+      shadowBlur: 6,
+      shadowOffsetX: 3,
+      shadowOffsetY: 3,
+      opacity: 1
+    },
+    safeArea: {
+      x: 50,
+      y: 50,
+      width: 500,
+      height: 500
+    },
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  }
+];
+
 const INITIAL_DB_STATE = {
   products: DEFAULT_PRODUCTS,
   coupons: DEFAULT_COUPONS,
@@ -844,7 +1056,9 @@ const INITIAL_DB_STATE = {
   blogs: DEFAULT_BLOGS,
   reviews: DEFAULT_REVIEWS,
   audit_logs: DEFAULT_AUDIT_LOGS,
-  community_feed: DEFAULT_COMMUNITY_FEED
+  community_feed: DEFAULT_COMMUNITY_FEED,
+  personalizations: DEFAULT_PERSONALIZATIONS,
+  personalizationTemplates: DEFAULT_PERSONALIZATION_TEMPLATES
 };
 
 // Memory cache for DB state to prevent read/write cycles and support read-only platforms
@@ -1227,6 +1441,59 @@ export async function createDbReview(review: any) {
   return newReview;
 }
 
+export async function getDbPersonalizations() {
+  const db = loadDbData();
+  return db.personalizations || [];
+}
+
+export async function getDbPersonalizationByOrderId(orderId: string) {
+  const list = await getDbPersonalizations();
+  return list.filter((p: any) => p.orderId === orderId);
+}
+
+export async function createDbPersonalization(personalization: any) {
+  const db = loadDbData();
+  if (!db.personalizations) db.personalizations = [];
+  const newRecord = {
+    id: `pers_${Math.random().toString(36).substring(2, 9)}`,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    status: 'placed',
+    versions: [] as any[],
+    ...personalization
+  };
+  db.personalizations.push(newRecord);
+  saveDbData(db);
+  return newRecord;
+}
+
+export async function updateDbPersonalization(id: string, updates: any) {
+  const db = loadDbData();
+  if (!db.personalizations) db.personalizations = [];
+  const idx = db.personalizations.findIndex((p: any) => p.id === id);
+  if (idx !== -1) {
+    const current = db.personalizations[idx];
+    if ((updates.playerName !== undefined && updates.playerName !== current.playerName) ||
+        (updates.playerNumber !== undefined && updates.playerNumber !== current.playerNumber)) {
+      if (!current.versions) current.versions = [];
+      current.versions.push({
+        playerName: current.playerName,
+        playerNumber: current.playerNumber,
+        previewImageUrl: current.previewImageUrl,
+        createdAt: current.updatedAt || current.createdAt || new Date().toISOString()
+      });
+    }
+    db.personalizations[idx] = {
+      ...current,
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    saveDbData(db);
+    return db.personalizations[idx];
+  }
+  return null;
+}
+
 export async function getDbAuditLogs() {
   const db = loadDbData();
   return db.audit_logs;
@@ -1264,4 +1531,48 @@ export async function addDbCommunityFeedEntry(entry: any) {
   }
   saveDbData(db);
   return newEntry;
+}
+
+export async function getDbPersonalizationTemplates() {
+  const db = loadDbData();
+  return db.personalizationTemplates || [];
+}
+
+export async function getDbPersonalizationTemplateByProductId(productId: string) {
+  const templates = await getDbPersonalizationTemplates();
+  return templates.find((t: any) => t.productId === productId) || null;
+}
+
+export async function updateDbPersonalizationTemplate(productId: string, updates: any) {
+  const db = loadDbData();
+  if (!db.personalizationTemplates) db.personalizationTemplates = [];
+  const idx = db.personalizationTemplates.findIndex((t: any) => t.productId === productId);
+  if (idx !== -1) {
+    db.personalizationTemplates[idx] = {
+      ...db.personalizationTemplates[idx],
+      ...updates,
+      updatedAt: new Date().toISOString()
+    };
+    saveDbData(db);
+    return db.personalizationTemplates[idx];
+  } else {
+    const newTemplate = {
+      id: `temp_${Math.random().toString(36).substring(2, 9)}`,
+      productId,
+      enabled: false,
+      renderImageId: "0",
+      renderImageUrl: "",
+      canvasWidth: 600,
+      canvasHeight: 600,
+      nameSettings: {},
+      numberSettings: {},
+      safeArea: { x: 0, y: 0, width: 600, height: 600 },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      ...updates
+    };
+    db.personalizationTemplates.push(newTemplate);
+    saveDbData(db);
+    return newTemplate;
+  }
 }

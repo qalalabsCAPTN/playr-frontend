@@ -8,6 +8,10 @@ export interface CartItem {
   colorName: string;
   size: string;
   quantity: number;
+  isPersonalized?: boolean;
+  playerName?: string;
+  playerNumber?: string;
+  previewImageUrl?: string;
 }
 
 export interface CartState {

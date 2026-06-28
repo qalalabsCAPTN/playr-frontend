@@ -47,6 +47,11 @@ export default function CartPage() {
                     <h3 className="font-headline-md text-headline-md uppercase">{item.title}</h3>
                     <p className="text-secondary font-label-md mt-1">Color: {item.colorName}</p>
                     <p className="text-secondary font-label-md">Size: {item.size}</p>
+                    {item.isPersonalized && (
+                      <p className="text-[12px] text-green-600 font-bold uppercase tracking-wider mt-1">
+                        Personalized: {item.playerName} ({item.playerNumber})
+                      </p>
+                    )}
                   </div>
                   <span className="font-headline-md text-headline-md">₹{item.price.toLocaleString('en-IN')}</span>
                 </div>

@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { NectarCommerce, NECTARAnalytics, loyaltyAdapter } from "@playr/nectar-core"
+import { NectarCommerce, NECTARAnalytics, loyaltyAdapter, drawPersonalizedTemplate } from "@playr/nectar-core"
 import type { GamificationProductContext } from "@playr/nectar-core"
 import { useCommerce } from "@/components/commerce/CommerceProvider"
 import { StockMeter } from "@playr/ui"
@@ -11,6 +11,245 @@ import { InteractiveProductCard } from "@/components/commerce/InteractiveProduct
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { cn } from "@playr/ui"
+
+// HTML5 Canvas Jersey Drawing Engine (DPI and Vector-based responsive rendering)
+const drawJersey = (
+  canvas: HTMLCanvasElement, 
+  name: string, 
+  number: string, 
+  themeColor: string, 
+  teamName: string,
+  isHighRes: boolean = false
+) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+
+  if (!isHighRes) {
+    // Draw subtle sports studio backdrop
+    const bgGrad = ctx.createRadialGradient(width/2, height/2, width/10, width/2, height/2, width/2);
+    bgGrad.addColorStop(0, '#1a1917');
+    bgGrad.addColorStop(1, '#0c0b0a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw grid mesh texture
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.lineWidth = 1;
+    const gridSize = width / 20;
+    for (let x = 0; x < width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+  }
+
+  // Draw T-shirt jersey shape
+  const cx = width / 2;
+  const cy = height / 2 + (isHighRes ? 20 : 10);
+  const scale = width * 0.75;
+
+  let accentColor = '#ffffff';
+  let fontColor = '#ffffff';
+  let stripeColor = '#ffffff';
+  const teamNameLower = teamName.toLowerCase();
+  
+  if (teamNameLower.includes('csk') || themeColor === '#FFFF00') {
+    accentColor = '#005ea6'; // CSK Blue
+    fontColor = '#005ea6';
+    stripeColor = '#ff6c00'; // CSK Orange
+  } else if (teamNameLower.includes('rr') || themeColor === '#FF69B4') {
+    accentColor = '#111e38'; // RR Navy
+    fontColor = '#ffffff';
+    stripeColor = '#e0a96d'; // RR Gold
+  } else if (teamNameLower.includes('mi') || themeColor === '#0000FF') {
+    accentColor = '#e0a96d'; // MI Gold
+    fontColor = '#e0a96d';
+    stripeColor = '#003b7a'; // MI Navy
+  } else {
+    accentColor = '#333333';
+    fontColor = '#ffffff';
+    stripeColor = '#888888';
+  }
+
+  ctx.save();
+  ctx.translate(cx, cy - scale * 0.05);
+
+  // Body Outline Path
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35); // Left collar
+  ctx.lineTo(-scale * 0.38, -scale * 0.28); // Left shoulder
+  ctx.lineTo(-scale * 0.46, -scale * 0.08); // Left sleeve end
+  ctx.lineTo(-scale * 0.34, -scale * 0.02); // Left sleeve bottom
+  ctx.lineTo(-scale * 0.26, -scale * 0.12); // Left armpit
+  ctx.lineTo(-scale * 0.24, scale * 0.35);  // Left side
+  ctx.quadraticCurveTo(0, scale * 0.38, scale * 0.24, scale * 0.35); // Bottom curve
+  ctx.lineTo(scale * 0.26, -scale * 0.12);  // Right armpit
+  ctx.lineTo(scale * 0.34, -scale * 0.02);  // Right sleeve bottom
+  ctx.lineTo(scale * 0.46, -scale * 0.08);  // Right sleeve end
+  ctx.lineTo(scale * 0.38, -scale * 0.28);  // Right shoulder
+  ctx.lineTo(scale * 0.15, -scale * 0.35);   // Right collar
+  ctx.quadraticCurveTo(0, -scale * 0.31, -scale * 0.15, -scale * 0.35); // Collar curve
+  ctx.closePath();
+
+  // Draw main body shading/mesh gradient
+  const jerseyGrad = ctx.createLinearGradient(0, -scale * 0.4, 0, scale * 0.4);
+  jerseyGrad.addColorStop(0, themeColor);
+  jerseyGrad.addColorStop(1, adjustColorBrightness(themeColor, -25));
+  ctx.fillStyle = jerseyGrad;
+  ctx.fill();
+
+  // Raglan seams shadows
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.lineWidth = scale * 0.005;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(-scale * 0.2, -scale * 0.2, -scale * 0.26, -scale * 0.12);
+  ctx.moveTo(scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(scale * 0.2, -scale * 0.2, scale * 0.26, -scale * 0.12);
+  ctx.stroke();
+
+  // Collar collar trim
+  ctx.fillStyle = accentColor;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(0, -scale * 0.31, scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(0, -scale * 0.34, -scale * 0.15, -scale * 0.35);
+  ctx.closePath();
+  ctx.fill();
+
+  // Sleeve cuffs trim
+  ctx.strokeStyle = accentColor;
+  ctx.lineWidth = scale * 0.025;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.46, -scale * 0.08);
+  ctx.lineTo(-scale * 0.34, -scale * 0.02);
+  ctx.moveTo(scale * 0.46, -scale * 0.08);
+  ctx.lineTo(scale * 0.34, -scale * 0.02);
+  ctx.stroke();
+
+  // Sleeve stripes accent
+  ctx.strokeStyle = stripeColor;
+  ctx.lineWidth = scale * 0.012;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.44, -scale * 0.09);
+  ctx.lineTo(-scale * 0.35, -scale * 0.04);
+  ctx.moveTo(scale * 0.44, -scale * 0.09);
+  ctx.lineTo(scale * 0.35, -scale * 0.04);
+  ctx.stroke();
+
+  // Side panels stripes
+  ctx.fillStyle = stripeColor;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.25, -scale * 0.05);
+  ctx.lineTo(-scale * 0.24, scale * 0.35);
+  ctx.lineTo(-scale * 0.21, scale * 0.35);
+  ctx.lineTo(-scale * 0.23, -scale * 0.05);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(scale * 0.25, -scale * 0.05);
+  ctx.lineTo(scale * 0.24, scale * 0.35);
+  ctx.lineTo(scale * 0.21, scale * 0.35);
+  ctx.lineTo(scale * 0.23, -scale * 0.05);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.lineWidth = scale * 0.005;
+  ctx.stroke();
+
+  // Render player name along arc path
+  if (name && name.length >= 2) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    let nameFontSize = Math.round(scale * 0.065);
+    if (name.length > 12) {
+      nameFontSize = Math.round(scale * (0.065 - (name.length - 12) * 0.002));
+    }
+    
+    ctx.font = `900 ${nameFontSize}px Impact, "Oswald", "Arial Black", sans-serif`;
+    ctx.fillStyle = fontColor;
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = scale * 0.015;
+
+    const radius = scale * 0.8;
+    const centerArcY = scale * 0.48;
+    const chars = name.split('');
+    const charSpacingAngle = name.length > 10 ? 0.03 : 0.042;
+    const totalAngle = (chars.length - 1) * charSpacingAngle;
+    const startAngle = -Math.PI / 2 - totalAngle / 2;
+
+    chars.forEach((char, index) => {
+      const angle = startAngle + index * charSpacingAngle;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius + centerArcY;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + Math.PI / 2);
+      ctx.strokeText(char, 0, 0);
+      ctx.fillText(char, 0, 0);
+      ctx.restore();
+    });
+
+    ctx.restore();
+  }
+
+  // Render player number
+  if (number) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const numFontSize = Math.round(scale * 0.32);
+    ctx.font = `900 ${numFontSize}px Impact, "Oswald", "Arial Black", sans-serif`;
+    ctx.fillStyle = fontColor;
+    
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = scale * 0.05;
+    ctx.strokeText(number, 0, scale * 0.06);
+    ctx.fillText(number, 0, scale * 0.06);
+
+    if (teamNameLower.includes('csk') || teamNameLower.includes('mi')) {
+      ctx.strokeStyle = stripeColor;
+      ctx.lineWidth = scale * 0.018;
+      ctx.strokeText(number, 0, scale * 0.06);
+      ctx.fillText(number, 0, scale * 0.06);
+    }
+  }
+
+  ctx.restore();
+};
+
+const adjustColorBrightness = (hex: string, percent: number) => {
+  let R = parseInt(hex.substring(1, 3), 16);
+  let G = parseInt(hex.substring(3, 5), 16);
+  let B = parseInt(hex.substring(5, 7), 16);
+
+  R = Math.max(0, Math.min(255, R + (R * percent / 100)));
+  G = Math.max(0, Math.min(255, G + (G * percent / 100)));
+  B = Math.max(0, Math.min(255, B + (B * percent / 100)));
+
+  const rHex = Math.round(R).toString(16).padStart(2, '0');
+  const gHex = Math.round(G).toString(16).padStart(2, '0');
+  const bHex = Math.round(B).toString(16).padStart(2, '0');
+
+  return `#${rHex}${gHex}${bHex}`;
+};
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
@@ -24,9 +263,154 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   const [gamificationCtx, setGamificationCtx] = React.useState<GamificationProductContext | null>(null)
   const [recentlyViewed, setRecentlyViewed] = React.useState<any[]>([])
 
+  // Customization States
+  const [isCustomizing, setIsCustomizing] = React.useState(false)
+  const [playerName, setPlayerName] = React.useState("")
+  const [playerNumber, setPlayerNumber] = React.useState("")
+  const [isUploading, setIsUploading] = React.useState(false)
+  const canvasRef = React.useRef<HTMLCanvasElement>(null)
+
   // Selection states
   const [selectedColor, setSelectedColor] = React.useState<any>(null)
   const [selectedSize, setSelectedSize] = React.useState<string>("")
+
+  // Input sanitization & validation
+  const maxChars = product?.personalizationTemplate?.nameSettings?.maxCharacters || 18;
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value.toUpperCase();
+    const cleanVal = rawVal.replace(/[^A-Z\s]/g, "");
+    if (cleanVal.length <= maxChars) {
+      setPlayerName(cleanVal);
+    }
+  };
+
+  const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawVal = e.target.value;
+    const cleanVal = rawVal.replace(/[^0-9]/g, "");
+    if (cleanVal === "") {
+      setPlayerNumber("");
+      return;
+    }
+    if (cleanVal.length <= 2) {
+      const numVal = parseInt(cleanVal, 10);
+      if (numVal >= 0 && numVal <= 99) {
+        setPlayerNumber(cleanVal);
+      }
+    }
+  };
+
+  // Redraw Canvas on changes
+  React.useEffect(() => {
+    if (!isCustomizing || !canvasRef.current || !product) return;
+    if (product.personalizationTemplate && product.personalizationTemplate.enabled) {
+      drawPersonalizedTemplate(canvasRef.current, product.personalizationTemplate, playerName, playerNumber, false);
+    } else {
+      const themeColor = selectedColor?.hex || product.colors[0]?.hex || "#000000";
+      drawJersey(canvasRef.current, playerName, playerNumber, themeColor, product.title);
+    }
+  }, [isCustomizing, playerName, playerNumber, product, selectedColor]);
+
+  // DPI-aware high-resolution upload with local mock fallback
+  const handleAddToCartCustomized = async (isBuyNow = false) => {
+    if (!selectedSize) {
+      alert("Please select a size first.");
+      return;
+    }
+    if (playerName.trim().length < 2) {
+      alert("Player Name must be at least 2 characters.");
+      return;
+    }
+    if (playerNumber === "") {
+      alert("Player Number must be between 0 and 99.");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const exportCanvas = document.createElement("canvas");
+      exportCanvas.width = 2400; 
+      exportCanvas.height = 2400;
+      
+      if (product.personalizationTemplate && product.personalizationTemplate.enabled) {
+        drawPersonalizedTemplate(exportCanvas, product.personalizationTemplate, playerName.trim(), playerNumber, false);
+      } else {
+        const themeColor = selectedColor?.hex || product.colors[0]?.hex || "#000000";
+        drawJersey(exportCanvas, playerName.trim(), playerNumber, themeColor, product.title, true);
+      }
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        exportCanvas.toBlob((b) => resolve(b), "image/png");
+      });
+
+      if (!blob) {
+        throw new Error("Failed to generate artwork file.");
+      }
+
+      const formData = new FormData();
+      formData.append("file", blob, `custom-${product.id}-${playerName}-${playerNumber}.png`);
+
+      const uploadRes = await fetch("/api/personalizations/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const { url } = await uploadRes.json();
+
+      addToCart({
+        id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}-${playerName}-${playerNumber}`,
+        productId: product.id,
+        variantId: "default",
+        title: `${product.title} (Personalized)`,
+        price: product.price,
+        imageSrc: url, 
+        colorName: selectedColor?.name || "Default",
+        size: selectedSize,
+        quantity: 1,
+        isPersonalized: true,
+        playerName: playerName.trim(),
+        playerNumber: playerNumber,
+        previewImageUrl: url
+      } as any);
+
+      if (isBuyNow) {
+        router.push("/checkout");
+      }
+    } catch (err: any) {
+      console.error("Personalization upload failed, using local offline fallback:", err);
+      
+      let dataUrl = "";
+      if (canvasRef.current) {
+        dataUrl = canvasRef.current.toDataURL("image/png");
+      }
+
+      addToCart({
+        id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}-${playerName}-${playerNumber}`,
+        productId: product.id,
+        variantId: "default",
+        title: `${product.title} (Personalized)`,
+        price: product.price,
+        imageSrc: dataUrl || product.imageSrc,
+        colorName: selectedColor?.name || "Default",
+        size: selectedSize,
+        quantity: 1,
+        isPersonalized: true,
+        playerName: playerName.trim(),
+        playerNumber: playerNumber,
+        previewImageUrl: dataUrl || product.imageSrc
+      } as any);
+
+      if (isBuyNow) {
+        router.push("/checkout");
+      }
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   // Reviews states
   const [reviews, setReviews] = React.useState<any[]>([])
@@ -190,26 +574,37 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
       </nav>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-section-gap-md items-start">
-        {/* Left Column: Image Gallery */}
+        {/* Left Column: Image Gallery / Custom Preview */}
         <div className="lg:col-span-7 flex flex-col gap-6">
-          <div className="aspect-square bg-surface-container-low rounded-lg overflow-hidden shadow-sm group relative">
-            {activeImage && (
+          <div className="aspect-square bg-surface-container-low rounded-lg overflow-hidden shadow-sm group relative flex items-center justify-center">
+            {isCustomizing ? (
+              <canvas
+                ref={canvasRef}
+                width={600}
+                height={600}
+                className="w-full h-full max-w-full max-h-full object-contain"
+                aria-label="Live personalized jersey preview"
+              />
+            ) : activeImage ? (
               <Image
                 fill
                 alt={`${product.title} main view`}
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 src={activeImage}
               />
-            )}
+            ) : null}
           </div>
           <div className="flex gap-4 overflow-x-auto pb-2 hide-scrollbar">
             {product.gallery.map((img: string, idx: number) => (
               <button
                 key={idx}
                 className={`relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden bg-surface-container-low shadow-sm border-2 transition-all ${
-                  activeImage === img ? "border-primary" : "border-transparent"
+                  !isCustomizing && activeImage === img ? "border-primary" : "border-transparent"
                 }`}
-                onClick={() => setActiveImage(img)}
+                onClick={() => {
+                  setActiveImage(img);
+                  setIsCustomizing(false);
+                }}
               >
                 <Image fill alt={`Thumbnail ${idx + 1}`} className="object-cover" src={img} />
               </button>
@@ -287,6 +682,63 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
 
           <StockMeter count={2} />
 
+          {(product.isPersonalized || (product.personalizationTemplate && product.personalizationTemplate.enabled)) && (
+            <div className="border border-outline-variant/30 rounded-2xl p-6 bg-surface-container/30 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">edit_square</span>
+                  <span className="font-headline-sm font-bold uppercase tracking-wide">Customize Jersey</span>
+                </div>
+                <button
+                  onClick={() => setIsCustomizing(!isCustomizing)}
+                  className={cn(
+                    "text-xs px-4 py-1.5 rounded-full font-bold uppercase tracking-wider transition-colors",
+                    isCustomizing ? "bg-primary text-on-primary" : "bg-surface-container-highest text-on-surface hover:bg-primary hover:text-on-primary"
+                  )}
+                >
+                  {isCustomizing ? "Active" : "Configure"}
+                </button>
+              </div>
+
+              {isCustomizing && (
+                <div className="space-y-4 pt-2 border-t border-outline/10 animate-fade-in">
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center text-xs font-bold uppercase tracking-wider text-secondary">
+                      <label htmlFor="playerName">Player Name</label>
+                      <span>{playerName.length} / {maxChars}</span>
+                    </div>
+                    <input
+                      id="playerName"
+                      type="text"
+                      className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 text-body-md outline-none focus:border-primary uppercase font-mono tracking-widest text-on-surface"
+                      placeholder="ENTER NAME"
+                      value={playerName}
+                      onChange={handleNameChange}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="playerNumber" className="block text-xs font-bold uppercase tracking-wider text-secondary">Player Number (0-99)</label>
+                    <input
+                      id="playerNumber"
+                      type="text"
+                      className="w-full bg-surface-container border border-outline/20 rounded-xl px-4 py-3 text-body-md outline-none focus:border-primary font-mono tracking-widest text-on-surface"
+                      placeholder="00"
+                      value={playerNumber}
+                      onChange={handleNumberChange}
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <p className="text-[10px] text-on-surface-variant leading-relaxed uppercase">
+                    * Names are converted to uppercase automatically. Allowed: A-Z and spaces only. Numbers 0-99 only.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* CTAs */}
           <div className="flex flex-col gap-4 pt-4">
             {/* XP context from NECTAR — render only, no calculations */}
@@ -318,25 +770,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             <div className="flex gap-4">
               <button 
                 onClick={() => {
-                  if (!selectedSize) {
-                    alert("Please select a size first.");
-                    return;
+                  if (isCustomizing) {
+                    handleAddToCartCustomized(false);
+                  } else {
+                    if (!selectedSize) {
+                      alert("Please select a size first.");
+                      return;
+                    }
+                    addToCart({
+                      id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
+                      productId: product.id,
+                      variantId: "default",
+                      title: product.title,
+                      price: product.price,
+                      imageSrc: product.imageSrc,
+                      colorName: selectedColor?.name || "Default",
+                      size: selectedSize,
+                      quantity: 1
+                    })
                   }
-                  addToCart({
-                    id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
-                    productId: product.id,
-                    variantId: "default",
-                    title: product.title,
-                    price: product.price,
-                    imageSrc: product.imageSrc,
-                    colorName: selectedColor?.name || "Default",
-                    size: selectedSize,
-                    quantity: 1
-                  })
                 }}
-                className="flex-grow bg-primary-container text-on-primary-container font-bold text-headline-sm py-5 rounded-full shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all duration-200"
+                disabled={isUploading}
+                className="flex-grow bg-primary-container text-on-primary-container font-bold text-headline-sm py-5 rounded-full shadow-lg shadow-primary-container/20 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add to Cart
+                {isUploading ? "Uploading Preview..." : "Add to Cart"}
               </button>
               {(() => {
                 const isWishlisted = wishlistItems.some(item => item.productId === product.id);
@@ -375,26 +832,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
             </div>
             <button 
               onClick={() => {
-                if (!selectedSize) {
-                  alert("Please select a size first.");
-                  return;
+                if (isCustomizing) {
+                  handleAddToCartCustomized(true);
+                } else {
+                  if (!selectedSize) {
+                    alert("Please select a size first.");
+                    return;
+                  }
+                  addToCart({
+                    id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
+                    productId: product.id,
+                    variantId: "default",
+                    title: product.title,
+                    price: product.price,
+                    imageSrc: product.imageSrc,
+                    colorName: selectedColor?.name || "Default",
+                    size: selectedSize,
+                    quantity: 1
+                  });
+                  router.push('/checkout');
                 }
-                addToCart({
-                  id: `${product.id}-${selectedColor?.name || 'default'}-${selectedSize}`,
-                  productId: product.id,
-                  variantId: "default",
-                  title: product.title,
-                  price: product.price,
-                  imageSrc: product.imageSrc,
-                  colorName: selectedColor?.name || "Default",
-                  size: selectedSize,
-                  quantity: 1
-                });
-                router.push('/checkout');
               }}
-              className="w-full bg-transparent border-2 border-secondary text-on-surface font-bold text-headline-sm py-5 rounded-full hover:bg-surface-container transition-all active:scale-95 duration-200"
+              disabled={isUploading}
+              className="w-full bg-transparent border-2 border-secondary text-on-surface font-bold text-headline-sm py-5 rounded-full hover:bg-surface-container transition-all active:scale-95 duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Buy Now
+              {isUploading ? "Please wait..." : "Buy Now"}
             </button>
             <div className="flex items-center gap-4 text-sm text-on-surface-variant pt-4 border-t border-outline/10">
               <button 

@@ -253,7 +253,11 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
             price: item.price,
             quantity: item.quantity,
             colorName: item.colorName,
-            size: item.size
+            size: item.size,
+            isPersonalized: item.isPersonalized || false,
+            playerName: item.playerName || "",
+            playerNumber: item.playerNumber || "",
+            previewImageUrl: item.previewImageUrl || ""
           })),
           shippingAddress: selectedAddressId !== null && selectedAddressId.startsWith('saved-')
             ? savedAddresses[parseInt(selectedAddressId.split('-')[1])]

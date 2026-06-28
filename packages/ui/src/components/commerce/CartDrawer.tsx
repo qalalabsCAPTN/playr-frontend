@@ -9,6 +9,10 @@ export interface CartDrawerItem {
   colorName: string
   size: string
   quantity: number
+  isPersonalized?: boolean
+  playerName?: string
+  playerNumber?: string
+  previewImageUrl?: string
 }
 
 export interface CartDrawerProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -90,6 +94,11 @@ export const CartDrawer = React.forwardRef<HTMLDivElement, CartDrawerProps>(
                       </div>
                       <p className="text-secondary font-label-sm mt-1">Color: {item.colorName}</p>
                       <p className="text-secondary font-label-sm">Size: {item.size}</p>
+                      {item.isPersonalized && (
+                        <p className="text-[11px] text-green-600 font-bold uppercase tracking-wider mt-1">
+                          Personalized: {item.playerName} ({item.playerNumber})
+                        </p>
+                      )}
                     </div>
                     <div className="flex justify-between items-center mt-2">
                       <div className="flex items-center border border-on-surface/30 rounded-full px-2 py-1 gap-2 bg-surface">

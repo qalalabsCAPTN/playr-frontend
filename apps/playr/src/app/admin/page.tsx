@@ -3,6 +3,277 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { drawPersonalizedTemplate } from '@playr/nectar-core'
+
+// HTML5 Canvas Jersey Drawing Engine (Shared with storefront for admin edits preview)
+const drawJersey = (
+  canvas: HTMLCanvasElement, 
+  name: string, 
+  number: string, 
+  themeColor: string, 
+  teamName: string,
+  isHighRes: boolean = false
+) => {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+
+  if (!isHighRes) {
+    // Draw subtle sports studio backdrop
+    const bgGrad = ctx.createRadialGradient(width/2, height/2, width/10, width/2, height/2, width/2);
+    bgGrad.addColorStop(0, '#1a1917');
+    bgGrad.addColorStop(1, '#0c0b0a');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, width, height);
+
+    // Draw grid mesh texture
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+    ctx.lineWidth = 1;
+    const gridSize = width / 20;
+    for (let x = 0; x < width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+  }
+
+  // Draw T-shirt jersey shape
+  const cx = width / 2;
+  const cy = height / 2 + (isHighRes ? 20 : 10);
+  const scale = width * 0.75;
+
+  let accentColor = '#ffffff';
+  let fontColor = '#ffffff';
+  let stripeColor = '#ffffff';
+  const teamNameLower = teamName.toLowerCase();
+  
+  if (teamNameLower.includes('csk') || themeColor === '#FFFF00') {
+    accentColor = '#005ea6'; // CSK Blue
+    fontColor = '#005ea6';
+    stripeColor = '#ff6c00'; // CSK Orange
+  } else if (teamNameLower.includes('rr') || themeColor === '#FF69B4') {
+    accentColor = '#111e38'; // RR Navy
+    fontColor = '#ffffff';
+    stripeColor = '#e0a96d'; // RR Gold
+  } else if (teamNameLower.includes('mi') || themeColor === '#0000FF') {
+    accentColor = '#e0a96d'; // MI Gold
+    fontColor = '#e0a96d';
+    stripeColor = '#003b7a'; // MI Navy
+  } else {
+    accentColor = '#333333';
+    fontColor = '#ffffff';
+    stripeColor = '#888888';
+  }
+
+  ctx.save();
+  ctx.translate(cx, cy - scale * 0.05);
+
+  // Body Outline Path
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35); // Left collar
+  ctx.lineTo(-scale * 0.38, -scale * 0.28); // Left shoulder
+  ctx.lineTo(-scale * 0.46, -scale * 0.08); // Left sleeve end
+  ctx.lineTo(-scale * 0.34, -scale * 0.02); // Left sleeve bottom
+  ctx.lineTo(-scale * 0.26, -scale * 0.12); // Left armpit
+  ctx.lineTo(-scale * 0.24, scale * 0.35);  // Left side
+  ctx.quadraticCurveTo(0, scale * 0.38, scale * 0.24, scale * 0.35); // Bottom curve
+  ctx.lineTo(scale * 0.26, -scale * 0.12);  // Right armpit
+  ctx.lineTo(scale * 0.34, -scale * 0.02);  // Right sleeve bottom
+  ctx.lineTo(scale * 0.46, -scale * 0.08);  // Right sleeve end
+  ctx.lineTo(scale * 0.38, -scale * 0.28);  // Right shoulder
+  ctx.lineTo(scale * 0.15, -scale * 0.35);   // Right collar
+  ctx.quadraticCurveTo(0, -scale * 0.31, -scale * 0.15, -scale * 0.35); // Collar curve
+  ctx.closePath();
+
+  // Draw main body shading/mesh gradient
+  const jerseyGrad = ctx.createLinearGradient(0, -scale * 0.4, 0, scale * 0.4);
+  jerseyGrad.addColorStop(0, themeColor);
+  jerseyGrad.addColorStop(1, adjustColorBrightness(themeColor, -25));
+  ctx.fillStyle = jerseyGrad;
+  ctx.fill();
+
+  // Raglan seams shadows
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.lineWidth = scale * 0.005;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(-scale * 0.2, -scale * 0.2, -scale * 0.26, -scale * 0.12);
+  ctx.moveTo(scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(scale * 0.2, -scale * 0.2, scale * 0.26, -scale * 0.12);
+  ctx.stroke();
+
+  // Collar collar trim
+  ctx.fillStyle = accentColor;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(0, -scale * 0.31, scale * 0.15, -scale * 0.35);
+  ctx.quadraticCurveTo(0, -scale * 0.34, -scale * 0.15, -scale * 0.35);
+  ctx.closePath();
+  ctx.fill();
+
+  // Sleeve cuffs trim
+  ctx.strokeStyle = accentColor;
+  ctx.lineWidth = scale * 0.025;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.46, -scale * 0.08);
+  ctx.lineTo(-scale * 0.34, -scale * 0.02);
+  ctx.moveTo(scale * 0.46, -scale * 0.08);
+  ctx.lineTo(scale * 0.34, -scale * 0.02);
+  ctx.stroke();
+
+  // Sleeve stripes accent
+  ctx.strokeStyle = stripeColor;
+  ctx.lineWidth = scale * 0.012;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.44, -scale * 0.09);
+  ctx.lineTo(-scale * 0.35, -scale * 0.04);
+  ctx.moveTo(scale * 0.44, -scale * 0.09);
+  ctx.lineTo(scale * 0.35, -scale * 0.04);
+  ctx.stroke();
+
+  // Side panels stripes
+  ctx.fillStyle = stripeColor;
+  ctx.beginPath();
+  ctx.moveTo(-scale * 0.25, -scale * 0.05);
+  ctx.lineTo(-scale * 0.24, scale * 0.35);
+  ctx.lineTo(-scale * 0.21, scale * 0.35);
+  ctx.lineTo(-scale * 0.23, -scale * 0.05);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.moveTo(scale * 0.25, -scale * 0.05);
+  ctx.lineTo(scale * 0.24, scale * 0.35);
+  ctx.lineTo(scale * 0.21, scale * 0.35);
+  ctx.lineTo(scale * 0.23, -scale * 0.05);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.lineWidth = scale * 0.005;
+  ctx.stroke();
+
+  // Render player name along arc path
+  if (name && name.length >= 2) {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    let nameFontSize = Math.round(scale * 0.065);
+    if (name.length > 12) {
+      nameFontSize = Math.round(scale * (0.065 - (name.length - 12) * 0.002));
+    }
+    
+    ctx.font = `900 ${nameFontSize}px Impact, "Oswald", "Arial Black", sans-serif`;
+    ctx.fillStyle = fontColor;
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = scale * 0.015;
+
+    const radius = scale * 0.8;
+    const centerArcY = scale * 0.48;
+    const chars = name.split('');
+    const charSpacingAngle = name.length > 10 ? 0.03 : 0.042;
+    const totalAngle = (chars.length - 1) * charSpacingAngle;
+    const startAngle = -Math.PI / 2 - totalAngle / 2;
+
+    chars.forEach((char, index) => {
+      const angle = startAngle + index * charSpacingAngle;
+      const x = Math.cos(angle) * radius;
+      const y = Math.sin(angle) * radius + centerArcY;
+
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle + Math.PI / 2);
+      ctx.strokeText(char, 0, 0);
+      ctx.fillText(char, 0, 0);
+      ctx.restore();
+    });
+
+    ctx.restore();
+  }
+
+  // Render player number
+  if (number) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const numFontSize = Math.round(scale * 0.32);
+    ctx.font = `900 ${numFontSize}px Impact, "Oswald", "Arial Black", sans-serif`;
+    ctx.fillStyle = fontColor;
+    
+    ctx.strokeStyle = accentColor;
+    ctx.lineWidth = scale * 0.05;
+    ctx.strokeText(number, 0, scale * 0.06);
+    ctx.fillText(number, 0, scale * 0.06);
+
+    if (teamNameLower.includes('csk') || teamNameLower.includes('mi')) {
+      ctx.strokeStyle = stripeColor;
+      ctx.lineWidth = scale * 0.018;
+      ctx.strokeText(number, 0, scale * 0.06);
+      ctx.fillText(number, 0, scale * 0.06);
+    }
+  }
+
+  ctx.restore();
+};
+
+const adjustColorBrightness = (hex: string, percent: number) => {
+  let R = parseInt(hex.substring(1, 3), 16);
+  let G = parseInt(hex.substring(3, 5), 16);
+  let B = parseInt(hex.substring(5, 7), 16);
+
+  R = Math.max(0, Math.min(255, R + (R * percent / 100)));
+  G = Math.max(0, Math.min(255, G + (G * percent / 100)));
+  B = Math.max(0, Math.min(255, B + (B * percent / 100)));
+
+  const rHex = Math.round(R).toString(16).padStart(2, '0');
+  const gHex = Math.round(G).toString(16).padStart(2, '0');
+  const bHex = Math.round(B).toString(16).padStart(2, '0');
+
+  return `#${rHex}${gHex}${bHex}`;
+};
+
+const downloadArtwork = async (orderDisplayId: string, name: string, num: string, imageUrl: string) => {
+  try {
+    const filename = `ORDER-${orderDisplayId}-${name.replace(/\s+/g, '_')}-${num}.png`;
+    
+    if (imageUrl.startsWith('data:')) {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
+    const res = await fetch(imageUrl);
+    const blob = await res.blob();
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
+  } catch (e) {
+    console.error("Artwork download failed, opening in new tab instead", e);
+    window.open(imageUrl, '_blank');
+  }
+};
 
 type Tab =
   | 'dashboard'
@@ -40,6 +311,28 @@ export default function AdminDashboardPage() {
   const [selectedLead, setSelectedLead] = useState<any | null>(null)
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null)
   const [selectedTicket, setSelectedTicket] = useState<any | null>(null)
+
+  // Personalization Edit & Admin States
+  const [personalizations, setPersonalizations] = useState<any[]>([])
+  const [isAdminEditingPers, setIsAdminEditingPers] = useState(false)
+  const [editingPersItemId, setEditingPersItemId] = useState('')
+  const [editingPersName, setEditingPersName] = useState('')
+  const [editingPersNumber, setEditingPersNumber] = useState('')
+  const [isAdminSavingPers, setIsAdminSavingPers] = useState(false)
+
+  // Personalization Template V2 States
+  const [selectedTemplateProduct, setSelectedTemplateProduct] = useState<any | null>(null)
+  const [tempEditorState, setTempEditorState] = useState<any | null>(null)
+  const [previewName, setPreviewName] = useState('AAYUSH')
+  const [previewNumber, setPreviewNumber] = useState('07')
+  const [isTemplateInSafeArea, setIsTemplateInSafeArea] = useState(true)
+  const [activeTempTab, setActiveTempTab] = useState<'image' | 'name' | 'number' | 'safe'>('image')
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false)
+  const adminTemplateCanvasRef = React.useRef<HTMLCanvasElement>(null)
+
+  // Filter/Search States for Orders
+  const [selectedOrderFilter, setSelectedOrderFilter] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
   
   // Forms states
   const [newCouponCode, setNewCouponCode] = useState('')
@@ -53,7 +346,7 @@ export default function AdminDashboardPage() {
   // Load Admin Data
   const loadAdminData = async () => {
     try {
-      const [leadsRes, custsRes, ordsRes, prodsRes, coupsRes, tktsRes, blogsRes, logsRes] = await Promise.all([
+      const [leadsRes, custsRes, ordsRes, prodsRes, coupsRes, tktsRes, blogsRes, logsRes, persRes] = await Promise.all([
         fetch('/api/admin/leads').then(r => r.json()),
         fetch('/api/identity/users/real_usr_8f92a').then(r => [r.json()]), // mock user list derived from search queries
         fetch('/api/admin/orders').then(r => r.json()),
@@ -61,7 +354,8 @@ export default function AdminDashboardPage() {
         fetch('/api/admin/coupons').then(r => r.json()),
         fetch('/api/admin/support-tickets').then(r => r.json()),
         fetch('/api/admin/blogs').then(r => r.json()),
-        fetch('/api/admin/audit-logs').then(r => r.json())
+        fetch('/api/admin/audit-logs').then(r => r.json()),
+        fetch('/api/personalizations').then(r => r.json()).catch(() => [])
       ]);
 
       setLeads(leadsRes || []);
@@ -72,6 +366,7 @@ export default function AdminDashboardPage() {
       setTickets(tktsRes || []);
       setBlogs(blogsRes || []);
       setAuditLogs(logsRes || []);
+      setPersonalizations(persRes || []);
     } catch (e) {
       console.error("Failed to load admin data", e);
     }
@@ -90,6 +385,8 @@ export default function AdminDashboardPage() {
     }
   }
 
+  const adminCanvasRef = React.useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
     // Session authorization check
     if (status === 'unauthenticated') {
@@ -99,6 +396,118 @@ export default function AdminDashboardPage() {
       loadCmsContent(cmsPage);
     }
   }, [status, cmsPage, router])
+
+  useEffect(() => {
+    if (!isAdminEditingPers || !adminCanvasRef.current) return;
+    const item = selectedOrder?.items.find((i: any) => i.id === editingPersItemId);
+    if (!item) return;
+    const p = products.find(prod => prod.id === item.productId) || {};
+    const themeColor = p.colors?.[0]?.hex || "#FFFF00";
+    drawJersey(adminCanvasRef.current, editingPersName, editingPersNumber, themeColor, p.title || 'Jersey');
+  }, [isAdminEditingPers, editingPersName, editingPersNumber, selectedOrder, editingPersItemId, products]);
+
+  useEffect(() => {
+    if (!selectedTemplateProduct || !tempEditorState || !adminTemplateCanvasRef.current) return;
+    const { inSafeArea } = drawPersonalizedTemplate(
+      adminTemplateCanvasRef.current,
+      tempEditorState,
+      previewName,
+      previewNumber,
+      true
+    );
+    setIsTemplateInSafeArea(inSafeArea);
+  }, [selectedTemplateProduct, tempEditorState, previewName, previewNumber]);
+
+  const handleOpenTemplateEditor = (p: any) => {
+    setSelectedTemplateProduct(p);
+    const existing = p.personalizationTemplate || {};
+    setTempEditorState({
+      enabled: existing.enabled || false,
+      renderImageId: existing.renderImageId || "0",
+      renderImageUrl: existing.renderImageUrl || p.imageSrc || "",
+      canvasWidth: existing.canvasWidth || 600,
+      canvasHeight: existing.canvasHeight || 600,
+      nameSettings: {
+        x: 300,
+        y: 160,
+        width: 400,
+        height: 50,
+        maxCharacters: 18,
+        fontFamily: "Impact",
+        fontWeight: "900",
+        fontSize: 38,
+        lineHeight: 1,
+        letterSpacing: 2,
+        alignment: "center",
+        textTransform: "uppercase",
+        rotation: 0,
+        color: "#ffffff",
+        enableOutline: true,
+        outlineWidth: 3,
+        outlineColor: "#000000",
+        enableShadow: false,
+        shadowColor: "rgba(0,0,0,0.5)",
+        shadowBlur: 4,
+        shadowOffsetX: 2,
+        shadowOffsetY: 2,
+        opacity: 1,
+        ...existing.nameSettings
+      },
+      numberSettings: {
+        x: 300,
+        y: 310,
+        width: 300,
+        height: 150,
+        fontFamily: "Impact",
+        fontWeight: "900",
+        fontSize: 120,
+        alignment: "center",
+        rotation: 0,
+        color: "#ffffff",
+        enableOutline: true,
+        outlineWidth: 6,
+        outlineColor: "#000000",
+        enableShadow: false,
+        shadowColor: "rgba(0,0,0,0.5)",
+        shadowBlur: 6,
+        shadowOffsetX: 3,
+        shadowOffsetY: 3,
+        opacity: 1,
+        ...existing.numberSettings
+      },
+      safeArea: {
+        x: 50,
+        y: 50,
+        width: 500,
+        height: 500,
+        ...existing.safeArea
+      }
+    });
+  };
+
+  const handleSaveTemplateSettings = async () => {
+    if (!selectedTemplateProduct || !tempEditorState) return;
+    setIsSavingTemplate(true);
+    try {
+      const res = await fetch(`/api/admin/products/${selectedTemplateProduct.id}/personalization-template`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(tempEditorState)
+      });
+      if (res.ok) {
+        alert("Personalization template saved successfully!");
+        setSelectedTemplateProduct(null);
+        loadAdminData();
+      } else {
+        alert("Failed to save personalization template.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error saving personalization template.");
+    } finally {
+      setIsSavingTemplate(false);
+    }
+  };
 
   if (status === 'loading') {
     return (
@@ -122,6 +531,69 @@ export default function AdminDashboardPage() {
       }
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  const handleSavePersEdit = async (orderId: string, itemId: string, productId: string) => {
+    setIsAdminSavingPers(true);
+    try {
+      const exportCanvas = document.createElement("canvas");
+      exportCanvas.width = 2400;
+      exportCanvas.height = 2400;
+      
+      const p = products.find(prod => prod.id === productId) || {};
+      const themeColor = p.colors?.[0]?.hex || "#FFFF00";
+      
+      drawJersey(exportCanvas, editingPersName.trim(), editingPersNumber, themeColor, p.title || 'Jersey', true);
+
+      const blob = await new Promise<Blob | null>((resolve) => {
+        exportCanvas.toBlob((b) => resolve(b), "image/png");
+      });
+
+      if (!blob) {
+        throw new Error("Blob creation failed");
+      }
+
+      const formData = new FormData();
+      formData.append("file", blob, `edit-${orderId}-${editingPersName}-${editingPersNumber}.png`);
+
+      const uploadRes = await fetch("/api/personalizations/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Upload failed");
+      }
+
+      const { url } = await uploadRes.json();
+
+      const editRes = await fetch(`/api/admin/orders/${orderId}/personalize`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemId,
+          playerName: editingPersName.trim(),
+          playerNumber: editingPersNumber,
+          previewImageUrl: url
+        })
+      });
+
+      if (editRes.ok) {
+        const updatedOrder = await editRes.json();
+        setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+        setSelectedOrder(updatedOrder);
+        setIsAdminEditingPers(false);
+        alert("Personalization updated successfully! Created new artwork version.");
+        loadAdminData();
+      } else {
+        alert("Failed to save personalization details on server.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error generating or saving new personalization artwork.");
+    } finally {
+      setIsAdminSavingPers(false);
     }
   }
 
@@ -329,6 +801,61 @@ export default function AdminDashboardPage() {
               ))}
             </div>
 
+            {/* Production Dashboard Widgets */}
+            <div className="bg-zinc-950 border border-zinc-800 p-8 rounded-2xl">
+              <h3 className="font-bold text-lg uppercase tracking-wider mb-6 text-yellow-400 flex items-center gap-2">
+                <span className="material-symbols-outlined">print</span>
+                Personalized Jersey Production Monitor
+              </h3>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { 
+                    title: "Today's Personalized Orders", 
+                    value: personalizations.filter(p => {
+                      const todayStr = new Date().toISOString().split('T')[0];
+                      return p.createdAt?.startsWith(todayStr);
+                    }).length.toString(), 
+                    icon: 'calendar_today', 
+                    color: 'text-amber-400',
+                    bg: 'bg-amber-500/10'
+                  },
+                  { 
+                    title: 'Pending Print', 
+                    value: personalizations.filter(p => 
+                      p.status === 'placed' || p.status === 'artwork_generated' || p.status === 'ready_for_print'
+                    ).length.toString(), 
+                    icon: 'pending_actions', 
+                    color: 'text-rose-400',
+                    bg: 'bg-rose-500/10'
+                  },
+                  { 
+                    title: 'Printing', 
+                    value: personalizations.filter(p => p.status === 'printing').length.toString(), 
+                    icon: 'print', 
+                    color: 'text-sky-400',
+                    bg: 'bg-sky-500/10'
+                  },
+                  { 
+                    title: 'Completed', 
+                    value: personalizations.filter(p => 
+                      p.status === 'qc' || p.status === 'packed' || p.status === 'shipped' || p.status === 'delivered'
+                    ).length.toString(), 
+                    icon: 'check_circle', 
+                    color: 'text-emerald-400',
+                    bg: 'bg-emerald-500/10'
+                  }
+                ].map((m, i) => (
+                  <div key={i} className={`border border-zinc-800 p-6 rounded-2xl relative overflow-hidden group hover:border-zinc-700 transition-colors ${m.bg}`}>
+                    <div className="flex justify-between items-start">
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-normal">{m.title}</span>
+                      <span className={`material-symbols-outlined ${m.color} text-2xl`}>{m.icon}</span>
+                    </div>
+                    <h3 className="text-3xl font-black mt-4 tabular-nums">{m.value}</h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Sales Graph Simulation */}
             <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl">
               <h3 className="font-bold text-lg uppercase tracking-wider mb-6">Revenue Trend (Last 7 Days)</h3>
@@ -486,86 +1013,353 @@ export default function AdminDashboardPage() {
         )}
 
         {/* TAB 4: Orders */}
-        {activeTab === 'orders' && (
-          <div className="space-y-12">
-            <div>
-              <h2 className="text-4xl font-black uppercase tracking-tight">Order Fulfilment & Logistics</h2>
-              <p className="text-zinc-500 text-sm mt-1">Fulfill sales checkouts and trigger carrier tracking updates.</p>
-            </div>
+        {activeTab === 'orders' && (() => {
+          const filteredOrders = orders.filter((o: any) => {
+            const q = searchQuery.toLowerCase();
+            const matchesSearch = q === '' || 
+              o.displayId?.toLowerCase().includes(q) ||
+              o.userId?.toLowerCase().includes(q) ||
+              o.status?.toLowerCase().includes(q) ||
+              (o.shippingAddress?.firstName + ' ' + o.shippingAddress?.lastName).toLowerCase().includes(q) ||
+              o.items?.some((i: any) => i.title.toLowerCase().includes(q) || i.playerName?.toLowerCase().includes(q) || i.playerNumber?.toString().includes(q));
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-zinc-950 border-b border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    <th className="p-5">Order ID</th>
-                    <th className="p-5">Date</th>
-                    <th className="p-5">User ID</th>
-                    <th className="p-5">Items</th>
-                    <th className="p-5">Amount</th>
-                    <th className="p-5">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800">
-                  {orders.map((o: any) => (
-                    <tr 
-                      key={o.id} 
-                      onClick={() => setSelectedOrder(o)}
-                      className="hover:bg-zinc-800/20 text-sm cursor-pointer"
-                    >
-                      <td className="p-5 font-bold font-mono text-primary-container">{o.displayId}</td>
-                      <td className="p-5 text-zinc-500 font-mono">{new Date(o.date).toLocaleDateString()}</td>
-                      <td className="p-5 text-zinc-400">{o.userId}</td>
-                      <td className="p-5 text-zinc-400">{(o.items || []).map((i: any) => `${i.title} (x${i.quantity})`).join(', ')}</td>
-                      <td className="p-5 font-black">₹{o.total.toLocaleString()}</td>
-                      <td className="p-5">
-                        <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
-                          o.status === 'delivered' ? 'bg-green-500/20 text-green-400' :
-                          o.status === 'shipped' ? 'bg-blue-500/20 text-blue-400' :
-                          'bg-yellow-500/20 text-yellow-400'
-                        }`}>
-                          {o.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            if (!matchesSearch) return false;
 
-            {/* Order Detail Modal */}
-            {selectedOrder && (
-              <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-                <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-md w-full relative">
-                  <button className="absolute top-4 right-4 text-zinc-500 hover:text-white" onClick={() => setSelectedOrder(null)}>
-                    <span className="material-symbols-outlined">close</span>
-                  </button>
-                  <h3 className="text-2xl font-black uppercase tracking-tight">Fulfill Order: {selectedOrder.displayId}</h3>
-                  <div className="space-y-4 mt-6 text-sm">
-                    <p><strong>Shipping To:</strong> {selectedOrder.shippingAddress?.firstName} {selectedOrder.shippingAddress?.lastName}</p>
-                    <p><strong>Full Address:</strong> {selectedOrder.shippingAddress?.address}</p>
-                    <p><strong>Contact phone:</strong> {selectedOrder.shippingAddress?.phone}</p>
-                    <p><strong>Carrier Status Flow:</strong></p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {['processing', 'shipped', 'delivered', 'cancelled'].map(status => (
-                        <button
-                          key={status}
-                          onClick={() => handleUpdateOrderStatus(selectedOrder.id, status)}
-                          className={`text-xs px-3 py-2 rounded-lg border uppercase tracking-wider font-bold ${
-                            selectedOrder.status === status
-                              ? 'bg-white text-black border-white'
-                              : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
-                          }`}
-                        >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+            if (selectedOrderFilter === 'all') return true;
+            if (selectedOrderFilter === 'personalized') {
+              return o.items?.some((i: any) => i.isPersonalized);
+            }
+            if (selectedOrderFilter === 'normal') {
+              return !o.items?.some((i: any) => i.isPersonalized);
+            }
+            return o.status?.toLowerCase() === selectedOrderFilter.toLowerCase();
+          });
+
+          return (
+            <div className="space-y-12">
+              <div>
+                <h2 className="text-4xl font-black uppercase tracking-tight">Order Fulfilment & Logistics</h2>
+                <p className="text-zinc-500 text-sm mt-1">Fulfill sales checkouts and trigger carrier tracking updates.</p>
+              </div>
+
+              {/* Search and Filters Bar */}
+              <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-zinc-950 p-4 border border-zinc-800 rounded-2xl">
+                <div className="relative w-full md:w-72">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-[18px]">search</span>
+                  <input
+                    type="text"
+                    placeholder="Search orders, ID, items..."
+                    className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-9 pr-4 py-2 text-xs outline-none focus:border-zinc-700 text-white"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Filter:</label>
+                  <select
+                    value={selectedOrderFilter}
+                    onChange={(e) => setSelectedOrderFilter(e.target.value)}
+                    className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 text-xs text-white outline-none focus:border-zinc-700 font-bold uppercase tracking-wider"
+                  >
+                    <option value="all">All Orders</option>
+                    <option value="personalized">🟡 Personalized Only</option>
+                    <option value="normal">Normal Only</option>
+                    <option value="placed">Order Placed</option>
+                    <option value="artwork_generated">Artwork Generated</option>
+                    <option value="ready_for_print">Ready For Print</option>
+                    <option value="printing">Printing</option>
+                    <option value="qc">QC</option>
+                    <option value="packed">Packed</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </div>
               </div>
-            )}
-          </div>
-        )}
+
+              <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-zinc-950 border-b border-zinc-800 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                      <th className="p-5">Order ID</th>
+                      <th className="p-5">Date</th>
+                      <th className="p-5">User ID</th>
+                      <th className="p-5">Items</th>
+                      <th className="p-5">Amount</th>
+                      <th className="p-5">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800">
+                    {filteredOrders.map((o: any) => (
+                      <tr 
+                        key={o.id} 
+                        onClick={() => setSelectedOrder(o)}
+                        className="hover:bg-zinc-800/20 text-sm cursor-pointer"
+                      >
+                        <td className="p-5 font-bold font-mono text-primary-container">
+                          <div className="flex items-center gap-2">
+                            <span>{o.displayId}</span>
+                            {o.items?.some((i: any) => i.isPersonalized) && (
+                              <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded">
+                                🟡 Personalized
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="p-5 text-zinc-500 font-mono">{new Date(o.date).toLocaleDateString()}</td>
+                        <td className="p-5 text-zinc-400">{o.userId}</td>
+                        <td className="p-5 text-zinc-400">
+                          <div className="space-y-1">
+                            {(o.items || []).map((i: any, idx: number) => (
+                              <div key={idx} className="flex items-center gap-2 text-xs">
+                                <span>{i.title} (x{i.quantity})</span>
+                                {i.isPersonalized && (
+                                  <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-[8px] font-extrabold uppercase px-1 py-0.2 rounded">
+                                    {i.playerName} ({i.playerNumber})
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                        <td className="p-5 font-black">₹{o.total.toLocaleString()}</td>
+                        <td className="p-5">
+                          <span className={`text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${
+                            o.status === 'delivered' ? 'bg-green-500/20 text-green-400' :
+                            o.status === 'shipped' ? 'bg-blue-500/20 text-blue-400' :
+                            o.status === 'processing' ? 'bg-zinc-700 text-zinc-300' :
+                            o.status === 'cancelled' ? 'bg-red-500/20 text-red-400' :
+                            'bg-yellow-500/20 text-yellow-400'
+                          }`}>
+                            {o.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Order Detail Modal */}
+              {selectedOrder && (() => {
+                const hasPersonalizedItems = selectedOrder.items?.some((i: any) => i.isPersonalized);
+                return (
+                  <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className={`bg-zinc-900 border border-zinc-800 p-8 rounded-2xl relative my-8 ${
+                      hasPersonalizedItems ? "max-w-4xl w-full" : "max-w-md w-full"
+                    }`}>
+                      <button className="absolute top-4 right-4 text-zinc-500 hover:text-white" onClick={() => {
+                        setSelectedOrder(null);
+                        setIsAdminEditingPers(false);
+                      }}>
+                        <span className="material-symbols-outlined">close</span>
+                      </button>
+                      
+                      <h3 className="text-2xl font-black uppercase tracking-tight mb-6">Fulfill Order: {selectedOrder.displayId}</h3>
+                      
+                      <div className={`grid gap-8 ${
+                        hasPersonalizedItems ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+                      }`}>
+                        {/* Column 1: Fulfillment / Shipping Details */}
+                        <div className="space-y-6 text-sm">
+                          <div className="bg-zinc-950 p-6 border border-zinc-800 rounded-xl space-y-3">
+                            <h4 className="font-bold text-xs uppercase text-zinc-400 tracking-wider">Shipping Details</h4>
+                            <p><strong>Recipient:</strong> {selectedOrder.shippingAddress?.firstName} {selectedOrder.shippingAddress?.lastName}</p>
+                            <p><strong>Address:</strong> {selectedOrder.shippingAddress?.address}</p>
+                            <p><strong>City/Postal:</strong> {selectedOrder.shippingAddress?.city}, {selectedOrder.shippingAddress?.postalCode}</p>
+                            <p><strong>Phone:</strong> {selectedOrder.shippingAddress?.phone}</p>
+                          </div>
+
+                          <div className="bg-zinc-950 p-6 border border-zinc-800 rounded-xl space-y-4">
+                            <h4 className="font-bold text-xs uppercase text-zinc-400 tracking-wider">Workflow Status Flow</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                              {[
+                                { key: 'placed', label: 'Order Placed' },
+                                { key: 'artwork_generated', label: 'Artwork Gen' },
+                                { key: 'ready_for_print', label: 'Ready for Print' },
+                                { key: 'printing', label: 'Printing' },
+                                { key: 'qc', label: 'Quality Control' },
+                                { key: 'packed', label: 'Packed' },
+                                { key: 'shipped', label: 'Shipped' },
+                                { key: 'delivered', label: 'Delivered' },
+                                { key: 'cancelled', label: 'Cancelled' }
+                              ].map(statusObj => (
+                                <button
+                                  key={statusObj.key}
+                                  onClick={() => handleUpdateOrderStatus(selectedOrder.id, statusObj.key)}
+                                  className={`text-[10px] px-3 py-2 rounded-lg border uppercase tracking-wider font-extrabold transition-colors ${
+                                    selectedOrder.status === statusObj.key
+                                      ? 'bg-yellow-400 text-black border-yellow-400'
+                                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:bg-zinc-800'
+                                  }`}
+                                >
+                                  {statusObj.label}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Column 2: Personalized Products details (Only rendered if order has personalized items) */}
+                        {hasPersonalizedItems && (
+                          <div className="space-y-6">
+                            <h4 className="font-bold text-xs uppercase text-zinc-400 tracking-wider">Personalized Items & Production</h4>
+                            <div className="space-y-6">
+                              {selectedOrder.items?.map((item: any, idx: number) => {
+                                if (!item.isPersonalized) return null;
+
+                                // Find matching personalization from history
+                                const persRecord = personalizations.find(p => p.orderId === selectedOrder.displayId && p.productId === item.productId) || {};
+
+                                return (
+                                  <div key={item.id || idx} className="bg-zinc-950 p-6 border border-zinc-800 rounded-xl space-y-4">
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <h5 className="font-bold text-sm text-white uppercase">{item.title}</h5>
+                                        <p className="text-zinc-500 text-xs">Size: {item.size} | Color: {item.colorName}</p>
+                                      </div>
+                                      <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded">
+                                        Active Artwork
+                                      </span>
+                                    </div>
+
+                                    {/* Preview image or edit canvas */}
+                                    <div className="aspect-square w-full bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex items-center justify-center relative">
+                                      {isAdminEditingPers && editingPersItemId === item.id ? (
+                                        <canvas
+                                          ref={adminCanvasRef}
+                                          width={400}
+                                          height={400}
+                                          className="w-full h-full object-contain"
+                                        />
+                                      ) : (
+                                        <img
+                                          src={item.previewImageUrl || item.imageSrc}
+                                          alt={item.title}
+                                          className="w-full h-full object-cover"
+                                        />
+                                      )}
+                                    </div>
+
+                                    {/* Edit controls / Display stats */}
+                                    {isAdminEditingPers && editingPersItemId === item.id ? (
+                                      <div className="space-y-3 pt-2 border-t border-zinc-800">
+                                        <div className="grid grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Player Name</label>
+                                            <input
+                                              type="text"
+                                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs uppercase font-mono text-white"
+                                              value={editingPersName}
+                                              onChange={(e) => {
+                                                const val = e.target.value.toUpperCase().replace(/[^A-Z\s]/g, "");
+                                                if (val.length <= 18) setEditingPersName(val);
+                                              }}
+                                            />
+                                          </div>
+                                          <div>
+                                            <label className="block text-[10px] font-bold uppercase text-zinc-500 mb-1">Number</label>
+                                            <input
+                                              type="text"
+                                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white"
+                                              value={editingPersNumber}
+                                              onChange={(e) => {
+                                                const val = e.target.value.replace(/[^0-9]/g, "");
+                                                if (val === "" || (parseInt(val) >= 0 && parseInt(val) <= 99 && val.length <= 2)) {
+                                                  setEditingPersNumber(val);
+                                                }
+                                              }}
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => handleSavePersEdit(selectedOrder.id, item.id, item.productId)}
+                                            disabled={isAdminSavingPers}
+                                            className="flex-grow bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2 rounded-lg transition-colors uppercase disabled:opacity-50"
+                                          >
+                                            {isAdminSavingPers ? "Saving..." : "Save Changes"}
+                                          </button>
+                                          <button
+                                            onClick={() => setIsAdminEditingPers(false)}
+                                            className="px-4 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-2 rounded-lg transition-colors"
+                                          >
+                                            Cancel
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-3">
+                                        <div className="flex justify-between items-center text-xs bg-zinc-900 p-3 rounded-lg border border-zinc-800">
+                                          <div>
+                                            <span className="block text-[10px] uppercase text-zinc-500">Player Name</span>
+                                            <span className="font-mono font-bold text-white text-sm">{item.playerName}</span>
+                                          </div>
+                                          <div className="text-right">
+                                            <span className="block text-[10px] uppercase text-zinc-500">Number</span>
+                                            <span className="font-mono font-bold text-white text-sm">{item.playerNumber}</span>
+                                          </div>
+                                        </div>
+
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => downloadArtwork(selectedOrder.displayId, item.playerName, item.playerNumber, item.previewImageUrl || item.imageSrc)}
+                                            className="flex-1 bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white font-bold text-xs py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors uppercase tracking-wider"
+                                          >
+                                            <span className="material-symbols-outlined text-[16px]">download</span>
+                                            Download PNG
+                                          </button>
+                                          
+                                          <button
+                                            onClick={() => {
+                                              setEditingPersItemId(item.id);
+                                              setEditingPersName(item.playerName || '');
+                                              setEditingPersNumber(item.playerNumber || '');
+                                              setIsAdminEditingPers(true);
+                                            }}
+                                            className="bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs px-3 rounded-lg flex items-center justify-center transition-colors"
+                                            title="Edit personalization details"
+                                          >
+                                            <span className="material-symbols-outlined text-[16px]">edit</span>
+                                          </button>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Version History List */}
+                                    {persRecord.versions && persRecord.versions.length > 0 && (
+                                      <div className="pt-3 border-t border-zinc-800 space-y-2">
+                                        <span className="block text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Version History</span>
+                                        <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
+                                          {persRecord.versions.map((ver: any, vidx: number) => (
+                                            <div key={vidx} className="flex justify-between items-center text-[10px] bg-zinc-900/60 p-2 rounded border border-zinc-900 text-zinc-400">
+                                              <span>v{vidx + 1}: <strong className="text-white">{ver.playerName}</strong> ({ver.playerNumber})</span>
+                                              <button 
+                                                onClick={() => downloadArtwork(selectedOrder.displayId, ver.playerName, ver.playerNumber, ver.previewImageUrl)}
+                                                className="material-symbols-outlined text-[14px] text-zinc-500 hover:text-white"
+                                              >
+                                                download
+                                              </button>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          );
+        })()}
 
         {/* TAB 5: Inventory Manager */}
         {activeTab === 'inventory' && (
@@ -579,7 +1373,14 @@ export default function AdminDashboardPage() {
               {products.map((p: any) => (
                 <div key={p.id} className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl flex flex-col justify-between gap-4">
                   <div>
-                    <h4 className="font-black text-lg text-white uppercase tracking-tight">{p.title}</h4>
+                    <h4 className="font-black text-lg text-white uppercase tracking-tight flex items-center justify-between gap-2">
+                      <span>{p.title}</span>
+                      {p.personalizationTemplate?.enabled && (
+                        <span className="bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 text-[9px] font-extrabold uppercase px-2 py-0.5 rounded-full shrink-0">
+                          Personalized
+                        </span>
+                      )}
+                    </h4>
                     <p className="text-zinc-500 text-xs mt-1">SKU: {p.variants[0]?.sku || 'N/A'}</p>
                     <div className="flex gap-4 mt-4">
                       <div className="bg-zinc-950 border border-zinc-800 px-3 py-2 rounded-lg flex-1">
@@ -593,43 +1394,633 @@ export default function AdminDashboardPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          const newStock = prompt("Enter new inventory level:", p.variants[0]?.inventory);
+                          if (newStock !== null) {
+                            const updatedVars = [...p.variants];
+                            updatedVars[0] = { ...updatedVars[0], inventory: Number(newStock) };
+                            fetch(`/api/admin/products/${p.id}/update`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ variants: updatedVars })
+                            }).then(() => loadAdminData());
+                          }
+                        }}
+                        className="flex-1 bg-white text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-zinc-200 transition-colors"
+                      >
+                        Restock Stock
+                      </button>
+                      <button 
+                        onClick={() => {
+                          const newPrice = prompt("Enter new price in ₹:", p.price);
+                          if (newPrice !== null) {
+                            fetch(`/api/admin/products/${p.id}/update`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ price: Number(newPrice) })
+                            }).then(() => loadAdminData());
+                          }
+                        }}
+                        className="flex-1 bg-zinc-800 border border-zinc-700 text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-zinc-700 transition-colors"
+                      >
+                        Edit Price
+                      </button>
+                    </div>
                     <button 
-                      onClick={() => {
-                        const newStock = prompt("Enter new inventory level:", p.variants[0]?.inventory);
-                        if (newStock !== null) {
-                          const updatedVars = [...p.variants];
-                          updatedVars[0] = { ...updatedVars[0], inventory: Number(newStock) };
-                          fetch(`/api/admin/products/${p.id}/update`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ variants: updatedVars })
-                          }).then(() => loadAdminData());
-                        }
-                      }}
-                      className="flex-1 bg-white text-black text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-zinc-200 transition-colors"
+                      onClick={() => handleOpenTemplateEditor(p)}
+                      className="w-full bg-zinc-950 border border-zinc-800 hover:bg-zinc-800 hover:border-zinc-700 text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 mt-2"
                     >
-                      Restock Stock
-                    </button>
-                    <button 
-                      onClick={() => {
-                        const newPrice = prompt("Enter new price in ₹:", p.price);
-                        if (newPrice !== null) {
-                          fetch(`/api/admin/products/${p.id}/update`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ price: Number(newPrice) })
-                          }).then(() => loadAdminData());
-                        }
-                      }}
-                      className="flex-1 bg-zinc-800 border border-zinc-700 text-xs font-bold uppercase tracking-wider py-2.5 rounded-lg hover:bg-zinc-700 transition-colors"
-                    >
-                      Edit Price
+                      <span className="material-symbols-outlined text-[16px] text-yellow-400">edit_square</span>
+                      Personalization Template
                     </button>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Personalization Template Editor Modal */}
+            {selectedTemplateProduct && tempEditorState && (
+              <div className="fixed inset-0 bg-black/85 z-[150] flex items-center justify-center p-4 overflow-y-auto backdrop-blur-sm">
+                <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-5xl w-full relative my-8">
+                  <button 
+                    className="absolute top-4 right-4 text-zinc-500 hover:text-white flex items-center" 
+                    onClick={() => {
+                      setSelectedTemplateProduct(null);
+                      setTempEditorState(null);
+                    }}
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+
+                  <h3 className="text-2xl font-black uppercase tracking-tight mb-2 text-white">
+                    Personalization Template: {selectedTemplateProduct.title}
+                  </h3>
+                  <p className="text-zinc-500 text-xs mb-8">
+                    Configure design parameters, coordinates, safe boundaries, and live preview rendering for customization.
+                  </p>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    {/* Left Column: Live Canvas Preview */}
+                    <div className="lg:col-span-5 flex flex-col gap-6">
+                      <div className="bg-zinc-950 p-6 border border-zinc-800 rounded-xl space-y-4">
+                        <span className="block text-[10px] font-bold uppercase text-zinc-500 tracking-wider">Live Preview Rendering</span>
+                        
+                        <div className="aspect-square w-full bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex items-center justify-center relative">
+                          <canvas
+                            ref={adminTemplateCanvasRef}
+                            width={400}
+                            height={400}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+
+                        {tempEditorState.enabled && !isTemplateInSafeArea && (
+                          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg flex items-start gap-2.5 text-xs animate-pulse">
+                            <span className="material-symbols-outlined text-[18px]">warning</span>
+                            <p className="font-medium text-left">Bounds exceeded: Name or Number settings extend outside the printable safe area!</p>
+                          </div>
+                        )}
+
+                        {tempEditorState.enabled && isTemplateInSafeArea && (
+                          <div className="bg-green-500/10 border border-green-500/20 text-green-400 p-3 rounded-lg flex items-start gap-2.5 text-xs">
+                            <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                            <p className="font-medium text-left">Safe: Personalization elements are fully within the printable safe area.</p>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                          <div>
+                            <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1 text-left">Name Test Input</label>
+                            <input
+                              type="text"
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs uppercase font-mono text-white outline-none focus:border-zinc-700"
+                              value={previewName}
+                              onChange={(e) => setPreviewName(e.target.value.toUpperCase())}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest mb-1 text-left">Number Test Input</label>
+                            <input
+                              type="text"
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs font-mono text-white outline-none focus:border-zinc-700"
+                              value={previewNumber}
+                              onChange={(e) => setPreviewNumber(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Template Controls */}
+                    <div className="lg:col-span-7 space-y-6">
+                      <div className="flex border-b border-zinc-850 overflow-x-auto">
+                        {[
+                          { key: 'image', label: 'Image & Canvas' },
+                          { key: 'name', label: 'Name Settings' },
+                          { key: 'number', label: 'Number Settings' },
+                          { key: 'safe', label: 'Safe Area' }
+                        ].map(t => (
+                          <button
+                            key={t.key}
+                            onClick={() => setActiveTempTab(t.key as any)}
+                            className={`px-4 py-3 text-xs font-bold uppercase tracking-wider border-b-2 transition-all whitespace-nowrap ${
+                              activeTempTab === t.key
+                                ? 'border-yellow-400 text-yellow-400'
+                                : 'border-transparent text-zinc-400 hover:text-white'
+                            }`}
+                          >
+                            {t.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Tab 1: Image & Canvas */}
+                      {activeTempTab === 'image' && (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-800 rounded-xl">
+                          <div className="flex items-center justify-between pb-4 border-b border-zinc-900">
+                            <div className="text-left">
+                              <span className="block font-bold text-xs uppercase text-white">Enable Personalization</span>
+                              <span className="text-[10px] text-zinc-500">Allow customers to customize this product on storefront.</span>
+                            </div>
+                            <input
+                              type="checkbox"
+                              className="w-5 h-5 rounded accent-yellow-400 bg-zinc-900 border-zinc-800"
+                              checked={tempEditorState.enabled}
+                              onChange={(e) => setTempEditorState({ ...tempEditorState, enabled: e.target.checked })}
+                            />
+                          </div>
+
+                          {tempEditorState.enabled && (
+                            <>
+                              <div className="space-y-3 text-left">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Select Render Image from Product Media</label>
+                                <div className="grid grid-cols-4 gap-3">
+                                  {selectedTemplateProduct.gallery?.map((img: string, gIdx: number) => (
+                                    <button
+                                      key={gIdx}
+                                      onClick={() => setTempEditorState({ ...tempEditorState, renderImageId: String(gIdx), renderImageUrl: img })}
+                                      className={`relative aspect-square rounded-lg overflow-hidden bg-zinc-900 border-2 transition-all ${
+                                        tempEditorState.renderImageUrl === img ? 'border-yellow-400 ring-2 ring-yellow-400/20' : 'border-transparent opacity-60 hover:opacity-100'
+                                      }`}
+                                    >
+                                      <img src={img} alt={`Gallery ${gIdx}`} className="w-full h-full object-cover" />
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-4 pt-2 text-left">
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Reference Canvas Width</label>
+                                  <input
+                                    type="number"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                    value={tempEditorState.canvasWidth}
+                                    onChange={(e) => setTempEditorState({ ...tempEditorState, canvasWidth: Number(e.target.value) })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Reference Canvas Height</label>
+                                  <input
+                                    type="number"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                    value={tempEditorState.canvasHeight}
+                                    onChange={(e) => setTempEditorState({ ...tempEditorState, canvasHeight: Number(e.target.value) })}
+                                  />
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Tab 2: Name Settings */}
+                      {activeTempTab === 'name' && (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-800 rounded-xl max-h-[40vh] overflow-y-auto pr-2 text-left">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">X Coordinate (Center): {tempEditorState.nameSettings.x}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasWidth}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.nameSettings.x}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, x: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Y Coordinate (Center): {tempEditorState.nameSettings.y}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasHeight}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.nameSettings.y}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, y: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Width (Bounding Box): {tempEditorState.nameSettings.width}</label>
+                              <input
+                                type="range"
+                                min="50"
+                                max={tempEditorState.canvasWidth}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.nameSettings.width}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, width: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Height (Bounding Box): {tempEditorState.nameSettings.height}</label>
+                              <input
+                                type="range"
+                                min="10"
+                                max="200"
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.nameSettings.height}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, height: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Family</label>
+                              <select
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.nameSettings.fontFamily}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, fontFamily: e.target.value } })}
+                              >
+                                <option value="Impact">Impact (Bold Athletic)</option>
+                                <option value="Sora">Sora (Modern/Round)</option>
+                                <option value="Oswald">Oswald (Tall Classic)</option>
+                                <option value="Arial">Arial (Standard)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Size (px): {tempEditorState.nameSettings.fontSize}</label>
+                              <input
+                                type="number"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.nameSettings.fontSize}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, fontSize: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Color (Hex)</label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="color"
+                                  className="w-10 h-10 border-0 rounded bg-transparent"
+                                  value={tempEditorState.nameSettings.color}
+                                  onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, color: e.target.value } })}
+                                />
+                                <input
+                                  type="text"
+                                  className="flex-grow bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white font-mono uppercase"
+                                  value={tempEditorState.nameSettings.color}
+                                  onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, color: e.target.value } })}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Text Alignment</label>
+                              <select
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.nameSettings.alignment}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, alignment: e.target.value } })}
+                              >
+                                <option value="center">Center</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Max Characters</label>
+                              <input
+                                type="number"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.nameSettings.maxCharacters}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, maxCharacters: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Rotation (Deg): {tempEditorState.nameSettings.rotation}</label>
+                              <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.nameSettings.rotation}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, rotation: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Outline settings */}
+                          <div className="pt-4 border-t border-zinc-900 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="block font-bold text-xs uppercase text-zinc-300">Enable Outline</span>
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 rounded accent-yellow-400 bg-zinc-900"
+                                checked={tempEditorState.nameSettings.enableOutline}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, enableOutline: e.target.checked } })}
+                              />
+                            </div>
+                            {tempEditorState.nameSettings.enableOutline && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Outline Width: {tempEditorState.nameSettings.outlineWidth}px</label>
+                                  <input
+                                    type="range"
+                                    min="1"
+                                    max="15"
+                                    className="w-full accent-yellow-400"
+                                    value={tempEditorState.nameSettings.outlineWidth}
+                                    onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, outlineWidth: Number(e.target.value) } })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Outline Color</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="color"
+                                      className="w-10 h-10 border-0 rounded bg-transparent"
+                                      value={tempEditorState.nameSettings.outlineColor}
+                                      onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, outlineColor: e.target.value } })}
+                                    />
+                                    <input
+                                      type="text"
+                                      className="flex-grow bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white font-mono uppercase"
+                                      value={tempEditorState.nameSettings.outlineColor}
+                                      onChange={(e) => setTempEditorState({ ...tempEditorState, nameSettings: { ...tempEditorState.nameSettings, outlineColor: e.target.value } })}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tab 3: Number Settings */}
+                      {activeTempTab === 'number' && (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-800 rounded-xl max-h-[40vh] overflow-y-auto pr-2 text-left">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">X Coordinate (Center): {tempEditorState.numberSettings.x}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasWidth}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.numberSettings.x}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, x: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Y Coordinate (Center): {tempEditorState.numberSettings.y}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasHeight}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.numberSettings.y}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, y: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Width (Bounding Box): {tempEditorState.numberSettings.width}</label>
+                              <input
+                                type="range"
+                                min="50"
+                                max={tempEditorState.canvasWidth}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.numberSettings.width}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, width: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Height (Bounding Box): {tempEditorState.numberSettings.height}</label>
+                              <input
+                                type="range"
+                                min="10"
+                                max="300"
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.numberSettings.height}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, height: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Family</label>
+                              <select
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.numberSettings.fontFamily}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, fontFamily: e.target.value } })}
+                              >
+                                <option value="Impact">Impact (Bold Athletic)</option>
+                                <option value="Sora">Sora (Modern/Round)</option>
+                                <option value="Oswald">Oswald (Tall Classic)</option>
+                                <option value="Arial">Arial (Standard)</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Size (px): {tempEditorState.numberSettings.fontSize}</label>
+                              <input
+                                type="number"
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white"
+                                value={tempEditorState.numberSettings.fontSize}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, fontSize: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Font Color (Hex)</label>
+                              <div className="flex gap-2">
+                                <input
+                                  type="color"
+                                  className="w-10 h-10 border-0 rounded bg-transparent"
+                                  value={tempEditorState.numberSettings.color}
+                                  onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, color: e.target.value } })}
+                                />
+                                <input
+                                  type="text"
+                                  className="flex-grow bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white font-mono uppercase"
+                                  value={tempEditorState.numberSettings.color}
+                                  onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, color: e.target.value } })}
+                                />
+                              </div>
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Rotation (Deg): {tempEditorState.numberSettings.rotation}</label>
+                              <input
+                                type="range"
+                                min="-180"
+                                max="180"
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.numberSettings.rotation}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, rotation: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Outline settings */}
+                          <div className="pt-4 border-t border-zinc-900 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <span className="block font-bold text-xs uppercase text-zinc-300">Enable Outline</span>
+                              <input
+                                type="checkbox"
+                                className="w-4 h-4 rounded accent-yellow-400 bg-zinc-900"
+                                checked={tempEditorState.numberSettings.enableOutline}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, enableOutline: e.target.checked } })}
+                              />
+                            </div>
+                            {tempEditorState.numberSettings.enableOutline && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Outline Width: {tempEditorState.numberSettings.outlineWidth}px</label>
+                                  <input
+                                    type="range"
+                                    min="1"
+                                    max="20"
+                                    className="w-full accent-yellow-400"
+                                    value={tempEditorState.numberSettings.outlineWidth}
+                                    onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, outlineWidth: Number(e.target.value) } })}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Outline Color</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="color"
+                                      className="w-10 h-10 border-0 rounded bg-transparent"
+                                      value={tempEditorState.numberSettings.outlineColor}
+                                      onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, outlineColor: e.target.value } })}
+                                    />
+                                    <input
+                                      type="text"
+                                      className="flex-grow bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2.5 text-xs text-white font-mono uppercase"
+                                      value={tempEditorState.numberSettings.outlineColor}
+                                      onChange={(e) => setTempEditorState({ ...tempEditorState, numberSettings: { ...tempEditorState.numberSettings, outlineColor: e.target.value } })}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tab 4: Safe Area settings */}
+                      {activeTempTab === 'safe' && (
+                        <div className="space-y-6 bg-zinc-950 p-6 border border-zinc-800 rounded-xl text-left">
+                          <span className="block text-[10px] text-zinc-500 mb-4 uppercase">
+                            Configure bounds for safe printable area. Personalization text entering outside these bounds triggers warning highlights.
+                          </span>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">X Margin Offset: {tempEditorState.safeArea.x}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasWidth / 2}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.safeArea.x}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, safeArea: { ...tempEditorState.safeArea, x: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Y Margin Offset: {tempEditorState.safeArea.y}</label>
+                              <input
+                                type="range"
+                                min="0"
+                                max={tempEditorState.canvasHeight / 2}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.safeArea.y}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, safeArea: { ...tempEditorState.safeArea, y: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Printable Width: {tempEditorState.safeArea.width}</label>
+                              <input
+                                type="range"
+                                min="100"
+                                max={tempEditorState.canvasWidth}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.safeArea.width}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, safeArea: { ...tempEditorState.safeArea, width: Number(e.target.value) } })}
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Printable Height: {tempEditorState.safeArea.height}</label>
+                              <input
+                                type="range"
+                                min="100"
+                                max={tempEditorState.canvasHeight}
+                                className="w-full accent-yellow-400"
+                                value={tempEditorState.safeArea.height}
+                                onChange={(e) => setTempEditorState({ ...tempEditorState, safeArea: { ...tempEditorState.safeArea, height: Number(e.target.value) } })}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex gap-4 pt-4 border-t border-zinc-800 justify-end">
+                        <button
+                          onClick={() => {
+                            setSelectedTemplateProduct(null);
+                            setTempEditorState(null);
+                          }}
+                          className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs rounded-lg transition-colors uppercase tracking-wider"
+                        >
+                          Close
+                        </button>
+                        <button
+                          onClick={handleSaveTemplateSettings}
+                          disabled={isSavingTemplate}
+                          className="px-8 py-2.5 bg-yellow-400 hover:bg-yellow-300 text-zinc-950 font-bold text-xs rounded-lg transition-colors uppercase tracking-wider disabled:opacity-50 flex items-center gap-2"
+                        >
+                          {isSavingTemplate ? (
+                            <>
+                              <span className="material-symbols-outlined text-[16px] animate-spin">sync</span>
+                              Saving...
+                            </>
+                          ) : "Save Template"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

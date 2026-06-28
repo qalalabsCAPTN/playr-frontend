@@ -398,6 +398,11 @@ function CheckoutForm() {
                   <div className="flex-grow flex flex-col justify-center">
                     <h4 className="text-label-lg font-label-lg text-white">{item.title}</h4>
                     <p className="text-label-md font-label-md text-white/80">{item.colorName} / {item.size}</p>
+                    {item.isPersonalized && (
+                      <p className="text-[11px] text-green-200 font-bold uppercase tracking-wider mt-0.5 animate-pulse">
+                        Personalized: {item.playerName} ({item.playerNumber})
+                      </p>
+                    )}
                   </div>
                   <div className="text-label-lg font-label-lg self-center text-white">
                     ₹{item.price.toLocaleString('en-IN')}

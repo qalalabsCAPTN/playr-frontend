@@ -107,6 +107,12 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
                     <span className="font-label-bold">₹{(item.price * item.quantity).toLocaleString('en-IN')}</span>
                   </div>
                   <p className="font-body-md text-onyx-gray mt-1">Color: {item.colorName} | Size: {item.size}</p>
+                  {item.isPersonalized && (
+                    <p className="text-[11px] text-green-600 font-bold uppercase tracking-wider mt-1.5 flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[14px]">edit_square</span>
+                      Personalized: {item.playerName} ({item.playerNumber})
+                    </p>
+                  )}
                   <p className="font-label-sm text-secondary mt-2">Qty: {item.quantity} × ₹{item.price.toLocaleString('en-IN')}</p>
                 </div>
               </div>

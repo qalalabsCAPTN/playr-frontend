@@ -135,6 +135,11 @@ function SuccessPageContent() {
                   <p className="text-xs text-outline">
                     Size: {item.size} | Color: {item.colorName || "Default"} | Qty: {item.quantity}
                   </p>
+                  {item.isPersonalized && (
+                    <p className="text-[11px] text-green-600 font-bold uppercase tracking-wider mt-0.5">
+                      Personalized: {item.playerName} ({item.playerNumber})
+                    </p>
+                  )}
                 </div>
                 <span className="font-black text-sm text-zinc-900">₹ {(item.price * item.quantity).toLocaleString()}</span>
               </div>
