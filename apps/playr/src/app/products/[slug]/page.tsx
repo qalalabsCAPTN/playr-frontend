@@ -11,6 +11,8 @@ import { InteractiveProductCard } from "@/components/commerce/InteractiveProduct
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { cn } from "@playr/ui"
+import ProductView from "@/components/bluorng/ProductView"
+import { getProduct as getBluorngProduct } from "@/lib/bluorng-data"
 
 // HTML5 Canvas Jersey Drawing Engine (DPI and Vector-based responsive rendering)
 const drawJersey = (
@@ -253,6 +255,16 @@ const adjustColorBrightness = (hex: string, percent: number) => {
 
 export default function ProductDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = React.use(params);
+  const bluorngProduct = getBluorngProduct(resolvedParams.slug);
+
+  if (bluorngProduct) {
+    return <ProductView product={bluorngProduct} />;
+  }
+
+  return <DefaultProductDetailPage slug={resolvedParams.slug} />;
+}
+
+function DefaultProductDetailPage({ slug }: { slug: string }) {
   const router = useRouter();
   const { data: session } = useSession();
   const [product, setProduct] = React.useState<any>(null)
@@ -469,7 +481,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
   }
 
   React.useEffect(() => {
-    NectarCommerce.getProduct(resolvedParams.slug).then(p => {
+    NectarCommerce.getProduct(slug).then(p => {
       if (p) {
         setProduct(p)
         setActiveImage(p.imageSrc)
@@ -496,21 +508,21 @@ export default function ProductDetailPage({ params }: { params: Promise<{ slug: 
         }
       }
     })
-  }, [resolvedParams.slug, fetchReviews])
+  }, [slug, fetchReviews])
 
   React.useEffect(() => {
     try {
       const stored = localStorage.getItem("recently_viewed");
       if (stored) {
         const list: string[] = JSON.parse(stored);
-        const fetchOthers = list.filter(slug => slug !== resolvedParams.slug);
-        Promise.all(fetchOthers.map(slug => NectarCommerce.getProduct(slug)))
+        const fetchOthers = list.filter(item => item !== slug);
+        Promise.all(fetchOthers.map(item => NectarCommerce.getProduct(item)))
           .then(res => setRecentlyViewed(res.filter(Boolean)));
       }
     } catch(e) {
       console.error("Error loading recently viewed", e);
     }
-  }, [resolvedParams.slug]);
+  }, [slug]);
 
   // Reviews calculations
   const totalReviews = reviews.length
