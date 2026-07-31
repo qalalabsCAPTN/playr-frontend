@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
 import { products, formatPrice } from '@/lib/bluorng-data';
 
 export default function CartDrawer() {
+  const router = useRouter();
   const cart = useCart();
   const suggestions = products.slice(0, 6);
 
@@ -71,7 +73,7 @@ export default function CartDrawer() {
               <span>{formatPrice(cart.total)}</span>
             </div>
             <p className="drawer__note">Taxes included. Discounts and shipping calculated at checkout.</p>
-            <button className="drawer__checkout" onClick={() => cart.showToast('Redirecting to checkout...')}>
+            <button className="drawer__checkout" onClick={() => { cart.setOpen(false); router.push('/checkout'); }}>
               Check out
             </button>
           </div>

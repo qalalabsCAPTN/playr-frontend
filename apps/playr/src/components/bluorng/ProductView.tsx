@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, MouseEvent } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
 import ProductSection from './ProductSection';
 import RecentlyVisited, { pushRecentlyVisited } from './RecentlyVisited';
@@ -57,6 +58,7 @@ export default function ProductView({ product }: ProductViewProps) {
   const related = products.filter((p) => p.type === product.type && p.handle !== product.handle).slice(0, 8);
   const onSale = product.compareAt && product.compareAt > product.price;
 
+  const router = useRouter();
   const addToBag = () => {
     if (product.soldOut) return;
     cart.addItem(product, size);
@@ -64,7 +66,7 @@ export default function ProductView({ product }: ProductViewProps) {
   const buyNow = () => {
     if (product.soldOut) return;
     cart.addItem(product, size);
-    cart.showToast('Redirecting to checkout...');
+    router.push('/checkout');
   };
 
   const images = product.images || [];
