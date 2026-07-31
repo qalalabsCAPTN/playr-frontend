@@ -1,41 +1,54 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { useCommerce } from "@/components/commerce/CommerceProvider"
-import { EmptyState } from "@playr/ui"
-import Link from "next/link"
-import Image from "next/image"
+import Link from 'next/link';
+import ProductCard from '@/components/bluorng/ProductCard';
+import { useCart } from '@/components/bluorng/CartContext';
+import { products } from '@/lib/bluorng-data';
 
 export default function WishlistPage() {
-  const { wishlistItems, removeFromWishlist, addAllWishlistToCart } = useCommerce()
+  const cart = useCart();
+  const { wishlist, removeFromWishlist, addAllWishlistToCart, addItem } = cart;
 
-  if (wishlistItems.length === 0) {
+  const suggestedProducts = products.filter(
+    (p) => !wishlist.some((w) => w.handle === p.handle)
+  ).slice(0, 4);
+
+  if (wishlist.length === 0) {
     return (
-      <main className="mt-32 px-container-margin-mobile md:px-container-margin-desktop max-w-[1440px] mx-auto min-h-[60vh] flex items-center justify-center">
-        <EmptyState 
-          title="YOUR BAG IS LIGHT." 
-          description="Save your favorite gear here and they will be waiting for you whenever you're ready to play."
-          actionLabel="EXPLORE SHOP"
-          onAction={() => window.location.href = '/collections/premium-polos'} 
-        />
+      <main className="min-h-[70vh] pt-32 pb-24 px-6 max-w-7xl mx-auto flex flex-col items-center justify-center text-center">
+        <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-6 text-neutral-400">
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-black uppercase tracking-tight mb-3">YOUR WISHLIST IS EMPTY</h1>
+        <p className="text-sm text-neutral-500 max-w-md mb-8 leading-relaxed">
+          Save your favorite gear here and they will be waiting for you whenever you're ready to play.
+        </p>
+        <Link 
+          href="/collections/all-products"
+          className="px-8 py-3.5 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-widest rounded-full hover:opacity-90 transition-opacity"
+        >
+          EXPLORE SHOP
+        </Link>
       </main>
-    )
+    );
   }
 
   return (
-    <main className="mt-32 px-container-margin-mobile md:px-container-margin-desktop max-w-[1440px] mx-auto min-h-[70vh]">
+    <main className="min-h-screen pt-28 pb-24 px-6 md:px-12 max-w-[1400px] mx-auto">
       {/* Wishlist Header */}
-      <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 gap-4">
-        <h1 className="text-display-lg-mobile md:text-display-lg font-display-lg tracking-tighter uppercase">
-          MY WISHLIST <span className="text-primary opacity-50 font-normal">({wishlistItems.length} ITEMS)</span>
-        </h1>
-        <div className="flex gap-4">
-          <button className="text-label-lg font-label-lg px-6 py-3 border border-secondary/20 rounded-lg hover:bg-surface-container transition-colors">
-            SHARE WISHLIST
-          </button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 pb-6 border-b border-neutral-200 dark:border-neutral-800 gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">
+            MY WISHLIST <span className="text-neutral-400 font-normal">({wishlist.length})</span>
+          </h1>
+          <p className="text-xs text-neutral-500 mt-1">Products you saved for later</p>
+        </div>
+        <div className="flex gap-3">
           <button 
             onClick={addAllWishlistToCart}
-            className="text-label-lg font-label-lg px-6 py-3 bg-on-background text-background rounded-lg hover:opacity-90 transition-opacity uppercase"
+            className="px-6 py-3 bg-black dark:bg-white text-white dark:text-black font-bold text-xs uppercase tracking-wider rounded-full hover:opacity-90 transition-opacity shadow-md"
           >
             ADD ALL TO BAG
           </button>
@@ -43,51 +56,43 @@ export default function WishlistPage() {
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-12">
-        {wishlistItems.map((item) => (
-          <div key={item.productId} className="group relative flex flex-col product-card-hover transition-transform duration-300">
-            <div className="relative aspect-square overflow-hidden rounded-xl bg-surface-container">
-              <Link href={`/products/${item.productId}`}>
-                <Image fill alt={item.title} className="object-cover transition-transform duration-700 group-hover:scale-110" src={item.imageSrc} />
-              </Link>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-16">
+        {wishlist.map((product) => (
+          <div key={product.handle} className="relative group">
+            <ProductCard product={product} gallery={true} />
+            <div className="mt-3 flex gap-2">
               <button 
-                onClick={() => removeFromWishlist(item.productId)}
-                className="absolute top-4 right-4 w-10 h-10 bg-background/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-background hover:bg-error/10 hover:text-error transition-all duration-200 z-10"
+                onClick={() => {
+                  addItem(product, 'One Size', 1);
+                  cart.showToast('Added to bag!');
+                }}
+                className="flex-1 py-2.5 bg-black dark:bg-white text-white dark:text-black text-xs font-bold uppercase rounded-lg hover:opacity-90 transition-opacity"
               >
-                <span className="material-symbols-outlined text-lg">delete</span>
+                ADD TO CART
               </button>
-              <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gradient-to-t from-black/20 to-transparent">
-                <button 
-                  onClick={addAllWishlistToCart} 
-                  className="w-full bg-primary-container text-on-background py-3 rounded-lg text-label-lg font-label-lg shadow-xl hover:scale-[1.02] transition-transform active:scale-95"
-                >
-                  ADD TO CART
-                </button>
-              </div>
-            </div>
-            <div className="mt-4 space-y-1">
-              <h3 className="text-headline-md font-headline-md uppercase tracking-tight">{item.title}</h3>
-              <p className="text-label-sm font-label-sm text-secondary uppercase">{item.category}</p>
-              <p className="text-label-lg font-label-lg mt-2">₹{item.price.toLocaleString('en-IN')}</p>
-            </div>
-            <div className="md:hidden mt-3 flex gap-2">
-              <button onClick={addAllWishlistToCart} className="flex-1 bg-primary-container text-on-background py-2 rounded-lg text-[12px] font-bold">ADD TO CART</button>
+              <button 
+                onClick={() => removeFromWishlist(product.handle)}
+                className="px-3 py-2.5 border border-neutral-300 dark:border-neutral-700 text-neutral-500 hover:text-red-500 hover:border-red-500 rounded-lg transition-colors"
+                title="Remove from wishlist"
+              >
+                ✕
+              </button>
             </div>
           </div>
         ))}
       </div>
 
       {/* Recommendations Section */}
-      <section className="mt-20 border-t border-secondary/10 pt-16 pb-20">
-        <h2 className="text-headline-lg font-black mb-8 uppercase">PEOPLE ALSO LIKED</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-gutter opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="aspect-[3/4] bg-surface-container rounded-xl flex items-center justify-center border border-dashed border-secondary/30">
-              <span className="text-label-sm font-bold opacity-30">SUGGESTED ITEM</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      {suggestedProducts.length > 0 && (
+        <section className="pt-12 border-t border-neutral-200 dark:border-neutral-800 space-y-6">
+          <h2 className="text-2xl font-black uppercase tracking-tight">YOU MIGHT ALSO LIKE</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {suggestedProducts.map((p) => (
+              <ProductCard key={p.handle} product={p} gallery={true} />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
-  )
+  );
 }

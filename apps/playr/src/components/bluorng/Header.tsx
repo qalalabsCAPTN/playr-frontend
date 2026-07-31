@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from './CartContext';
 import StoryViewer from './StoryViewer';
+import LoginModal from '@/components/auth/LoginModal';
 import { stories, products } from '@/lib/bluorng-data';
 
 const Icon = {
@@ -28,7 +29,7 @@ const Icon = {
   ),
   bookmark: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-      <path d="M6 3.5A1.5 1.5 0 0 1 7.5 2h9A1.5 1.5 0 0 1 18 3.5V22l-6-4-6 4V3.5Z" />
+      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16Z" />
     </svg>
   ),
   bag: (
@@ -44,38 +45,58 @@ const Icon = {
   ),
 };
 
-const menu = {
-  featured: [
-    { label: 'Latest Drop', href: '/collections/new-in' },
-    { label: 'Caps & Headwear', href: '/collections/caps' },
-    { label: 'Swimming', href: '/collections/swimming' },
-    { label: 'Seattle Orcas', href: '/collections/seattle-orcas' },
-    { label: 'Kids', href: '/collections/kids' },
-  ],
-  headwear: [
-    { label: 'Mesh Caps', href: '/collections/caps' },
-    { label: 'Match Caps', href: '/collections/seattle-orcas' },
-    { label: 'Bucket Hats', href: '/collections/caps' },
-  ],
-  swim: [
-    { label: 'Goggles', href: '/collections/goggles' },
-    { label: 'Swim Caps', href: '/collections/swim-caps' },
-    { label: 'Kids Swim', href: '/collections/kids' },
-  ],
-  shop: [
-    { label: 'All Products', href: '/collections/all-products' },
-    { label: 'New In', href: '/collections/new-in' },
-  ],
+const ThemeIcon = {
+  sun: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="5" />
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+    </svg>
+  ),
+  moon: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
+    </svg>
+  ),
 };
+
+const menuData = {
+  category: {
+    apparels: ['Bottomwear', 'Suit', 'Topwear', 'Innerwear'],
+    equipment: ['Paddle', 'Band', 'Bag', 'Ball', 'Bat', 'Gloves', 'Guard', 'Yoga Mat', 'Swimming Goggles', 'Swimming caps', 'Swimming Accessories'],
+    accessories: ['Bag', 'Cushion', 'Drinkware', 'Headwear', 'Socks'],
+  },
+  sports: {
+    popular: ['Cricket', 'Running & Training', 'Cycling', 'Football', 'Pickleball', 'Swimming'],
+    court: ['Badminton', 'Tennis', 'Volleyball', 'Squash', 'Basketball'],
+    fitness: ['Fitness Gym & Yoga', 'Outdoor & Adventure', 'Golf', 'Baseball'],
+    lifestyle: ['Lifestyle After Sports', 'Kabaddi', 'Home & Office'],
+  },
+  brand: {
+    official: ['playR', 'playR Official Merchandise', 'New Arrivals'],
+    ipl: ['playR x Chennai Super Kings', 'playR x Sunrisers Hyderabad', 'playR x Lucknow Super Giants'],
+    otherLeagues: ['playR x UP Yoddhas', 'playR X Seattle Orcas'],
+  },
+  club: {
+    ipl: ['Chennai Super Kings', 'Sunrisers Hyderabad', 'Lucknow Super Giants'],
+    other: ['UP Yoddhas', 'Seattle Orcas'],
+  },
+};
+
+type MenuTab = 'category' | 'sports' | 'brand' | 'club';
 
 export default function Header() {
   const [megaOpen, setMegaOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<MenuTab>('category');
   const [storyOpen, setStoryOpen] = useState(false);
+  const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const cart = useCart();
   const pathname = usePathname();
+
+  const slugify = (str: string) =>
+    str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   const filteredProducts = products.filter((p) =>
     p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -91,28 +112,157 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, [pathname]);
 
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+
+  useEffect(() => {
+    const saved = localStorage.getItem('playr-theme') as 'light' | 'dark' | null;
+    if (saved === 'dark') {
+      setTheme('dark');
+      document.body.classList.add('theme-dark');
+    } else {
+      setTheme('light');
+      document.body.classList.remove('theme-dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (theme === 'light') {
+      setTheme('dark');
+      localStorage.setItem('playr-theme', 'dark');
+      document.body.classList.add('theme-dark');
+    } else {
+      setTheme('light');
+      localStorage.setItem('playr-theme', 'light');
+      document.body.classList.remove('theme-dark');
+    }
+  };
+
   useEffect(() => {
     document.body.classList.toggle('hdr-solid', solid);
   }, [solid]);
+
+  const openTab = (tab: MenuTab) => {
+    setActiveTab(tab);
+    setMegaOpen(true);
+  };
 
   return (
     <>
       <header className={`header ${solid ? 'header--solid' : ''}`} onMouseLeave={() => setMegaOpen(false)}>
         <div className="header__inner">
           <nav className="header__nav header__nav--desktop">
-            <Link href="/collections/new-in" className="header__link">
-              New in
-            </Link>
-            <button className="header__link" onMouseEnter={() => setMegaOpen(true)} onClick={() => setMegaOpen((v) => !v)}>
-              Collections
+            <button 
+              className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'category' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
+              onMouseEnter={() => openTab('category')} 
+              onClick={() => openTab('category')}
+            >
+              <span>Category</span>
+              <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'category' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
             </button>
+            <button 
+              className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'sports' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
+              onMouseEnter={() => openTab('sports')} 
+              onClick={() => openTab('sports')}
+            >
+              <span>Sports</span>
+              <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'sports' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            <button 
+              className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'brand' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
+              onMouseEnter={() => openTab('brand')} 
+              onClick={() => openTab('brand')}
+            >
+              <span>Brand</span>
+              <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'brand' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            {/* Club Nav Button with Dedicated Popover Dropdown */}
+            <div className="relative" onMouseEnter={() => openTab('club')}>
+              <button 
+                className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'club' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
+                onClick={() => openTab('club')}
+              >
+                <span>Club</span>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'club' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Popover Dropdown under CLUB */}
+              {activeTab === 'club' && megaOpen && (
+                <div 
+                  className="absolute top-full left-0 mt-2 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-sm py-2 z-50"
+                >
+                  <Link 
+                    href="/earn-points" 
+                    className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    onClick={() => setMegaOpen(false)}
+                  >
+                    Player Club
+                  </Link>
+                  
+                  {/* LET'S PLAY Item with Right Submenu */}
+                  <div className="group/sub relative">
+                    <div 
+                      className="flex items-center justify-between w-full px-5 py-2.5 text-xs font-bold tracking-wider uppercase hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors"
+                    >
+                      <span>LET'S PLAY</span>
+                      <svg className="w-3 h-3 transition-transform group-hover/sub:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+
+                    {/* Submenu flyout next to LET'S PLAY */}
+                    <div 
+                      className="hidden group-hover/sub:block absolute left-full top-0 ml-0.5 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-sm py-2 z-50"
+                    >
+                      <Link 
+                        href="/earn-points" 
+                        className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        onClick={() => setMegaOpen(false)}
+                      >
+                        Win Giveaways
+                      </Link>
+                      <Link 
+                        href="/earn-points" 
+                        className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        onClick={() => setMegaOpen(false)}
+                      >
+                        Earn points
+                      </Link>
+                    </div>
+                  </div>
+
+                  <Link 
+                    href="/offer" 
+                    className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    onClick={() => setMegaOpen(false)}
+                  >
+                    Offer
+                  </Link>
+                </div>
+              )}
+            </div>
           </nav>
 
-          <Link href="/" className="header__logo">
-            <span style={{ fontSize: 24, fontWeight: 900, letterSpacing: '0.05em', color: solid ? '#000' : '#fff' }}>
-              play<span style={{ color: '#e63946' }}>R</span>
-            </span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <button 
+              className={`header__pill-plus ${megaOpen ? 'active' : ''}`}
+              onClick={() => setMegaOpen((v) => !v)}
+              aria-label="Toggle menu"
+            >
+              +
+            </button>
+            <Link href="/" className="header__logo">
+              <img src="/logo.png" alt="playR" />
+            </Link>
+          </div>
 
           <div className="header__right">
             <button className="iconbtn iconbtn--story" onClick={() => setStoryOpen(true)} aria-label="Stories">
@@ -132,12 +282,22 @@ export default function Header() {
             >
               {Icon.search}
             </button>
-            <Link href="/account" className="iconbtn" aria-label="Account">
+            <button className="iconbtn" onClick={() => setLoginOpen(true)} aria-label="Account">
               {Icon.user}
-            </Link>
-            <Link href="/wishlist" className="iconbtn" aria-label="Wishlist">
+            </button>
+            <Link href="/wishlist" className="iconbtn relative" aria-label="Wishlist">
               {Icon.bookmark}
+              {cart.wishlistCount > 0 && <span className="iconbtn__count">{cart.wishlistCount}</span>}
             </Link>
+            <button 
+              className="theme-toggle" 
+              onClick={toggleTheme}
+              aria-label="Toggle theme"
+            >
+              <span className="theme-toggle__thumb">
+                {theme === 'light' ? ThemeIcon.sun : ThemeIcon.moon}
+              </span>
+            </button>
             <button className="iconbtn" onClick={() => cart.setOpen(true)} aria-label="Bag">
               {Icon.bag}
               {cart.count > 0 && <span className="iconbtn__count">{cart.count}</span>}
@@ -158,108 +318,145 @@ export default function Header() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
               />
-              <span className="header__search-icon-inside">{Icon.search}</span>
+              <button 
+                className="header__search-close" 
+                onClick={() => setSearchOpen(false)}
+                aria-label="Close search"
+              >
+                ×
+              </button>
             </div>
-            <button className="header__search-close" onClick={() => { setSearchOpen(false); setSearchQuery(''); }}>
-              &times;
-            </button>
-          </div>
-        )}
-
-        {searchOpen && (
-          <div className="header__search-dropdown">
-            {searchQuery.trim() === '' ? (
-              <div className="header__search-results-inner">
-                <div className="header__search-title">Collections</div>
-                <div className="header__search-list">
-                  <Link href="/collections/new-in" className="header__search-item" onClick={() => setSearchOpen(false)}>
-                    <img src="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard1_db8669c2-f8f1-4854-99a3-3b6342fbe6d7.jpg?v=1782909214" alt="" />
-                    <span>Latest Drop</span>
-                  </Link>
-                  <Link href="/collections/caps" className="header__search-item" onClick={() => setSearchOpen(false)}>
-                    <img src="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard28.png?v=1782909395" alt="" />
-                    <span>Caps &amp; Headwear</span>
-                  </Link>
-                  <Link href="/collections/swimming" className="header__search-item" onClick={() => setSearchOpen(false)}>
-                    <img src="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard96.jpg?v=1782800549" alt="" />
-                    <span>Swimming Gear</span>
-                  </Link>
-                  <Link href="/collections/seattle-orcas" className="header__search-item" onClick={() => setSearchOpen(false)}>
-                    <img src="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard12.png?v=1782821928" alt="" />
-                    <span>Seattle Orcas MLC</span>
-                  </Link>
-                  <Link href="/collections/kids" className="header__search-item" onClick={() => setSearchOpen(false)}>
-                    <img src="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard32_a56263d0-f386-480b-b80d-18254dc75f14.jpg?v=1782802430" alt="" />
-                    <span>Kids Collection</span>
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="header__search-results-inner">
-                <div className="header__search-title">Products</div>
-                <div className="header__search-list">
-                  {filteredProducts.length > 0 ? (
-                    filteredProducts.slice(0, 5).map((p) => (
-                      <Link key={p.handle} href={`/products/${p.handle}`} className="header__search-item" onClick={() => { setSearchOpen(false); setSearchQuery(''); }}>
-                        <img src={p.images[0]} alt="" />
-                        <div className="header__search-item-info">
-                          <span className="header__search-item-title">{p.title}</span>
-                          <span className="header__search-item-price">Rs. {p.price}</span>
-                        </div>
-                      </Link>
-                    ))
-                  ) : (
-                    <div className="header__search-no-results">No products found matching &quot;{searchQuery}&quot;</div>
-                  )}
-                </div>
+            {searchQuery && (
+              <div className="header__search-results">
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((p) => (
+                    <Link
+                      key={p.handle}
+                      href={`/products/${p.handle}`}
+                      className="header__search-item"
+                      onClick={() => setSearchOpen(false)}
+                    >
+                      <img src={p.images[0]} alt={p.title} />
+                      <div>
+                        <span className="title">{p.title}</span>
+                        <span className="price">₹{p.price}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="header__search-empty">No products found for "{searchQuery}"</div>
+                )}
               </div>
             )}
           </div>
         )}
 
-        <div className={`mega ${megaOpen ? 'open' : ''}`}>
-          <div>
-            <h4>Featured</h4>
-            {menu.featured.map((l) => (
-              <Link key={l.label} href={l.href} onClick={() => setMegaOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <h4>Headwear</h4>
-            {menu.headwear.map((l) => (
-              <Link key={l.label} href={l.href} onClick={() => setMegaOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <h4>Swimming</h4>
-            {menu.swim.map((l) => (
-              <Link key={l.label} href={l.href} onClick={() => setMegaOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <h4>Shop</h4>
-            {menu.shop.map((l) => (
-              <Link key={l.label} href={l.href} onClick={() => setMegaOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-          </div>
-          <div>
-            <h4>Support</h4>
-            <Link href="/">Track your order</Link>
-            <Link href="/">Returns & exchange</Link>
-            <Link href="/">Shipping policy</Link>
-          </div>
+        {/* Original Sleek Mega Menu Panel (For Category, Sports, Brand) */}
+        <div className={`mega ${megaOpen && activeTab !== 'club' ? 'open' : ''}`}>
+          {activeTab === 'category' && (
+            <>
+              <div>
+                <h4>Apparels</h4>
+                {menuData.category.apparels.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Equipment</h4>
+                {menuData.category.equipment.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Accessories</h4>
+                {menuData.category.accessories.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Shop All</h4>
+                <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Products</Link>
+                <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>New In</Link>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'sports' && (
+            <>
+              <div>
+                <h4>Popular Sports</h4>
+                {menuData.sports.popular.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Court &amp; Racket</h4>
+                {menuData.sports.court.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Fitness &amp; Outdoor</h4>
+                {menuData.sports.fitness.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Lifestyle</h4>
+                {menuData.sports.lifestyle.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
+
+          {activeTab === 'brand' && (
+            <>
+              <div>
+                <h4>Official Brand</h4>
+                {menuData.brand.official.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>IPL Collaborations</h4>
+                {menuData.brand.ipl.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+              <div>
+                <h4>Other Leagues</h4>
+                {menuData.brand.otherLeagues.map((item) => (
+                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </header>
 
       {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
+      <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );
 }

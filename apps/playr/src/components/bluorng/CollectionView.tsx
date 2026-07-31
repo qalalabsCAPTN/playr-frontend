@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import ProductCard from './ProductCard';
 import Reveal from './Reveal';
-import { collections, getCollectionProducts, filterChips } from '@/lib/bluorng-data';
+import { collections, getCollectionProducts, filterChips, formatCollectionTitle } from '@/lib/bluorng-data';
 import { useCart } from './CartContext';
 
 interface CollectionViewProps {
@@ -11,23 +12,80 @@ interface CollectionViewProps {
 }
 
 export default function CollectionView({ handle }: CollectionViewProps) {
-  const col = collections[handle] || { title: 'Collection', description: 'Explore playR products' };
+  const collectionTitle = formatCollectionTitle(handle);
+  const col = collections[handle] || { title: collectionTitle, description: `Explore playR ${collectionTitle} products` };
   const all = getCollectionProducts(handle);
   const [chip, setChip] = useState('View all');
+  const [gridCols, setGridCols] = useState<2 | 4>(4);
+  const [sortOrder, setSortOrder] = useState<string>('default');
   const cart = useCart();
 
-  const items = chip === 'View all' ? all : all.filter((p) => p.type === chip);
+  let items = chip === 'View all' ? [...all] : all.filter((p) => p.type === chip);
+
+  if (sortOrder === 'price-low') {
+    items.sort((a, b) => a.price - b.price);
+  } else if (sortOrder === 'price-high') {
+    items.sort((a, b) => b.price - a.price);
+  } else if (sortOrder === 'name') {
+    items.sort((a, b) => a.title.localeCompare(b.title));
+  }
 
   return (
-    <div className="listing">
-      <div className="listing__head">
-        <h1 className="listing__title">{col.title}</h1>
-        <button className="listing__adv" onClick={() => cart.showToast('Filters menu')}>
-          Advance Filters
-        </button>
+    <div className="listing w-full max-w-[1720px] mx-auto px-6 sm:px-10 py-8 md:py-10">
+      {/* Breadcrumb Trail */}
+      <nav className="flex items-center gap-2 text-xs text-[var(--muted)] mb-4">
+        <Link href="/" className="hover:underline">Home</Link>
+        <span>/</span>
+        <Link href="/collections/all-products" className="hover:underline">Collections</Link>
+        <span>/</span>
+        <span className="text-[var(--fg)] font-medium">{collectionTitle}</span>
+      </nav>
+
+      <div className="listing__head flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="listing__title text-2xl md:text-3xl font-extrabold tracking-tight">{collectionTitle}</h1>
+          <p className="text-xs text-[var(--muted)] mt-1">{col.description}</p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {/* Sort Dropdown */}
+          <select 
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="px-3 py-1.5 bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-xs font-medium text-[var(--fg)] focus:outline-none cursor-pointer"
+          >
+            <option value="default">Sort by: Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Title: A - Z</option>
+          </select>
+
+          {/* Grid Layout Density Toggles */}
+          <div className="hidden sm:flex items-center bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] p-1 gap-1">
+            <button
+              onClick={() => setGridCols(2)}
+              className={`px-2 py-1 text-xs font-bold rounded ${gridCols === 2 ? 'bg-[var(--fg)] text-[var(--panel)]' : 'text-[var(--muted)]'}`}
+              aria-label="2 Columns Grid"
+            >
+              2 Col
+            </button>
+            <button
+              onClick={() => setGridCols(4)}
+              className={`px-2 py-1 text-xs font-bold rounded ${gridCols === 4 ? 'bg-[var(--fg)] text-[var(--panel)]' : 'text-[var(--muted)]'}`}
+              aria-label="4 Columns Grid"
+            >
+              4 Col
+            </button>
+          </div>
+
+          <button className="listing__adv" onClick={() => cart.showToast('Filters menu active')}>
+            Advance Filters
+          </button>
+        </div>
       </div>
 
-      <div className="chips">
+      {/* Category Chips */}
+      <div className="chips mb-6">
         {filterChips.map((c) => (
           <button key={c} className={`chip ${chip === c ? 'active' : ''}`} onClick={() => setChip(c)}>
             {c}
@@ -35,7 +93,8 @@ export default function CollectionView({ handle }: CollectionViewProps) {
         ))}
       </div>
 
-      <Reveal stagger className="pgrid" as="div">
+      {/* Product Grid */}
+      <Reveal stagger className={`pgrid ${gridCols === 2 ? 'pgrid--2col' : 'pgrid--4col'}`} as="div">
         {items.map((p) => (
           <ProductCard key={p.handle} product={p} gallery={true} />
         ))}

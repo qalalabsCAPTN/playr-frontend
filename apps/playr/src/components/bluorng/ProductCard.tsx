@@ -20,8 +20,8 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, gallery = true }: ProductCardProps) {
   const [idx, setIdx] = useState(0);
-  const [saved, setSaved] = useState(false);
   const cart = useCart();
+  const saved = cart.isInWishlist(product.handle);
   const onSale = product.compareAt && product.compareAt > product.price;
   const imgs = gallery ? product.images : product.images.slice(0, 1);
 
@@ -44,8 +44,7 @@ export default function ProductCard({ product, gallery = true }: ProductCardProp
   const toggleSave = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setSaved((v) => !v);
-    cart.showToast(saved ? 'Removed from wishlist' : 'Saved to wishlist');
+    cart.toggleWishlist(product);
   };
 
   return (

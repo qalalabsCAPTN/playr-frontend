@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scanning Images...</title>
+  <style>
+    body { font-family: monospace; padding: 20px; white-space: pre-wrap; background: #222; color: #fff; }
+    h1 { color: #0f0; }
+  </style>
+</head>
+<body>
+  <h1>Image Scan Progress</h1>
+  <div id="status">Starting scan...</div>
+  <pre id="output"></pre>
+
+  <script type="module">
+    import { products } from './lib-data.js';
+
+    async function isWhiteBg(url) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = 10;
+          canvas.height = 10;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, 10, 10);
+          try {
+            const pixels = [
+              ctx.getImageData(0, 0, 1, 1).data,
+              ctx.getImageData(9, 0, 1, 1).data,
+              ctx.getImageData(0, 9, 1, 1).data,
+              ctx.getImageData(9, 9, 1, 1).data,
+            ];
+            // If all 4 corner pixels are close to white (e.g. RGB components > 248)
+            const isWhite = pixels.every(p => p[0] > 248 && p[1] > 248 && p[2] > 248);
+            
+            console.log(url, pixels, isWhite);
+            resolve(isWhite);
+          } catch (e) {
+            console.error("CORS / Canvas Error for", url, e);
+            resolve(false); // keep on error
+          }
+        };
+        img.onerror = () => {
+          console.error("Load Error for", url);
+          resolve(false);
+        };
+        img.src = url;
+      });
+    }
+
+    async function run() {
+      const statusEl = document.getElementById('status');
+      const outputEl = document.getElementById('output');
+      
+      const results = [];
+      let index = 0;
+      
+      for (const product of products) {
+        statusEl.innerText = `Scanning product ${++index}/${products.length}: ${product.title}`;
+        
+        const nonWhiteImages = [];
+        for (const imageUrl of product.images) {
+          const isWhite = await isWhiteBg(imageUrl);
+          if (!isWhite) {
+            nonWhiteImages.push(imageUrl);
+          }
+        }
+        
+        // If ALL images got filtered out, keep at least the first one so the product is not empty.
+        if (nonWhiteImages.length === 0 && product.images.length > 0) {
+          nonWhiteImages.push(product.images[0]);
+        }
+        
+        results.push({
+          title: product.title,
+          handle: product.handle,
+          originalCount: product.images.length,
+          newCount: nonWhiteImages.length,
+          images: nonWhiteImages
+        });
+      }
+      
+      statusEl.innerText = `Saving scan results to disk...`;
+      try {
+        await fetch('/api/save-json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(results)
+        });
+        statusEl.innerText = `Scan complete and saved!`;
+      } catch (e) {
+        statusEl.innerText = `Scan complete, but failed to save file: ${e.message}`;
+      }
+      statusEl.style.color = '#0f0';
+      
+      outputEl.innerText = JSON.stringify(results, null, 2);
+      console.log("FINAL_RESULTS_JSON", JSON.stringify(results));
+    }
+
+    run();
+  </script>
+</body>
+</html>

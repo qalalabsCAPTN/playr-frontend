@@ -7,6 +7,7 @@ import Header from '@/components/bluorng/Header';
 import CartDrawer from '@/components/bluorng/CartDrawer';
 import Footer from '@/components/bluorng/Footer';
 import SmoothScroll from '@/components/layout/SmoothScroll';
+import { MobileNavDock } from '@/components/layout/MobileNavDock';
 
 export function StorefrontShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function StorefrontShell({ children }: { children: React.ReactNode }) {
       <div className="page-frame" />
       <main className="flex-1">{children}</main>
       <CartDrawer />
+      <MobileNavDock />
       <Footer />
     </CartProvider>
   );

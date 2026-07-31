@@ -46,10 +46,11 @@ export default function ProductView({ product }: ProductViewProps) {
   const unavailable = UNAVAILABLE[product.type] || [];
   const firstAvailable = sizes.find((s) => !unavailable.includes(s)) || 'One Size';
   const [size, setSize] = useState(sizes.length === 1 ? sizes[0] : firstAvailable);
+  const [quantity, setQuantity] = useState(1);
   const [tab, setTab] = useState<'details' | 'care' | 'shipping'>('details');
   const [guideOpen, setGuideOpen] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  const saved = cart.isInWishlist(product.handle);
 
   useEffect(() => {
     pushRecentlyVisited(product.handle);
@@ -61,11 +62,11 @@ export default function ProductView({ product }: ProductViewProps) {
   const router = useRouter();
   const addToBag = () => {
     if (product.soldOut) return;
-    cart.addItem(product, size);
+    cart.addItem(product, size, quantity);
   };
   const buyNow = () => {
     if (product.soldOut) return;
-    cart.addItem(product, size);
+    cart.addItem(product, size, quantity);
     router.push('/checkout');
   };
 
@@ -104,11 +105,9 @@ export default function ProductView({ product }: ProductViewProps) {
               <div>
                 <h1 className="pdp__title">
                   {product.title}
-                  <button
-                    onClick={() => {
-                      setSaved((v) => !v);
-                      cart.showToast(saved ? 'Removed from wishlist' : 'Saved to wishlist');
-                    }}
+                  <button 
+                    className="pdp__wish" 
+                    onClick={() => cart.toggleWishlist(product)}
                     aria-label="Save to wishlist"
                   >
                     <BookmarkIcon filled={saved} />
@@ -117,6 +116,13 @@ export default function ProductView({ product }: ProductViewProps) {
                 <div className="pdp__price">
                   {onSale && product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
                   <span>{formatPrice(product.price)}</span>
+                </div>
+                <div className="mt-2 text-xs font-semibold">
+                  {product.soldOut ? (
+                    <span className="text-red-500 bg-red-100 px-2 py-0.5 rounded">Sold Out</span>
+                  ) : (
+                    <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">In Stock</span>
+                  )}
                 </div>
               </div>
               <button className="sizeguide-btn" onClick={() => setGuideOpen(true)}>
@@ -139,11 +145,29 @@ export default function ProductView({ product }: ProductViewProps) {
               })}
             </div>
 
-            <div className="pdp__actions">
-              <button className="pdp__atb" onClick={addToBag} disabled={product.soldOut}>
+            <div className="pdp__actions flex items-center gap-3">
+              <div className="qty-stepper">
+                <button 
+                  className="qty-stepper__btn" 
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span className="qty-stepper__val">{quantity}</span>
+                <button 
+                  className="qty-stepper__btn" 
+                  onClick={() => setQuantity((q) => q + 1)}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
+
+              <button className="pdp__atb flex-1" onClick={addToBag} disabled={product.soldOut}>
                 {product.soldOut ? 'Sold out' : 'Add to Bag'}
               </button>
-              <button className="pdp__buy" onClick={buyNow} disabled={product.soldOut}>
+              <button className="pdp__buy flex-1" onClick={buyNow} disabled={product.soldOut}>
                 Buy Now
               </button>
             </div>

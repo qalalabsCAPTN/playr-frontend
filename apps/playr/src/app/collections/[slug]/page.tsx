@@ -1,11 +1,12 @@
 import * as React from "react"
 import type { Metadata } from "next"
 import CollectionView from "@/components/bluorng/CollectionView"
-import { collections } from "@/lib/bluorng-data"
+import { collections, formatCollectionTitle } from "@/lib/bluorng-data"
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const resolvedParams = await params;
-  const col = collections[resolvedParams.slug] || { title: resolvedParams.slug.toUpperCase(), description: 'playR Collection' };
+  const title = formatCollectionTitle(resolvedParams.slug);
+  const col = collections[resolvedParams.slug] || { title, description: `Shop the ${title} collection at playR.` };
   return {
     title: col.title,
     description: `Shop the ${col.title} collection at playR. Luxury sportwear & performance gear.`,

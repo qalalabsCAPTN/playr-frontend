@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 'use client';
 
-import { createContext, useContext, useMemo, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useMemo, useState, useEffect, useCallback, ReactNode } from 'react';
 import { BluorngProduct } from '@/lib/bluorng-data';
 
 export interface CartLineItem {
@@ -17,28 +17,62 @@ interface CartContextType {
   total: number;
   open: boolean;
   setOpen(open: boolean): void;
-  addItem(product: BluorngProduct, size?: string): void;
+  addItem(product: BluorngProduct, size?: string, qty?: number): void;
   updateQty(key: string, delta: number): void;
   removeItem(key: string): void;
   toast: string;
   showToast(msg: string): void;
+
+  wishlist: BluorngProduct[];
+  wishlistCount: number;
+  toggleWishlist(product: BluorngProduct): void;
+  isInWishlist(handle: string): boolean;
+  removeFromWishlist(handle: string): void;
+  addAllWishlistToCart(): void;
 }
 
 const CartCtx = createContext<CartContextType | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartLineItem[]>([]);
+  const [wishlist, setWishlist] = useState<BluorngProduct[]>([]);
   const [open, setOpen] = useState(false);
   const [toast, setToast] = useState('');
+  const [mounted, setMounted] = useState(false);
 
-  const addItem = useCallback((product: BluorngProduct, size: string = 'M') => {
+  // Load cart & wishlist from localStorage
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const storedCart = localStorage.getItem('playr_cart_items');
+      if (storedCart) setItems(JSON.parse(storedCart));
+      
+      const storedWishlist = localStorage.getItem('playr_wishlist');
+      if (storedWishlist) setWishlist(JSON.parse(storedWishlist));
+    } catch (e) {
+      console.error('Failed to load stored cart/wishlist', e);
+    }
+  }, []);
+
+  // Save cart & wishlist to localStorage
+  useEffect(() => {
+    if (!mounted) return;
+    try {
+      localStorage.setItem('playr_cart_items', JSON.stringify(items));
+      localStorage.setItem('playr_wishlist', JSON.stringify(wishlist));
+    } catch (e) {
+      console.error('Failed to save cart/wishlist', e);
+    }
+  }, [items, wishlist, mounted]);
+
+  const addItem = useCallback((product: BluorngProduct, size: string = 'M', qtyAdd: number = 1) => {
     setItems((prev) => {
       const key = product.handle + '|' + size;
       const found = prev.find((i) => i.key === key);
       if (found) {
-        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + 1 } : i));
+        return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qtyAdd } : i));
       }
-      return [...prev, { key, product, size, qty: 1 }];
+      return [...prev, { key, product, size, qty: qtyAdd }];
     });
     setOpen(true);
   }, []);
@@ -60,11 +94,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setTimeout(() => setToast(''), 2400);
   }, []);
 
+  const toggleWishlist = useCallback((product: BluorngProduct) => {
+    setWishlist((prev) => {
+      const exists = prev.some((p) => p.handle === product.handle);
+      if (exists) {
+        setToast('Removed from wishlist');
+        setTimeout(() => setToast(''), 2400);
+        return prev.filter((p) => p.handle !== product.handle);
+      } else {
+        setToast('Saved to wishlist');
+        setTimeout(() => setToast(''), 2400);
+        return [...prev, product];
+      }
+    });
+  }, []);
+
+  const isInWishlist = useCallback((handle: string) => {
+    return wishlist.some((p) => p.handle === handle);
+  }, [wishlist]);
+
+  const removeFromWishlist = useCallback((handle: string) => {
+    setWishlist((prev) => prev.filter((p) => p.handle !== handle));
+    setToast('Removed from wishlist');
+    setTimeout(() => setToast(''), 2400);
+  }, []);
+
+  const addAllWishlistToCart = useCallback(() => {
+    wishlist.forEach((product) => {
+      addItem(product, 'One Size', 1);
+    });
+    setToast('All items added to bag!');
+    setTimeout(() => setToast(''), 2400);
+  }, [wishlist, addItem]);
+
   const value = useMemo(() => {
     const count = items.reduce((n, i) => n + i.qty, 0);
     const total = items.reduce((n, i) => n + i.qty * i.product.price, 0);
-    return { items, count, total, open, setOpen, addItem, updateQty, removeItem, toast, showToast };
-  }, [items, open, addItem, updateQty, removeItem, toast, showToast]);
+    const wishlistCount = wishlist.length;
+
+    return {
+      items,
+      count,
+      total,
+      open,
+      setOpen,
+      addItem,
+      updateQty,
+      removeItem,
+      toast,
+      showToast,
+      wishlist,
+      wishlistCount,
+      toggleWishlist,
+      isInWishlist,
+      removeFromWishlist,
+      addAllWishlistToCart,
+    };
+  }, [items, open, addItem, updateQty, removeItem, toast, showToast, wishlist, toggleWishlist, isInWishlist, removeFromWishlist, addAllWishlistToCart]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }

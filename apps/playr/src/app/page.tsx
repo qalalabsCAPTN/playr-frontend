@@ -2,36 +2,45 @@ import React from 'react';
 import Hero from '@/components/bluorng/Hero';
 import ProductSection from '@/components/bluorng/ProductSection';
 import BannerSlider from '@/components/bluorng/BannerSlider';
-import { products } from '@/lib/bluorng-data';
+import RecentlyVisited from '@/components/bluorng/RecentlyVisited';
+import { getCollectionProducts } from '@/lib/bluorng-data';
 
 export default function HomePage() {
-  const latestDrop = products.slice(0, 8);
-  const seattleOrcas = products.filter((p) => p.collections.includes('seattle-orcas')).slice(0, 8);
-  const swimmingGear = products.filter((p) => p.collections.includes('swimming')).slice(0, 8);
+  const latest = getCollectionProducts('new-in');
+  const caps = getCollectionProducts('caps');
+  const goggles = getCollectionProducts('goggles').slice(0, 8);
+  const swimCaps = getCollectionProducts('swim-caps').slice(0, 8);
 
   return (
     <div>
       <Hero />
       <ProductSection
         title="Latest drop"
-        products={latestDrop}
+        products={latest}
         moreHref="/collections/new-in"
         gallery={true}
         flat={true}
       />
       <ProductSection
-        title="Seattle Orcas x MLC 2026"
-        products={seattleOrcas}
-        moreHref="/collections/seattle-orcas"
+        title="playR Caps"
+        products={caps}
+        moreHref="/collections/caps"
         gallery={true}
       />
       <BannerSlider />
       <ProductSection
-        title="Swimming & Performance Gear"
-        products={swimmingGear}
-        moreHref="/collections/swimming"
+        title="Swimming — Goggles"
+        products={goggles}
+        moreHref="/collections/goggles"
         gallery={true}
       />
+      <ProductSection
+        title="Swim Caps"
+        products={swimCaps}
+        moreHref="/collections/swim-caps"
+        gallery={true}
+      />
+      <RecentlyVisited />
     </div>
   );
 }

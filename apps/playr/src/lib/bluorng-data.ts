@@ -388,15 +388,84 @@ export const products: BluorngProduct[] = [
 ];
 
 export const collections: Record<string, { title: string; description: string }> = {
-  'new-in': { title: 'Latest Drop', description: 'The newest gear from playR.' },
-  'all-products': { title: 'All Products', description: 'Everything playR.' },
+  // Category - Apparels
+  'new-in': { title: 'Latest Drop', description: 'The newest performance sportswear and gear from playR.' },
+  'all-products': { title: 'All Products', description: 'Explore the complete playR collection.' },
+  bottomwear: { title: 'Bottomwear', description: 'Performance shorts, track pants, tights, and training bottoms.' },
+  topwear: { title: 'Topwear', description: 'Breathable tees, polos, jerseys, and jackets built for movement.' },
+  suit: { title: 'Suit & Tracksuits', description: 'Official playR athletic suits and tracksuits.' },
+  innerwear: { title: 'Innerwear', description: 'Comfortable base layers and athletic innerwear.' },
+  
+  // Category - Equipment
+  paddle: { title: 'Paddle & Pickleball', description: 'Professional pickleball paddles, balls, and court gear.' },
+  band: { title: 'Bands & Resistance', description: 'Fitness resistance bands and athletic wristbands.' },
+  bag: { title: 'Bags & Duffels', description: 'Durable sports bags, duffels, and gear backpacks.' },
+  ball: { title: 'Balls & Equipment', description: 'Match balls, training balls, and equipment.' },
+  bat: { title: 'Bats & Gear', description: 'Premium cricket bats and batting accessories.' },
+  gloves: { title: 'Gloves', description: 'Batting, fielding, and sports gloves for max grip.' },
+  guard: { title: 'Guards & Protection', description: 'Protective guards and pads engineered for safety.' },
+  'yoga-mat': { title: 'Yoga Mats', description: 'Non-slip fitness and yoga mats for daily training.' },
+  'swimming-goggles': { title: 'Swimming Goggles', description: 'UV-protected, anti-fog goggles for every swimmer.' },
+  'swimming-caps': { title: 'Swimming Caps', description: 'Chlorine-resistant silicone swim caps.' },
+  'swimming-accessories': { title: 'Swimming Accessories', description: 'Swim fins, kickboards, and pool accessories.' },
+
+  // Category - Accessories
+  cushion: { title: 'Cushions & Accessories', description: 'Comfort accessories and stadium cushions.' },
+  drinkware: { title: 'Drinkware & Bottles', description: 'Insulated stainless steel bottles and hydration gear.' },
+  headwear: { title: 'Headwear & Caps', description: 'Breathable caps, visors, and beanies built for sport.' },
   caps: { title: 'Caps & Headwear', description: 'Breathable caps and hats built for sport and street.' },
+  socks: { title: 'Socks & Performance', description: 'Cushioned athletic socks with arch support.' },
+
+  // Sports - Popular & Court
+  cricket: { title: 'Cricket Collection', description: 'Official match jerseys, training tees, bats, and cricket gear.' },
+  'running-training': { title: 'Running & Training', description: 'Lightweight, sweat-wicking gear for runners and gym enthusiasts.' },
+  cycling: { title: 'Cycling', description: 'Aerodynamic cycling wear and accessories.' },
+  football: { title: 'Football', description: 'Jerseys, shorts, and training equipment for football.' },
+  pickleball: { title: 'Pickleball', description: 'Pickleball paddles, balls, and court apparel.' },
   swimming: { title: 'Swimming', description: 'Goggles and swim caps engineered for the pool.' },
   goggles: { title: 'Goggles', description: 'UV-protected, anti-fog goggles for every swimmer.' },
   'swim-caps': { title: 'Swim Caps', description: 'Chlorine-resistant silicone caps.' },
-  'seattle-orcas': { title: 'Seattle Orcas', description: 'Official playR x Seattle Orcas merchandise for MLC 2026.' },
-  kids: { title: 'Kids', description: 'Built for young athletes.' },
+  badminton: { title: 'Badminton', description: 'Rackets, apparel, and court gear for badminton.' },
+  tennis: { title: 'Tennis', description: 'Tennis polos, shorts, and accessories.' },
+  volleyball: { title: 'Volleyball', description: 'Volleyball jerseys, kneepads, and training gear.' },
+  squash: { title: 'Squash', description: 'Court gear and breathable apparel for squash.' },
+  basketball: { title: 'Basketball', description: 'Hoops jerseys, shorts, and basketball gear.' },
+
+  // Sports - Fitness & Lifestyle
+  'fitness-gym-yoga': { title: 'Fitness Gym & Yoga', description: 'Apparel and accessories built for yoga and strength training.' },
+  'outdoor-adventure': { title: 'Outdoor & Adventure', description: 'Durable gear for hiking, trail running, and outdoor adventures.' },
+  golf: { title: 'Golf', description: 'Premium golf polos and performance accessories.' },
+  baseball: { title: 'Baseball', description: 'Baseball caps, jerseys, and field gear.' },
+  'lifestyle-after-sports': { title: 'Lifestyle After Sports', description: 'Casual street style apparel for recovery and everyday wear.' },
+  kabaddi: { title: 'Kabaddi', description: 'Official Kabaddi jerseys, shorts, and fan gear.' },
+  'home-office': { title: 'Home & Office', description: 'Lifestyle accessories and drinkware for work and home.' },
+
+  // Brand & Collaborations
+  playr: { title: 'playR Core Collection', description: 'The signature performance sportswear collection by playR.' },
+  'playr-official-merchandise': { title: 'playR Official Merchandise', description: 'Authentic playR licensed merchandise and gear.' },
+  'chennai-super-kings': { title: 'Chennai Super Kings', description: 'Official playR x Chennai Super Kings IPL merchandise.' },
+  'sunrisers-hyderabad': { title: 'Sunrisers Hyderabad', description: 'Official playR x Sunrisers Hyderabad IPL merchandise.' },
+  'lucknow-super-giants': { title: 'Lucknow Super Giants', description: 'Official playR x Lucknow Super Giants IPL merchandise.' },
+  'up-yoddhas': { title: 'UP Yoddhas', description: 'Official playR x UP Yoddhas PKL merchandise.' },
+  'seattle-orcas': { title: 'Seattle Orcas', description: 'Official playR x Seattle Orcas MLC merchandise.' },
+  kids: { title: 'Kids Collection', description: 'Performance sportswear built for young athletes.' },
 };
+
+export function formatCollectionTitle(slug: string): string {
+  if (!slug) return 'Collection';
+  if (collections[slug]?.title) {
+    return collections[slug].title;
+  }
+  return slug
+    .split('-')
+    .map((word) => {
+      const lower = word.toLowerCase();
+      if (lower === 'and') return '&';
+      if (['ipl', 'csk', 'lsg', 'srh', 'mlc', 'pkl'].includes(lower)) return lower.toUpperCase();
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
 
 export const filterChips = ['View all', 'Caps', 'Headwear', 'Goggles', 'Swim Caps'];
 
@@ -405,8 +474,24 @@ export function getProduct(handle: string): BluorngProduct | undefined {
 }
 
 export function getCollectionProducts(handle: string): BluorngProduct[] {
-  if (handle === 'all-products') return products;
-  return products.filter((p) => p.collections.includes(handle));
+  if (!handle || handle === 'all-products' || handle === 'collection') return products;
+  
+  const normalized = handle.toLowerCase().replace(/[^a-z0-9]/g, '');
+  
+  const matches = products.filter((p) => {
+    const pCollections = p.collections.map((c) => c.toLowerCase().replace(/[^a-z0-9]/g, ''));
+    const pType = p.type ? p.type.toLowerCase().replace(/[^a-z0-9]/g, '') : '';
+    const pTitle = p.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    return (
+      pCollections.includes(normalized) ||
+      pType.includes(normalized) ||
+      (normalized.length > 2 && pType.includes(normalized.slice(0, 4))) ||
+      pTitle.includes(normalized)
+    );
+  });
+
+  return matches.length > 0 ? matches : products.slice(0, 8);
 }
 
 export function formatPrice(n: number): string {
