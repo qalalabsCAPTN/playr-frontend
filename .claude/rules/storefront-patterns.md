@@ -11,3 +11,8 @@
 
 3. **Floating Storefront Badges**:
    - Maintain the fixed `0 Points` pill badge at bottom-left and support badge at bottom-right across promotional and account pages.
+
+4. **Wishlist & Commerce State Persistence**:
+   - Never use isolated local component state (`useState(false)`) for product bookmark or saved status.
+   - Always consume `isInWishlist(product.handle)` and `toggleWishlist(product)` from `useCart()` / `useCommerce()`.
+   - Ensure all wishlist mutations automatically sync to `localStorage.setItem('playr_wishlist', ...)` and reflect real-time count badges in `Header`.
