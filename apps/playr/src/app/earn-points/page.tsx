@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 
 export default function EarnPointsPage() {
   const [copied, setCopied] = useState(false);
@@ -336,7 +335,7 @@ export default function EarnPointsPage() {
           <div className="space-y-1">
             <h2 className="text-2xl font-bold tracking-tight">Referral Leaderboard</h2>
             <p className="text-xs text-neutral-500 dark:text-neutral-400">
-              See who's earning the most rewards and climb the leaderboard.
+              See who&apos;s earning the most rewards and climb the leaderboard.
             </p>
           </div>
 

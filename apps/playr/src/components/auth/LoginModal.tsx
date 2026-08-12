@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, MouseEvent } from 'react';
+import React, { useState, MouseEvent } from 'react';
 
 interface LoginModalProps {
   isOpen: boolean;

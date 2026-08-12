@@ -212,7 +212,7 @@ export default function Header() {
                     <div 
                       className="flex items-center justify-between w-full px-5 py-2.5 text-xs font-bold tracking-wider uppercase hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors"
                     >
-                      <span>LET'S PLAY</span>
+                      <span>LET&apos;S PLAY</span>
                       <svg className="w-3 h-3 transition-transform group-hover/sub:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                       </svg>
@@ -344,7 +344,7 @@ export default function Header() {
                     </Link>
                   ))
                 ) : (
-                  <div className="header__search-empty">No products found for "{searchQuery}"</div>
+                  <div className="header__search-empty">No products found for &quot;{searchQuery}&quot;</div>
                 )}
               </div>
             )}

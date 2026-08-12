@@ -23,7 +23,7 @@ export default function WishlistPage() {
         </div>
         <h1 className="text-3xl font-black uppercase tracking-tight mb-3">YOUR WISHLIST IS EMPTY</h1>
         <p className="text-sm text-neutral-500 max-w-md mb-8 leading-relaxed">
-          Save your favorite gear here and they will be waiting for you whenever you're ready to play.
+          Save your favorite gear here and they will be waiting for you whenever you&apos;re ready to play.
         </p>
         <Link 
           href="/collections/all-products"

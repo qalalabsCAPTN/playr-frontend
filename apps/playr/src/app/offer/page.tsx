@@ -15,7 +15,7 @@ interface OfferCardProps {
   layout?: 'grid' | 'full';
 }
 
-const offers = [
+const offers: OfferCardProps[] = [
   {
     title: '3 Training Tees at ₹749',
     tagline: 'ANY COLOR, ANY SIZE. GET 3 TRAINING TEES AT A SPECIAL PRICE.',
