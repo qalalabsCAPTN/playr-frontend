@@ -1315,9 +1315,74 @@ export async function updateDbSupportTicket(ticketId: string, updates: any) {
   return null;
 }
 
+let supabaseProductsCache: any[] | null = null;
+let supabaseProductsCacheAt = 0;
+const SUPABASE_PRODUCTS_TTL_MS = 60_000;
+
+function mapSupabaseProduct(row: any) {
+  const images: string[] = Array.isArray(row.images) ? row.images : [];
+  const colors = Array.isArray(row.colors) ? row.colors : [];
+  const sizes: string[] = Array.isArray(row.sizes) ? row.sizes : ['One Size'];
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    description: row.description || '',
+    category: row.category || row.category3 || row.category2 || 'Shop',
+    price: Number(row.price) || 0,
+    imageSrc: images[0] || '',
+    gallery: images,
+    variants: sizes.map((size: string, i: number) => ({
+      id: `${row.id}-var-${i}`,
+      sku: row.sku || row.style_code || row.id,
+      price: Number(row.price) || 0,
+      inventory: 25,
+      size,
+    })),
+    colors,
+    sizes,
+    specifications: Array.isArray(row.specifications) ? row.specifications : [],
+    materialAndCare: {
+      material: row.composition || 'See product details',
+      care: 'Follow the care label instructions.',
+    },
+    loyaltyPoints: Math.round((Number(row.price) || 0) * 0.1),
+  };
+}
+
+async function fetchSupabaseProductsOnce() {
+  const { data, error } = await supabase!.from('products').select('*');
+  if (error || !data) throw error || new Error('No data returned from Supabase');
+  return data.map(mapSupabaseProduct);
+}
+
+async function getSupabaseProducts() {
+  if (!supabase) return [];
+  const now = Date.now();
+  if (supabaseProductsCache && now - supabaseProductsCacheAt < SUPABASE_PRODUCTS_TTL_MS) {
+    return supabaseProductsCache;
+  }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const mapped = await fetchSupabaseProductsOnce();
+      supabaseProductsCache = mapped;
+      supabaseProductsCacheAt = now;
+      return supabaseProductsCache;
+    } catch (e) {
+      if (attempt === 0) continue;
+      console.error('Supabase products fetch failed:', (e as Error)?.message || e);
+    }
+  }
+  return supabaseProductsCache || [];
+}
+
 export async function getDbProducts() {
   const db = loadDbData();
-  return db.products;
+  const supabaseProducts = await getSupabaseProducts();
+  if (supabaseProducts.length === 0) return db.products;
+  const supabaseSlugs = new Set(supabaseProducts.map((p: any) => p.slug));
+  const localOnly = db.products.filter((p: any) => !supabaseSlugs.has(p.slug));
+  return [...supabaseProducts, ...localOnly];
 }
 
 export async function getDbProductBySlug(slug: string) {
