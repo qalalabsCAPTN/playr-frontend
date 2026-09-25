@@ -31,6 +31,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-maroon',
@@ -44,6 +45,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-india-blue',
@@ -58,6 +60,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-dark-grey',
@@ -71,6 +74,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-bottle-green',
@@ -85,6 +89,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'seattle-orcas-match-hat',
