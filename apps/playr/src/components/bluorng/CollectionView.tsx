@@ -30,21 +30,33 @@ export default function CollectionView({ handle }: CollectionViewProps) {
     items.sort((a, b) => a.title.localeCompare(b.title));
   }
 
+  const coverImage = all[0]?.images[0];
+
   return (
-    <div className="listing w-full max-w-[1720px] mx-auto px-6 sm:px-10 py-8 md:py-10">
-      {/* Breadcrumb Trail */}
-      <nav className="flex items-center gap-2 text-xs text-[var(--muted)] mb-4">
-        <Link href="/" className="hover:underline">Home</Link>
-        <span>/</span>
-        <Link href="/collections/all-products" className="hover:underline">Collections</Link>
-        <span>/</span>
-        <span className="text-[var(--fg)] font-medium">{collectionTitle}</span>
-      </nav>
+    <div className="listing w-full max-w-[1720px] mx-auto px-6 sm:px-10 py-6 md:py-8">
+      {/* Collection Header Banner (1920:400) */}
+      <div className="cat-banner relative w-full aspect-[1920/400] min-h-[160px] md:min-h-[220px] rounded-[var(--radius-lg)] overflow-hidden mb-6 flex flex-col justify-end p-6 md:p-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent">
+        {coverImage && (
+          <img
+            src={coverImage}
+            alt={collectionTitle}
+            className="absolute inset-0 w-full h-full object-cover -z-10 brightness-[0.55]"
+          />
+        )}
+        <nav className="flex items-center gap-2 text-xs text-white/70 mb-2">
+          <Link href="/" className="hover:underline">Home</Link>
+          <span>/</span>
+          <Link href="/collections" className="hover:underline">Collections</Link>
+          <span>/</span>
+          <span className="text-white font-medium">{collectionTitle}</span>
+        </nav>
+        <h1 className="text-2xl md:text-4xl font-extrabold uppercase tracking-tight text-white">{collectionTitle}</h1>
+        <p className="text-xs md:text-sm text-white/80 mt-1 max-w-xl">{col.description}</p>
+      </div>
 
       <div className="listing__head flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="listing__title text-2xl md:text-3xl font-extrabold tracking-tight">{collectionTitle}</h1>
-          <p className="text-xs text-[var(--muted)] mt-1">{col.description}</p>
+          <div className="text-xs font-bold text-[var(--muted)] uppercase tracking-wider">{items.length} Products Available</div>
         </div>
 
         <div className="flex items-center gap-3">

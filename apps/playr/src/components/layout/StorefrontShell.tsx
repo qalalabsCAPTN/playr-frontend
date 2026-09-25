@@ -11,7 +11,7 @@ import { MobileNavDock } from '@/components/layout/MobileNavDock';
 
 export function StorefrontShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+  const isAdmin = pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard');
 
   if (isAdmin) {
     return <>{children}</>;
