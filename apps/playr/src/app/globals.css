@@ -1036,14 +1036,6 @@ html.lenis, html.lenis body {
 }
 
 /* ============ THEME SYSTEM OVERRIDES ============ */
-body.theme-dark {
-  --page-bg: #09090b;
-  --panel: #18181b;
-  --fg: #fafafa;
-  --muted: #a1a1aa;
-  --line: #27272a;
-  --chip: #27272a;
-}
 body {
   background: var(--page-bg);
   color: var(--fg);
