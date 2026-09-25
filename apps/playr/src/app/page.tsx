@@ -1,7 +1,11 @@
 import React from 'react';
 import Hero from '@/components/bluorng/Hero';
+import StoriesBar from '@/components/bluorng/StoriesBar';
 import ProductSection from '@/components/bluorng/ProductSection';
 import BannerSlider from '@/components/bluorng/BannerSlider';
+import DiscoverCollections from '@/components/bluorng/DiscoverCollections';
+import StoresSection from '@/components/bluorng/StoresSection';
+import SeoBlock from '@/components/bluorng/SeoBlock';
 import RecentlyVisited from '@/components/bluorng/RecentlyVisited';
 import { getCollectionProducts } from '@/lib/bluorng-data';
 
@@ -14,6 +18,7 @@ export default function HomePage() {
   return (
     <div>
       <Hero />
+      <StoriesBar />
       <ProductSection
         title="Latest drop"
         products={latest}
@@ -28,6 +33,7 @@ export default function HomePage() {
         gallery={true}
       />
       <BannerSlider />
+      <DiscoverCollections />
       <ProductSection
         title="Swimming — Goggles"
         products={goggles}
@@ -40,7 +46,9 @@ export default function HomePage() {
         moreHref="/collections/swim-caps"
         gallery={true}
       />
+      <StoresSection />
       <RecentlyVisited />
+      <SeoBlock />
     </div>
   );
 }

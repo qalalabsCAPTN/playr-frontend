@@ -12,6 +12,7 @@ export interface BluorngProduct {
   images: string[];
   description: string;
   details: string[];
+  colors?: string[];
   soldOut?: boolean;
 }
 
@@ -28,6 +29,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-maroon',
@@ -41,6 +43,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-india-blue',
@@ -55,6 +58,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-dark-grey',
@@ -68,6 +72,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'playr-mesh-cap-bottle-green',
@@ -82,6 +87,7 @@ export const products: BluorngProduct[] = [
     ],
     description: 'A breathable, lightweight cap built for everyday sport and street wear. Structured mesh back panel for ventilation, curved brim, and an adjustable snap closure for a secure fit.',
     details: ['Structured mesh back panel', 'Curved brim', 'Adjustable snap closure', 'Lightweight everyday fit'],
+    colors: ['Red', 'Maroon', 'India Blue', 'Dark Grey', 'Bottle Green'],
   },
   {
     handle: 'seattle-orcas-match-hat',
@@ -526,5 +532,61 @@ export const banners = [
     href: '/collections/caps',
     image: getProduct('playr-mesh-cap-india-blue')?.images[1] || '',
     bg: 'linear-gradient(120deg, #1e2749, #3b4a8f)',
+  },
+];
+
+export interface DiscoverCollection {
+  handle: string;
+  title: string;
+  image: string;
+}
+
+export const discoverCollections: DiscoverCollection[] = [
+  {
+    handle: 'caps',
+    title: 'Caps & Headwear',
+    image: getProduct('playr-mesh-cap-bottle-green')?.images[0] || '',
+  },
+  {
+    handle: 'swimming',
+    title: 'Swim Gear',
+    image: getProduct('goggles-professional-blue-green')?.images[0] || '',
+  },
+  {
+    handle: 'seattle-orcas',
+    title: 'Seattle Orcas Collection',
+    image: getProduct('seattle-orcas-match-cap')?.images[0] || '',
+  },
+];
+
+export interface StoreLocation {
+  city: string;
+  image: string;
+  address: string;
+  phone: string;
+  map: string;
+}
+
+export const stores: StoreLocation[] = [
+  {
+    city: 'Mumbai',
+    image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=600&q=80',
+    address: 'Ground Floor, Phoenix Palladium, Senapati Bapat Marg, Lower Parel, Mumbai, Maharashtra 400013',
+    phone: '+91 22 6634 3000',
+    map: 'https://maps.google.com/?q=Phoenix+Palladium+Mumbai',
+  },
+  {
+    city: 'Bengaluru',
+    image: 'https://images.unsplash.com/photo-1567401893930-f158be9cf7b3?auto=format&fit=crop&w=600&q=80',
+    address: '2nd Floor, Orion Mall, Dr Rajkumar Rd, Rajajinagar, Bengaluru, Karnataka 560055',
+    phone: '+91 80 6728 2222',
+    map: 'https://maps.google.com/?q=Orion+Mall+Bengaluru',
+  },
+  {
+    city: 'New Delhi',
+    image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=600&q=80',
+    address: 'Ground Floor, DLF Promenade, Nelson Mandela Marg, Vasant Kunj, New Delhi, Delhi 110070',
+    phone: '+91 11 4606 8600',
+    map: 'https://maps.google.com/?q=DLF+Promenade+Delhi',
   },
 ];

@@ -28,6 +28,24 @@ function pageTint(title: string) {
   return hit ? hit[1] : '#ececec';
 }
 
+const COLOR_HEX: Record<string, string> = {
+  black: '#111111', white: '#f4f4f4', grey: '#9a9a9a', gray: '#9a9a9a', 'dark grey': '#4a4a4a',
+  silver: '#cbcdd0', red: '#c0392b', maroon: '#7b2233', pink: '#e79ab4', orange: '#e07b39',
+  yellow: '#f5c518', green: '#3f7d4f', 'bottle green': '#1f4d3a', teal: '#1c8a8a', blue: '#2f5fce',
+  navy: '#1c2a4a', 'india blue': '#274b8f', cyan: '#2bb7c6', 'sky blue': '#78b6e6', 'light blue': '#9cc5e8',
+  khaki: '#8a7a52', brown: '#6b4a2f',
+};
+
+function colorSwatch(name: string) {
+  const key = name.trim().toLowerCase();
+  if (COLOR_HEX[key]) return COLOR_HEX[key];
+  const parts = key.split(/[/&]| and /).map((p) => p.trim()).filter(Boolean);
+  const hexes = parts.map((p) => COLOR_HEX[p] || COLOR_HEX[p.split(' ')[0]]).filter(Boolean) as string[];
+  if (hexes.length >= 2) return `linear-gradient(135deg, ${hexes[0]} 0 50%, ${hexes[1]} 50% 100%)`;
+  if (hexes.length === 1) return hexes[0];
+  return '#c8c8c8';
+}
+
 function BookmarkIcon({ filled }: { filled: boolean }) {
   return (
     <svg viewBox="0 0 18 22" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.6">
@@ -50,6 +68,7 @@ export default function ProductView({ product }: ProductViewProps) {
   const [tab, setTab] = useState<'details' | 'care' | 'shipping'>('details');
   const [guideOpen, setGuideOpen] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const saved = cart.isInWishlist(product.handle);
 
   useEffect(() => {
@@ -129,6 +148,22 @@ export default function ProductView({ product }: ProductViewProps) {
                 Size Guide
               </button>
             </div>
+
+            {product.colors && product.colors.length > 0 && (
+              <div className="swatches">
+                {product.colors.map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`swatch ${selectedColor === c ? 'active' : ''}`}
+                    style={{ background: colorSwatch(c) }}
+                    onClick={() => setSelectedColor(c)}
+                    aria-label={c}
+                    title={c}
+                  />
+                ))}
+              </div>
+            )}
 
             <div className="sizes">
               {sizes.map((s) => {
