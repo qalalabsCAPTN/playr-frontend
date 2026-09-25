@@ -1094,6 +1094,23 @@ body.theme-dark .theme-switch__thumb svg { stroke: #fafafa; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 64px;
 }
 
+/* Shop-by-category tiles */
+.cattiles {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px; padding: 0 20px 20px;
+}
+.cattile {
+  position: relative; display: block; border-radius: var(--radius); overflow: hidden;
+  aspect-ratio: 1/1; background: var(--panel);
+}
+.cattile img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s var(--ease); }
+.cattile:hover img { transform: scale(1.06); }
+.cattile__title {
+  position: absolute; inset: auto 0 0 0; padding: 10px; text-align: center;
+  font-size: 12px; font-weight: 800; text-transform: uppercase; color: #fff;
+  background: linear-gradient(0deg, rgba(0,0,0,0.6), transparent);
+}
+
 /* Discover Collections showcase */
 .discover {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -1153,3 +1170,81 @@ body.theme-dark .theme-switch__thumb svg { stroke: #fafafa; }
 }
 .swatch:hover { transform: scale(1.08); }
 .swatch.active { box-shadow: inset 0 0 0 2px var(--panel), 0 0 0 2px var(--fg); }
+
+/* Jersey promo banner */
+.jerseybanner {
+  position: relative; margin: 0 20px 20px; border-radius: var(--radius-lg);
+  overflow: hidden; aspect-ratio: 16/7; background: var(--panel);
+}
+.jerseybanner img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.jerseybanner__overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;
+  gap: 8px; padding: 24px 32px; background: linear-gradient(90deg, rgba(0,0,0,0.75), transparent 65%);
+  color: #fff; max-width: 380px;
+}
+.jerseybanner__label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; }
+.jerseybanner__title { font-size: 26px; font-weight: 900; text-transform: uppercase; line-height: 1.1; }
+
+/* Partner collaboration marquee */
+.marquee {
+  width: 100%; overflow: hidden; background: var(--fg); color: var(--panel); padding: 12px 0;
+}
+.marquee__track { display: flex; gap: 40px; white-space: nowrap; animation: marqueeScroll 22s linear infinite; }
+.marquee__item { display: flex; align-items: center; gap: 40px; font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.marquee__dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+@keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* XP program teaser */
+.xpteaser { padding: 0 20px 20px; }
+.xpteaser__tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
+.xpteaser__tier {
+  display: flex; flex-direction: column; gap: 4px; padding: 14px; border-radius: var(--radius);
+  background: var(--chip); border: 1px solid var(--line); text-align: center;
+}
+.xpteaser__tier-name { font-size: 13px; font-weight: 800; text-transform: uppercase; }
+.xpteaser__tier-min { font-size: 11px; color: var(--muted); }
+
+/* Defy Limits tech banner */
+.defylimits {
+  position: relative; margin: 20px; border-radius: var(--radius-lg); overflow: hidden;
+  aspect-ratio: 21/9; background: linear-gradient(120deg, #16181d, #2a2e38);
+  display: flex; align-items: center;
+}
+.defylimits__overlay { padding: 24px 40px; color: #fff; max-width: 460px; }
+.defylimits__label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.8; }
+.defylimits__title { font-size: 26px; font-weight: 900; margin: 6px 0; line-height: 1.15; }
+.defylimits__overlay p { font-size: 13px; opacity: 0.85; margin-bottom: 14px; }
+
+/* Brand story section */
+.brandstory {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center;
+  padding: 32px 20px; max-width: 1200px; margin: 0 auto;
+}
+.brandstory__label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.brandstory__title { font-size: 28px; font-weight: 900; margin: 8px 0 12px; }
+.brandstory__copy p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+.brandstory__media { border-radius: var(--radius-lg); aspect-ratio: 4/3; background: var(--panel); }
+@media (max-width: 720px) {
+  .brandstory { grid-template-columns: 1fr; }
+  .brandstory__media { order: -1; }
+}
+
+/* Newsletter section */
+.newsletter {
+  text-align: center; padding: 40px 20px; max-width: 640px; margin: 0 auto;
+}
+.newsletter h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+.newsletter p { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+.newsletter__form { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.newsletter__form input {
+  flex: 1; min-width: 220px; padding: 12px 16px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--panel); color: var(--fg); font-size: 13px;
+}
+.newsletter__form button {
+  padding: 12px 24px; border-radius: 999px; background: var(--fg); color: var(--panel);
+  font-weight: 700; font-size: 13px; border: none; cursor: pointer;
+}
+.newsletter__success { font-size: 14px; font-weight: 700; color: var(--fg); }
+
+/* Simple dark/light pill variants used by the new marketing sections */
+.pill--dark { background: var(--fg); color: var(--panel); }
