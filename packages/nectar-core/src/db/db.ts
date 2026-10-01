@@ -16,11 +16,11 @@ function getDbFilePath(): string {
   if (typeof window !== 'undefined') {
     return 'db_store.json';
   }
-  return process.env.VERCEL
-    ? path.resolve(process.cwd(), '..', '..', 'db_store.json')
-    : fs.existsSync(path.resolve(process.cwd(), 'db_store.json'))
-      ? path.resolve(process.cwd(), 'db_store.json')
-      : path.join('c:', 'Users', 'pc', 'Desktop', 'playR', 'db_store.json');
+  const localPath = path.resolve(process.cwd(), 'db_store.json');
+  const parentRootPath = path.resolve(process.cwd(), '..', '..', 'db_store.json');
+  if (fs.existsSync(localPath)) return localPath;
+  if (fs.existsSync(parentRootPath)) return parentRootPath;
+  return process.env.VERCEL ? parentRootPath : localPath;
 }
 
 // Default Seed Data

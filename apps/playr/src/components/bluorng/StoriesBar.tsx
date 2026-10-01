@@ -5,15 +5,15 @@ import { stories } from '@/lib/bluorng-data';
 import StoryViewer from './StoryViewer';
 
 export default function StoriesBar() {
-  const [open, setOpen] = useState(false);
+  const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
 
   if (!stories.length) return null;
 
   return (
     <>
       <div className="stories">
-        {stories.map((s) => (
-          <button key={s.label} className="story" onClick={() => setOpen(true)} aria-label={s.label}>
+        {stories.map((s, idx) => (
+          <button key={s.label} className="story" onClick={() => setActiveStoryIndex(idx)} aria-label={s.label}>
             <span className="story__ring">
               <img src={s.image} alt={s.label} loading="lazy" />
             </span>
@@ -21,7 +21,9 @@ export default function StoriesBar() {
           </button>
         ))}
       </div>
-      {open && <StoryViewer onClose={() => setOpen(false)} />}
+      {activeStoryIndex !== null && (
+        <StoryViewer initialIndex={activeStoryIndex} onClose={() => setActiveStoryIndex(null)} />
+      )}
     </>
   );
 }

@@ -33,21 +33,54 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
   // Load from local storage
   useEffect(() => {
     setMounted(true)
-    const storedCart = localStorage.getItem("playr_cart")
-    const storedWishlist = localStorage.getItem("playr_wishlist")
-    
-    if (storedCart) {
-      try { setCartItems(JSON.parse(storedCart)) } catch(e) { console.error(e) }
-    } else {
-      // Mock defaults if empty (as per Phase 3 requirements to have some data, but let's let empty state shine)
+    const loadStoredCart = () => {
+      const storedCart = localStorage.getItem("playr_cart")
+      const storedCartItems = localStorage.getItem("playr_cart_items")
+      const storedWishlist = localStorage.getItem("playr_wishlist")
+      
+      if (storedCart) {
+        try { 
+          const parsed = JSON.parse(storedCart)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCartItems(parsed)
+            return
+          }
+        } catch(e) { console.error(e) }
+      }
+      
+      if (storedCartItems) {
+        try {
+          const parsed = JSON.parse(storedCartItems)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            const converted: CartItem[] = parsed.map((item: any) => ({
+              id: item.key || String(Math.random()),
+              productId: item.product?.handle || item.key || "prod",
+              variantId: item.key || "var",
+              title: item.product?.title || "Product",
+              imageSrc: item.product?.images?.[0] || "",
+              colorName: item.product?.colors?.[0] || "Default",
+              price: item.product?.price || 0,
+              quantity: item.qty || 1,
+              size: item.size || "One Size"
+            }))
+            setCartItems(converted)
+            return
+          }
+        } catch(e) { console.error(e) }
+      }
+
       setCartItems([])
+
+      if (storedWishlist) {
+        try { setWishlistItems(JSON.parse(storedWishlist)) } catch(e) { console.error(e) }
+      } else {
+        setWishlistItems([])
+      }
     }
-    
-    if (storedWishlist) {
-      try { setWishlistItems(JSON.parse(storedWishlist)) } catch(e) { console.error(e) }
-    } else {
-      setWishlistItems([])
-    }
+
+    loadStoredCart()
+    window.addEventListener('storage', loadStoredCart)
+    return () => window.removeEventListener('storage', loadStoredCart)
   }, [])
 
   // Save to local storage

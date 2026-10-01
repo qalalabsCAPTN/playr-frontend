@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { stories } from '@/lib/bluorng-data';
 
 interface StoryViewerProps {
+  initialIndex?: number;
   onClose: () => void;
 }
 
-export default function StoryViewer({ onClose }: StoryViewerProps) {
-  const [idx, setIdx] = useState(0);
+export default function StoryViewer({ initialIndex = 0, onClose }: StoryViewerProps) {
+  const [idx, setIdx] = useState(initialIndex);
   const [paused, setPaused] = useState(false);
 
   useEffect(() => {

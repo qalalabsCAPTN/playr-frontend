@@ -136,11 +136,13 @@ export default function ProductView({ product }: ProductViewProps) {
                   {onSale && product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
                   <span>{formatPrice(product.price)}</span>
                 </div>
-                <div className="mt-2 text-xs font-semibold">
+                <div className="mt-2 text-xs font-semibold flex items-center gap-2">
+                  <span className="text-[var(--muted)] font-normal text-[11px]">(Incl. of all taxes)</span>
+                  <span className="text-[var(--muted)]">·</span>
                   {product.soldOut ? (
-                    <span className="text-red-500 bg-red-100 px-2 py-0.5 rounded">Sold Out</span>
+                    <span className="text-red-500 bg-red-100 dark:bg-red-950/40 px-2 py-0.5 rounded">Sold Out</span>
                   ) : (
-                    <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">In Stock</span>
+                    <span className="text-emerald-700 bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 px-2 py-0.5 rounded">In Stock</span>
                   )}
                 </div>
               </div>
@@ -180,31 +182,39 @@ export default function ProductView({ product }: ProductViewProps) {
               })}
             </div>
 
-            <div className="pdp__actions flex items-center gap-3">
-              <div className="qty-stepper">
-                <button 
-                  className="qty-stepper__btn" 
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  aria-label="Decrease quantity"
-                >
-                  -
-                </button>
-                <span className="qty-stepper__val">{quantity}</span>
-                <button 
-                  className="qty-stepper__btn" 
-                  onClick={() => setQuantity((q) => q + 1)}
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
+            {/* Box-Aligned Actions */}
+            <div className="pdp__actions-box space-y-3 pt-1">
+              <div className="flex items-center justify-between text-xs font-semibold text-[var(--muted)] uppercase tracking-wider py-1 border-t border-[var(--line)]">
+                <span>Quantity</span>
+                <div className="qty-stepper">
+                  <button 
+                    type="button"
+                    className="qty-stepper__btn" 
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
+                  <span className="qty-stepper__val">{quantity}</span>
+                  <button 
+                    type="button"
+                    className="qty-stepper__btn" 
+                    onClick={() => setQuantity((q) => q + 1)}
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
 
-              <button className="pdp__atb flex-1" onClick={addToBag} disabled={product.soldOut}>
-                {product.soldOut ? 'Sold out' : 'Add to Bag'}
-              </button>
-              <button className="pdp__buy flex-1" onClick={buyNow} disabled={product.soldOut}>
-                Buy Now
-              </button>
+              <div className="pdp__actions">
+                <button className="pdp__atb" onClick={addToBag} disabled={product.soldOut}>
+                  {product.soldOut ? 'Sold out' : 'Add to Bag'}
+                </button>
+                <button className="pdp__buy" onClick={buyNow} disabled={product.soldOut}>
+                  Buy Now
+                </button>
+              </div>
             </div>
           </div>
 

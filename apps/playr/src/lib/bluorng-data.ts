@@ -506,12 +506,16 @@ export function formatPrice(n: number): string {
   return 'RS. ' + n.toLocaleString('en-IN');
 }
 
-export const stories = [
-  { label: 'New Caps', href: '/collections/caps', cta: 'Shop Now', image: products[0].images[0] },
-  { label: 'Orcas x MLC', href: '/collections/seattle-orcas', cta: 'Shop Now', image: getProduct('seattle-orcas-match-hat')?.images[0] || '' },
-  { label: 'Swim Season', href: '/collections/swimming', cta: 'Shop Now', image: getProduct('goggles-performance-neon-orange')?.images[0] || '' },
-  { label: 'Pro Gear', href: '/collections/goggles', cta: 'Explore More', image: getProduct('goggles-professional-blue-green')?.images[0] || '' },
-];
+export const stories = Array.from({ length: 14 }).map((_, i) => {
+  const p = products[i % products.length];
+  const num = String(i + 1).padStart(2, '0');
+  return {
+    label: `Look ${num}`,
+    href: `/products/${p.handle}`,
+    cta: 'Shop Look',
+    image: p.images[0] || '',
+  };
+});
 
 export const banners = [
   {

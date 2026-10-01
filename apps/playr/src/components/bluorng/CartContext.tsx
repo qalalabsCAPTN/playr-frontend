@@ -59,6 +59,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (!mounted) return;
     try {
       localStorage.setItem('playr_cart_items', JSON.stringify(items));
+      const commerceCart = items.map((i) => ({
+        id: i.key,
+        productId: i.product.handle,
+        variantId: i.key,
+        title: i.product.title,
+        imageSrc: i.product.images[0] || '',
+        colorName: i.product.colors?.[0] || 'Default',
+        price: i.product.price,
+        quantity: i.qty,
+        size: i.size || 'One Size',
+      }));
+      localStorage.setItem('playr_cart', JSON.stringify(commerceCart));
       localStorage.setItem('playr_wishlist', JSON.stringify(wishlist));
     } catch (e) {
       console.error('Failed to save cart/wishlist', e);
