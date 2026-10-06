@@ -1,0 +1,17 @@
+Dockerfile
+.dockerignore
+.git
+.github
+.claude
+.memory
+.turbo
+node_modules
+apps/playr/node_modules
+apps/playr/.next
+packages/*/node_modules
+*.log
+.env*.local
+*.csv
+*.xlsx
+New UI
+scripts

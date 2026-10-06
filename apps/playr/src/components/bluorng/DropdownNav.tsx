@@ -11,58 +11,53 @@ interface SubCategory {
 const CATEGORY_DATA: SubCategory[] = [
   {
     title: 'Apparels',
-    items: ['Bottomwear', 'Suit', 'Topwear', 'Innerwear'],
+    items: ['Topwear', 'Bottomwear', 'Suit', 'Innerwear'],
   },
   {
     title: 'Equipment',
     items: [
-      'Paddle',
-      'Band',
-      'Bag',
-      'Ball',
       'Bat',
+      'Ball',
+      'Bag',
+      'Band',
       'Gloves',
       'Guard',
       'Yoga Mat',
-      'Swimming Goggles',
-      'Swimming caps',
-      'Swimming Accessories',
+      'Eyewear',
+      'Paddle Raquet',
+      'Set',
     ],
   },
   {
     title: 'Accessories',
-    items: ['Bag', 'Cushion', 'Drinkware', 'Headwear', 'Socks'],
+    items: ['Bag', 'Headwear', 'Drinkware', 'Socks', 'Cushion', 'Towel'],
   },
 ];
 
 const SPORTS_DATA = [
   'Cricket',
   'Running & Training',
-  'Cycling',
+  'Gym Fitness Yoga',
   'Lifestyle After Sports',
-  'Kabaddi',
-  'Home & Office',
-  'Football',
   'Pickleball',
   'Swimming',
-  'Badminton',
-  'Tennis',
-  'Volleyball',
-  'Baseball',
-  'Squash',
-  'Fitness Gym & Yoga',
   'Outdoor & Adventure',
-  'Golf',
+  'Cycling',
+  'Football',
   'Basketball',
+  'Golf',
+  'Kabaddi',
+  'Home & Office',
 ];
 
 const BRAND_DATA = [
   'playR',
+  'playR STREET',
   'playR x Chennai Super Kings',
-  'playR x Sunrisers Hyderabad',
-  'playR x UP Yoddhas',
   'playR x Lucknow Super Giants',
-  'playR X Seattle Orcas',
+  'playR x Seattle Orcas',
+  'playR x Sunrisers Hyderabad',
+  'playR x UP Yoddha',
 ];
 
 const CLUB_DATA = [

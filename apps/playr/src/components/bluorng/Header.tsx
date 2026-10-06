@@ -61,23 +61,22 @@ const ThemeIcon = {
 
 const menuData = {
   category: {
-    apparels: ['Bottomwear', 'Suit', 'Topwear', 'Innerwear'],
-    equipment: ['Paddle', 'Band', 'Bag', 'Ball', 'Bat', 'Gloves', 'Guard', 'Yoga Mat', 'Swimming Goggles', 'Swimming caps', 'Swimming Accessories'],
-    accessories: ['Bag', 'Cushion', 'Drinkware', 'Headwear', 'Socks'],
+    apparels: ['Topwear', 'Bottomwear', 'Suit', 'Innerwear'],
+    equipment: ['Bat', 'Ball', 'Bag', 'Band', 'Gloves', 'Guard', 'Yoga Mat', 'Eyewear', 'Paddle Raquet', 'Set'],
+    accessories: ['Bag', 'Headwear', 'Drinkware', 'Socks', 'Cushion', 'Towel'],
   },
   sports: {
-    popular: ['Cricket', 'Running & Training', 'Cycling', 'Football', 'Pickleball', 'Swimming'],
-    court: ['Badminton', 'Tennis', 'Volleyball', 'Squash', 'Basketball'],
-    fitness: ['Fitness Gym & Yoga', 'Outdoor & Adventure', 'Golf', 'Baseball'],
-    lifestyle: ['Lifestyle After Sports', 'Kabaddi', 'Home & Office'],
+    popular: ['Cricket', 'Running & Training', 'Gym Fitness Yoga', 'Lifestyle After Sports'],
+    performance: ['Pickleball', 'Swimming', 'Outdoor & Adventure', 'Cycling'],
+    courtField: ['Football', 'Basketball', 'Golf', 'Kabaddi', 'Home & Office'],
   },
   brand: {
-    official: ['playR', 'playR Official Merchandise', 'New Arrivals'],
-    ipl: ['playR x Chennai Super Kings', 'playR x Sunrisers Hyderabad', 'playR x Lucknow Super Giants'],
-    otherLeagues: ['playR x UP Yoddhas', 'playR X Seattle Orcas'],
+    official: ['playR', 'playR STREET', 'playR Official Merchandise', 'New Arrivals'],
+    ipl: ['playR x Chennai Super Kings', 'playR x Lucknow Super Giants', 'playR x Sunrisers Hyderabad'],
+    otherLeagues: ['playR x UP Yoddha', 'playR x Seattle Orcas'],
   },
   club: {
-    ipl: ['Chennai Super Kings', 'Sunrisers Hyderabad', 'Lucknow Super Giants'],
+    ipl: ['Chennai Super Kings', 'Lucknow Super Giants', 'Sunrisers Hyderabad'],
     other: ['UP Yoddhas', 'Seattle Orcas'],
   },
 };
@@ -398,28 +397,25 @@ export default function Header() {
                 ))}
               </div>
               <div>
-                <h4>Court &amp; Racket</h4>
-                {menuData.sports.court.map((item) => (
+                <h4>Performance Sports</h4>
+                {menuData.sports.performance.map((item) => (
                   <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
                     {item}
                   </Link>
                 ))}
               </div>
               <div>
-                <h4>Fitness &amp; Outdoor</h4>
-                {menuData.sports.fitness.map((item) => (
+                <h4>Field, Court &amp; Leisure</h4>
+                {menuData.sports.courtField.map((item) => (
                   <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
                     {item}
                   </Link>
                 ))}
               </div>
               <div>
-                <h4>Lifestyle</h4>
-                {menuData.sports.lifestyle.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
+                <h4>Shop All Sports</h4>
+                <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Gear</Link>
+                <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>Latest Drops</Link>
               </div>
             </>
           )}

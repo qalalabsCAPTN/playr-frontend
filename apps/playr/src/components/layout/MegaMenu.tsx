@@ -10,30 +10,31 @@ const MEGA_MENU_DATA = [
   {
     title: 'Category',
     columns: [
-      { heading: 'Apparel', links: [{ name: 'T-Shirts & Polos', href: '/collections/tshirts' }, { name: 'Shorts & Pants', href: '/collections/bottoms' }, { name: 'Jackets', href: '/collections/jackets' }] },
-      { heading: 'Footwear', links: [{ name: 'Performance Trainers', href: '/collections/trainers' }, { name: 'Lifestyle Sneakers', href: '/collections/sneakers' }] },
-      { heading: 'Accessories', links: [{ name: 'Caps & Hats', href: '/collections/headwear' }, { name: 'Bags & Backpacks', href: '/collections/bags' }] }
+      { heading: 'Apparel', links: [{ name: 'Topwear', href: '/collections/topwear' }, { name: 'Bottomwear', href: '/collections/bottomwear' }, { name: 'Tracksuits', href: '/collections/suit' }, { name: 'Innerwear', href: '/collections/innerwear' }] },
+      { heading: 'Equipment', links: [{ name: 'Cricket Bats', href: '/collections/bat' }, { name: 'Pickleball Paddles', href: '/collections/paddle-raquet' }, { name: 'Protective Guards', href: '/collections/guard' }, { name: 'Resistance Bands', href: '/collections/band' }] },
+      { heading: 'Accessories', links: [{ name: 'Caps & Hats', href: '/collections/headwear' }, { name: 'Sports Bags', href: '/collections/bag' }, { name: 'Sippers & Bottles', href: '/collections/drinkware' }, { name: 'Athletic Socks', href: '/collections/socks' }] }
     ]
   },
   {
     title: 'Sports',
     columns: [
-      { heading: 'Cricket', links: [{ name: 'Training Gear', href: '/collections/cricket-training' }, { name: 'Match Whites', href: '/collections/cricket-match' }] },
-      { heading: 'Football', links: [{ name: 'Boots', href: '/collections/football-boots' }, { name: 'Kits', href: '/collections/football-kits' }] },
-      { heading: 'Training', links: [{ name: 'Gym Wear', href: '/collections/gym' }, { name: 'Running', href: '/collections/running' }] }
+      { heading: 'Popular', links: [{ name: 'Cricket', href: '/collections/cricket' }, { name: 'Running & Training', href: '/collections/running-training' }, { name: 'Gym Fitness Yoga', href: '/collections/gym-fitness-yoga' }] },
+      { heading: 'Performance', links: [{ name: 'Pickleball', href: '/collections/pickleball' }, { name: 'Swimming', href: '/collections/swimming' }, { name: 'Outdoor & Adventure', href: '/collections/outdoor-adventure' }] },
+      { heading: 'Active', links: [{ name: 'Cycling', href: '/collections/cycling' }, { name: 'Football', href: '/collections/football' }, { name: 'Golf', href: '/collections/golf' }, { name: 'Kabaddi', href: '/collections/kabaddi' }] }
     ]
   },
   {
     title: 'Brand',
     columns: [
-      { heading: 'playR Lines', links: [{ name: 'Limitless Performance', href: '/collections/limitless' }, { name: 'Everyday Lifestyle', href: '/collections/lifestyle' }] },
-      { heading: 'Editions', links: [{ name: 'Pro Issue', href: '/collections/pro-issue' }, { name: 'Basics', href: '/collections/basics' }] }
+      { heading: 'playR Lines', links: [{ name: 'playR Core', href: '/collections/playr' }, { name: 'playR STREET', href: '/collections/playr-street' }] },
+      { heading: 'IPL Merchandise', links: [{ name: 'Chennai Super Kings', href: '/collections/chennai-super-kings' }, { name: 'Lucknow Super Giants', href: '/collections/lucknow-super-giants' }, { name: 'Sunrisers Hyderabad', href: '/collections/sunrisers-hyderabad' }] },
+      { heading: 'Leagues', links: [{ name: 'UP Yoddha (PKL)', href: '/collections/up-yoddha' }, { name: 'Seattle Orcas (MLC)', href: '/collections/seattle-orcas' }] }
     ]
   },
   {
     title: 'Club',
     columns: [
-      { heading: 'Official Merchandise', links: [{ name: 'Chennai Super Kings', href: '/collections/csk' }, { name: 'Mumbai Indians', href: '/collections/mi' }, { name: 'Seattle Orcas', href: '/collections/seattle-orcas' }, { name: 'UP Yoddhas', href: '/collections/up-yoddhas' }] }
+      { heading: 'Official Merchandise', links: [{ name: 'Chennai Super Kings', href: '/collections/chennai-super-kings' }, { name: 'Lucknow Super Giants', href: '/collections/lucknow-super-giants' }, { name: 'Sunrisers Hyderabad', href: '/collections/sunrisers-hyderabad' }, { name: 'UP Yoddhas', href: '/collections/up-yoddha' }, { name: 'Seattle Orcas', href: '/collections/seattle-orcas' }] }
     ]
   }
 ];

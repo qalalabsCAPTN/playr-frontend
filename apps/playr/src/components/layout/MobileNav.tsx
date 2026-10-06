@@ -51,7 +51,7 @@ export function MobileNav({ scrolled }: { scrolled: boolean }) {
                   <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Category</h3>
                   <div className="flex flex-col gap-3">
                     <Link href="/collections/apparel" className="text-lg font-medium">Apparel</Link>
-                    <Link href="/collections/footwear" className="text-lg font-medium">Footwear</Link>
+                    <Link href="/collections/equipment" className="text-lg font-medium">Equipment</Link>
                     <Link href="/collections/accessories" className="text-lg font-medium">Accessories</Link>
                   </div>
                 </div>
@@ -60,16 +60,21 @@ export function MobileNav({ scrolled }: { scrolled: boolean }) {
                   <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Sports</h3>
                   <div className="flex flex-col gap-3">
                     <Link href="/collections/cricket" className="text-lg font-medium">Cricket</Link>
-                    <Link href="/collections/football" className="text-lg font-medium">Football</Link>
-                    <Link href="/collections/training" className="text-lg font-medium">Training</Link>
+                    <Link href="/collections/running-training" className="text-lg font-medium">Running & Training</Link>
+                    <Link href="/collections/gym-fitness-yoga" className="text-lg font-medium">Gym Fitness Yoga</Link>
+                    <Link href="/collections/pickleball" className="text-lg font-medium">Pickleball</Link>
+                    <Link href="/collections/swimming" className="text-lg font-medium">Swimming</Link>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Club Official</h3>
+                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Official Brands</h3>
                   <div className="flex flex-col gap-3">
-                    <Link href="/collections/csk" className="text-lg font-medium">Chennai Super Kings</Link>
-                    <Link href="/collections/mi" className="text-lg font-medium">Mumbai Indians</Link>
+                    <Link href="/collections/chennai-super-kings" className="text-lg font-medium">Chennai Super Kings</Link>
+                    <Link href="/collections/lucknow-super-giants" className="text-lg font-medium">Lucknow Super Giants</Link>
+                    <Link href="/collections/sunrisers-hyderabad" className="text-lg font-medium">Sunrisers Hyderabad</Link>
+                    <Link href="/collections/up-yoddha" className="text-lg font-medium">UP Yoddhas</Link>
+                    <Link href="/collections/seattle-orcas" className="text-lg font-medium">Seattle Orcas</Link>
                   </div>
                 </div>
               </div>
