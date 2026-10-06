@@ -540,6 +540,11 @@ def main():
         if display_type in ['PPLR_HIDDEN_PRODUCT', '']:
             display_type = 'Sportswear'
 
+        # Check if product is customizable jersey/apparel
+        is_customizable = any(k in f"{clean_title} {display_type} {cols}".lower() for k in [
+            'jersey', 'custom', 'fanwear', 'match edition', 'match whites', 'singlet', 't-shirt', 'tee', 'polo'
+        ])
+
         clean_catalog.append({
             'handle': h,
             'title': clean_title,
@@ -551,6 +556,8 @@ def main():
             'description': body_text[:400].strip(),
             'details': bullets[:6] if bullets else ['Official playR High Performance Gear', 'Ergonomic fit engineered for active movement'],
             'colors': colors_list if colors_list else None,
+            'sizes': sizes_list if sizes_list else None,
+            'customizable': is_customizable,
             'seoTitle': seo_title,
             'seoDescription': seo_desc,
         })
@@ -574,8 +581,12 @@ export const skuCatalog: BluorngProduct[] = [
         ts_code += f"    images: {json.dumps(item['images'])},\n"
         ts_code += f"    description: {json.dumps(item['description'])},\n"
         ts_code += f"    details: {json.dumps(item['details'])},\n"
-        if item['colors']:
+        if item.get('colors'):
             ts_code += f"    colors: {json.dumps(item['colors'])},\n"
+        if item.get('sizes'):
+            ts_code += f"    sizes: {json.dumps(item['sizes'])},\n"
+        if item.get('customizable'):
+            ts_code += f"    customizable: true,\n"
         if item.get('seoTitle'):
             ts_code += f"    seoTitle: {json.dumps(item['seoTitle'])},\n"
         if item.get('seoDescription'):

@@ -9,6 +9,9 @@ export interface CartLineItem {
   product: BluorngProduct;
   size: string;
   qty: number;
+  customName?: string;
+  customNumber?: string;
+  customImage?: string;
 }
 
 interface CartContextType {
@@ -17,7 +20,7 @@ interface CartContextType {
   total: number;
   open: boolean;
   setOpen(open: boolean): void;
-  addItem(product: BluorngProduct, size?: string, qty?: number): void;
+  addItem(product: BluorngProduct, size?: string, qty?: number, customization?: { name?: string; number?: string; image?: string }): void;
   updateQty(key: string, delta: number): void;
   removeItem(key: string): void;
   toast: string;
@@ -64,11 +67,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
         productId: i.product.handle,
         variantId: i.key,
         title: i.product.title,
-        imageSrc: i.product.images[0] || '',
+        imageSrc: i.customImage || i.product.images[0] || '',
         colorName: i.product.colors?.[0] || 'Default',
         price: i.product.price,
         quantity: i.qty,
         size: i.size || 'One Size',
+        customName: i.customName,
+        customNumber: i.customNumber,
       }));
       localStorage.setItem('playr_cart', JSON.stringify(commerceCart));
       localStorage.setItem('playr_wishlist', JSON.stringify(wishlist));
@@ -77,14 +82,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, wishlist, mounted]);
 
-  const addItem = useCallback((product: BluorngProduct, size: string = 'M', qtyAdd: number = 1) => {
+  const addItem = useCallback((
+    product: BluorngProduct, 
+    size: string = 'M', 
+    qtyAdd: number = 1,
+    customization?: { name?: string; number?: string; image?: string }
+  ) => {
     setItems((prev) => {
-      const key = product.handle + '|' + size;
+      const customKeySuffix = customization?.name || customization?.number 
+        ? `|${customization.name || ''}_${customization.number || ''}` 
+        : '';
+      const key = product.handle + '|' + size + customKeySuffix;
       const found = prev.find((i) => i.key === key);
       if (found) {
         return prev.map((i) => (i.key === key ? { ...i, qty: i.qty + qtyAdd } : i));
       }
-      return [...prev, { key, product, size, qty: qtyAdd }];
+      return [...prev, { 
+        key, 
+        product, 
+        size, 
+        qty: qtyAdd,
+        customName: customization?.name,
+        customNumber: customization?.number,
+        customImage: customization?.image,
+      }];
     });
     setOpen(true);
   }, []);

@@ -496,7 +496,7 @@ html.lenis, html.lenis body {
 .card { position: relative; display: block; }
 .card__media {
   position: relative; border-radius: var(--radius-sm); overflow: hidden;
-  background: #f4f4f4; aspect-ratio: 3/4;
+  background: #f4f4f4; aspect-ratio: 1 / 1;
 }
 .card__media img {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
@@ -702,9 +702,10 @@ body.theme-dark .chip.active {
   position: sticky;
   top: calc(var(--header-h) + 16px);
 }
-.pdp__gallery-left img {
+.pdp__gallery-left img,
+.pdp__gallery-left canvas {
   width: 100%;
-  height: calc(100vh - var(--header-h) - 32px);
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   background: #f1f1f1;
   object-fit: cover;
@@ -717,7 +718,7 @@ body.theme-dark .chip.active {
 }
 .pdp__gallery-right img {
   width: 100%;
-  height: calc(100vh - var(--header-h) - 32px);
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   background: #f1f1f1;
   object-fit: cover;
@@ -1054,9 +1055,10 @@ body.theme-dark .chip.active {
   .pdp__gallery { grid-template-columns: 1fr; }
   .pdp__gallery-left { position: static; }
   .pdp__gallery-left img,
+  .pdp__gallery-left canvas,
   .pdp__gallery-right img {
     height: auto;
-    aspect-ratio: 3/4;
+    aspect-ratio: 1 / 1;
   }
 }
 

@@ -13,6 +13,8 @@ export interface BluorngProduct {
   description: string;
   details: string[];
   colors?: string[];
+  sizes?: string[];
+  customizable?: boolean;
   soldOut?: boolean;
   /** True when no real product photo could be sourced yet — renders a "Photo coming soon" placeholder. */
   placeholder?: boolean;

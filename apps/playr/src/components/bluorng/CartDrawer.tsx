@@ -43,11 +43,16 @@ export default function CartDrawer() {
           ) : (
             cart.items.map((line) => (
               <div key={line.key} className="cartline">
-                <img src={line.product.images[0]} alt={line.product.title} />
+                <img src={line.customImage || line.product.images[0]} alt={line.product.title} />
                 <div className="cartline__info">
                   <div className="cartline__title">{line.product.title}</div>
                   <div className="cartline__meta">
                     Size: {line.size} · {formatPrice(line.product.price)}
+                    {(line.customName || line.customNumber) && (
+                      <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400 mt-0.5">
+                        Custom: #{line.customNumber || '0'} {line.customName || ''}
+                      </div>
+                    )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div className="qty">
