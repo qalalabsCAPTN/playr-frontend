@@ -16,6 +16,8 @@ export interface BluorngProduct {
   soldOut?: boolean;
   /** True when no real product photo could be sourced yet — renders a "Photo coming soon" placeholder. */
   placeholder?: boolean;
+  seoTitle?: string;
+  seoDescription?: string;
 }
 
 export const products: BluorngProduct[] = [
@@ -570,25 +572,46 @@ export const stories = Array.from({ length: 14 }).map((_, i) => {
 
 export const banners = [
   {
-    title: 'SWIM SEASON 2026',
+    title: 'PICKLEBALL 2026',
+    cta: 'Shop now',
+    href: '/collections/pickleball',
+    image: `${CDN}/amazon_3.jpg`,
+    bg: 'linear-gradient(120deg, #1e3a8a, #065f46)',
+  },
+  {
+    title: 'SWIM PERFORMANCE',
     cta: 'Shop now',
     href: '/collections/swimming',
-    image: getProduct('goggles-professional-blue-green')?.images[1] || '',
+    image: `${CDN}/amazon_5.jpg`,
     bg: 'linear-gradient(120deg, #06263f, #0e4d7a)',
   },
   {
-    title: 'playR x SEATTLE ORCAS',
-    cta: 'Shop now',
-    href: '/collections/seattle-orcas',
-    image: getProduct('seattle-orcas-match-cap')?.images[1] || '',
-    bg: 'linear-gradient(120deg, #0b2818, #14532d)',
+    title: 'CHENNAI SUPER KINGS',
+    cta: 'Shop fanwear',
+    href: '/collections/csk',
+    image: `${CDN}/csk_web_banner__jpg.jpg`,
+    bg: 'linear-gradient(120deg, #854d0e, #1e3a8a)',
   },
   {
-    title: 'MESH CAPS — ALL COLOURS',
+    title: 'GYM & WORKOUT',
     cta: 'Shop now',
-    href: '/collections/caps',
-    image: getProduct('playr-mesh-cap-india-blue')?.images[1] || '',
-    bg: 'linear-gradient(120deg, #1e2749, #3b4a8f)',
+    href: '/collections/gym',
+    image: `${CDN}/amazon.jpg`,
+    bg: 'linear-gradient(120deg, #18181b, #27272a)',
+  },
+  {
+    title: 'SUNRISERS HYDERABAD',
+    cta: 'Shop fanwear',
+    href: '/collections/srh',
+    image: `${CDN}/srh_web_banner__jpg.jpg`,
+    bg: 'linear-gradient(120deg, #9a3412, #431407)',
+  },
+  {
+    title: 'LUCKNOW SUPER GIANTS',
+    cta: 'Shop fanwear',
+    href: '/collections/lsg',
+    image: `${CDN}/lsg_available_now_banner.jpg`,
+    bg: 'linear-gradient(120deg, #0284c7, #075985)',
   },
 ];
 

@@ -5,11 +5,14 @@ import Link from 'next/link';
 
 const CDN = 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files';
 const SLIDES = [
-  { src: `${CDN}/playR_sub_banner_jpg.jpg?v=1783589812`, alt: 'playR — Perform. Play. Repeat.', href: '/collections/all-products' },
-  { src: `${CDN}/Artboard_8.jpg_2.jpg`, alt: 'Unmatched style. Unstoppable performance.', href: '/collections/all-products' },
-  { src: `${CDN}/Artboard_1.jpg_16.jpg?v=1782108677`, alt: 'playR training range', href: '/collections/new-in' },
-  { src: `${CDN}/Artboard_4.jpg_8.jpg?v=1779694962`, alt: 'Wear your new look — up to 50% off', href: '/collections/all-products' },
-  { src: `${CDN}/Artboard_2.jpg_10.jpg?v=1779694962`, alt: 'Refined looks that always shine', href: '/collections/all-products' },
+  { src: `${CDN}/amazon_3.jpg`, alt: 'playR Pickleball — Precision & Power', href: '/collections/pickleball' },
+  { src: `${CDN}/amazon_5.jpg`, alt: 'playR Swim Gear — Engineered for the Water', href: '/collections/swimming' },
+  { src: `${CDN}/amazon.jpg`, alt: 'playR Gym & Training — High Performance Activewear', href: '/collections/gym' },
+  { src: `${CDN}/csk_web_banner__jpg.jpg`, alt: 'Official Chennai Super Kings Fanwear & Kit', href: '/collections/csk' },
+  { src: `${CDN}/srh_web_banner__jpg.jpg`, alt: 'Official Sunrisers Hyderabad Fanwear', href: '/collections/srh' },
+  { src: `${CDN}/lsg_available_now_banner.jpg`, alt: 'Official Lucknow Super Giants Fanwear', href: '/collections/lsg' },
+  { src: `${CDN}/kikirt_banner.png`, alt: 'playR Cricket Gear & Equipment', href: '/collections/cricket' },
+  { src: `${CDN}/Artboard_1.jpg_16.jpg?v=1782108677`, alt: 'Official Seattle Orcas Collection', href: '/collections/seattle-orcas' },
 ];
 
 export default function Hero() {
