@@ -31,4 +31,4 @@ jobs:
 
       - name: Submit Cloud Build & Deploy
         run: |
-          gcloud builds submit --config=cloudbuild.yaml --project=streetplayr-production
+          gcloud builds submit --config=cloudbuild.yaml --substitutions=_COMMIT_SHA=${{ github.sha }} --project=streetplayr-production

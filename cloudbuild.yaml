@@ -4,7 +4,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$COMMIT_SHA'
+      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$_COMMIT_SHA'
       - '-t'
       - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:latest'
       - '.'
@@ -13,7 +13,7 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'push'
-      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$COMMIT_SHA'
+      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$_COMMIT_SHA'
 
   # 3. Deploy to Cloud Run (Service: playr)
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -23,7 +23,7 @@ steps:
       - 'deploy'
       - 'playr'
       - '--image'
-      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$COMMIT_SHA'
+      - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$_COMMIT_SHA'
       - '--region'
       - 'asia-south1'
       - '--platform'
@@ -47,11 +47,11 @@ steps:
       - 'SUPABASE_SERVICE_ROLE_KEY=streetplayr-supabase-service-role:latest,PLATFORM_TOKEN_PLAYR=streetplayr-platform-token:latest,CRON_SECRET=streetplayr-cron-secret:latest,GOOGLE_AI_API_KEY=streetplayr-google-ai-key:latest,UNICOMMERCE_PASSWORD=streetplayr-uniware-password:latest,EASEBUZZ_MERCHANT_KEY=streetplayr-easebuzz-key:latest,EASEBUZZ_SALT=streetplayr-easebuzz-salt:latest,SMTP_PASSWORD=streetplayr-smtp-password:latest'
 
 images:
-  - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$COMMIT_SHA'
+  - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:$_COMMIT_SHA'
   - 'asia-south1-docker.pkg.dev/streetplayr-production/cloud-run-source-deploy/playr:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  COMMIT_SHA: 'latest'
+  _COMMIT_SHA: 'latest'
