@@ -72,11 +72,29 @@ const menuData = {
   },
   brand: {
     official: ['playR', 'playR STREET', 'playR Official Merchandise', 'New Arrivals'],
-    ipl: ['playR x Chennai Super Kings', 'playR x Lucknow Super Giants', 'playR x Sunrisers Hyderabad'],
-    otherLeagues: ['playR x UP Yoddha', 'playR x Seattle Orcas'],
+    ipl: [
+      'playR x Chennai Super Kings',
+      'playR x Mumbai Indians',
+      'playR x Rajasthan Royals',
+      'playR x Punjab Kings',
+      'playR x Kolkata Knight Riders',
+      'playR x Gujarat Titans',
+      'playR x Lucknow Super Giants',
+      'playR x Sunrisers Hyderabad',
+    ],
+    otherLeagues: ['playR x UP Yoddha', 'playR x Seattle Orcas', 'Adidas', 'Reebok', 'ICC'],
   },
   club: {
-    ipl: ['Chennai Super Kings', 'Lucknow Super Giants', 'Sunrisers Hyderabad'],
+    ipl: [
+      'Chennai Super Kings',
+      'Mumbai Indians',
+      'Rajasthan Royals',
+      'Punjab Kings',
+      'Kolkata Knight Riders',
+      'Gujarat Titans',
+      'Lucknow Super Giants',
+      'Sunrisers Hyderabad',
+    ],
     other: ['UP Yoddhas', 'Seattle Orcas'],
   },
 };

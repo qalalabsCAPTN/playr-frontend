@@ -7,9 +7,7 @@ import os
 import json
 
 CSV_ZIP_PATH = r"C:\Users\aashi\Downloads\products_export_1.zip"
-THEME_ZIP_PATH = r"C:\Users\aashi\Downloads\theme_export__playr-in-copy-of-playr-main-by-dbdev__25SEP2026-0909am.zip"
 OUTPUT_TS_PATH = r"apps\playr\src\lib\sku-catalog.ts"
-BLUORNG_DATA_PATH = r"apps\playr\src\lib\bluorng-data.ts"
 
 def clean_copy_title(title):
     if not title:
@@ -79,84 +77,347 @@ def slugify(text):
     return text.strip('-')
 
 def determine_collections(tags_str, p_type, title, vendor):
-    tags = [t.strip().lower() for t in tags_str.split(',') if t.strip()]
     full_text = f"{title} {p_type} {vendor} {tags_str}".lower()
     cols = set()
 
-    # Always in shop-all and new-in
+    # Baseline collections
     cols.add('shop-all')
     cols.add('all-products')
 
-    # Functions / Sports
-    if any(k in full_text for k in ['swim', 'goggle', 'pool', 'diving']):
-        cols.add('swimming')
-    if any(k in full_text for k in ['cricket', 'csk', 'srh', 'lsg', 'bat', 'willow', 'wicket']):
+    # =========================================================
+    # 1. SPORTS / ACTIVITIES (Header Sports Tab & Filtering)
+    # =========================================================
+    # Cricket
+    if any(k in full_text for k in ['cricket', 'bat', 'willow', 'wicket', 'icc', 'ipl', 'leather ball', 'tennis ball', 'batting', 'keeping leg guard', 'batting gloves', 'csk', 'lsg', 'srh', 'yoddha', 'orcas']):
         cols.add('cricket')
+
+    # Swimming
+    if any(k in full_text for k in ['swim', 'swimming', 'goggle', 'diving', 'pool', 'swim cap', 'ear plugs', 'nose clip']):
+        cols.add('swimming')
+        cols.add('swim-caps')
+        cols.add('swimming-goggles')
+
+    # Pickleball
     if any(k in full_text for k in ['pickleball', 'paddle']):
         cols.add('pickleball')
-    if any(k in full_text for k in ['gym', 'yoga', 'fitness', 'workout', 'resistance band']):
-        cols.add('gym-fitness-yoga')
+        cols.add('paddle')
+        cols.add('paddle-raquet')
+
+    # Running & Training
     if any(k in full_text for k in ['running', 'marathon', 'jogging', 'training', 'activewear']):
         cols.add('running-training')
-    if any(k in full_text for k in ['cycling', 'cycle']):
+
+    # Gym, Fitness & Yoga
+    if any(k in full_text for k in ['gym', 'yoga', 'fitness', 'workout', 'resistance band', 'weights', 'exercise', 'training']):
+        cols.add('gym-fitness-yoga')
+        cols.add('fitness-gym-yoga')
+
+    # Cycling
+    if any(k in full_text for k in ['cycling', 'cycle', 'atom', 'stallion', 'bff', 'fat tyre', 'speed', 'air pump']):
         cols.add('cycling')
-    if any(k in full_text for k in ['football', 'soccer']):
+
+    # Football
+    if any(k in full_text for k in ['football', 'soccer', 'goalkeeper', 'fussballliebe', 'messi', 'real madrid', 'manchester united', 'arsenal', 'argentina', 'ucl', 'euro 24']):
         cols.add('football')
-    if any(k in full_text for k in ['golf']):
+
+    # Basketball
+    if 'basketball' in full_text:
+        cols.add('basketball')
+
+    # Golf
+    if 'golf' in full_text:
         cols.add('golf')
-    if any(k in full_text for k in ['outdoor', 'adventure', 'trekking', 'camping']):
+
+    # Volleyball
+    if 'volleyball' in full_text:
+        cols.add('volleyball')
+
+    # Kabaddi
+    if any(k in full_text for k in ['kabaddi', 'yoddha', 'pkl']):
+        cols.add('kabaddi')
+
+    # Outdoor & Adventure
+    if any(k in full_text for k in ['outdoor', 'adventure', 'trekking', 'camping', 'hiking']):
         cols.add('outdoor-adventure')
-    if any(k in full_text for k in ['lifestyle', 'casual']):
+
+    # Lifestyle After Sports
+    if any(k in full_text for k in ['lifestyle', 'casual', 'after sports', 'street', 'varsity', 'hooded jacket']):
         cols.add('lifestyle-after-sports')
 
-    # Brands
-    v_low = vendor.lower()
-    if 'chennai' in v_low or 'csk' in full_text:
-        cols.add('chennai-super-kings')
-    elif 'lucknow' in v_low or 'lsg' in full_text:
-        cols.add('lucknow-super-giants')
-    elif 'sunrisers' in v_low or 'srh' in full_text:
-        cols.add('sunrisers-hyderabad')
-    elif 'seattle' in v_low or 'orcas' in full_text:
-        cols.add('seattle-orcas')
-    elif 'yoddha' in v_low:
-        cols.add('up-yoddha')
-    elif 'mumbai indians' in v_low:
-        cols.add('mumbai-indians')
-    elif 'rajasthan' in v_low:
-        cols.add('rajasthan-royals')
-    elif 'punjab' in v_low:
-        cols.add('punjab-kings')
-    elif 'kolkata' in v_low:
-        cols.add('kolkata-knight-riders')
-    elif 'street' in full_text:
-        cols.add('playr-street')
-    else:
-        cols.add('playr')
+    # =========================================================
+    # 2. CATEGORY - APPARELS
+    # =========================================================
+    is_apparel = False
 
-    # Categories
-    if any(k in full_text for k in ['t-shirt', 'tee', 'polo', 'jersey', 'singlet', 'top', 'hoodie', 'jacket']):
+    # Topwear
+    if any(k in full_text for k in ['t-shirt', 't-shirt tee', 'tee', 'polo', 'jersey', 'singlet', 'top', 'hoodie', 'jacket', 'sweatshirt', 'sweaters', 'tank top', 'track top', 'match whites', 'upper']):
         cols.add('topwear')
-    if any(k in full_text for k in ['short', 'pant', 'jogger', 'trouser', 'tights', 'trackpant']):
+        cols.add('apparel')
+        is_apparel = True
+        if any(k in full_text for k in ['polo']):
+            cols.add('t-shirt-polo')
+        elif any(k in full_text for k in ['jersey', 'match whites']):
+            cols.add('jersey')
+        elif any(k in full_text for k in ['hoodie', 'sweatshirt', 'sweaters']):
+            cols.add('hoodie')
+        elif any(k in full_text for k in ['jacket', 'track top']):
+            cols.add('jacket')
+        elif any(k in full_text for k in ['singlet', 'tank top']):
+            cols.add('singlet')
+        else:
+            cols.add('t-shirt-tee')
+
+    # Bottomwear
+    if any(k in full_text for k in ['short', 'shorts', 'pant', 'pants', 'jogger', 'joggers', 'trouser', 'tights', 'track pant', 'lower', 'skin pant', 'skirt']):
         cols.add('bottomwear')
-    if any(k in full_text for k in ['cap', 'hat', 'headwear']):
-        cols.add('caps')
-        cols.add('headwear')
-    if any(k in full_text for k in ['backpack', 'bag', 'duffle', 'kitbag', 'sling']):
+        cols.add('apparel')
+        is_apparel = True
+        if any(k in full_text for k in ['short', 'shorts']):
+            cols.add('shorts')
+        elif any(k in full_text for k in ['jogger', 'joggers']):
+            cols.add('jogger')
+        elif any(k in full_text for k in ['tights', 'skin pant']):
+            cols.add('skin-pants')
+        else:
+            cols.add('pants')
+
+    # Suit & Tracksuits
+    if any(k in full_text for k in ['suit', 'track suit', 'tracksuit']):
+        cols.add('suit')
+        cols.add('apparel')
+        cols.add('track-set')
+        is_apparel = True
+
+    # Innerwear & Compression
+    if any(k in full_text for k in ['sports bra', 'inner bra', 'innerwear', 'skin', 'skin pant', 'skin shorts', 'skin singlet', 'skin tee']):
+        cols.add('innerwear')
+        cols.add('apparel')
+        is_apparel = True
+
+    # =========================================================
+    # 3. CATEGORY - EQUIPMENT
+    # =========================================================
+    is_equipment = False
+
+    # Bat
+    if any(k in full_text for k in ['english willow', 'kashmir willow', 'popular willow', 'tennis bat', 'cricket bat', 'bat']):
+        if not any(k in full_text for k in ['batting gloves', 'batting leg guard']):
+            cols.add('bat')
+            cols.add('equipment')
+            is_equipment = True
+            if 'english willow' in full_text:
+                cols.add('english-willow')
+            elif 'kashmir willow' in full_text:
+                cols.add('kashmir-willow')
+            elif 'popular willow' in full_text or 'tennis bat' in full_text:
+                cols.add('popular-willow')
+
+    # Ball
+    if any(k in full_text for k in ['leather ball', 'tennis ball', 'deco ball', 'cricket ball', 'football', 'basketball', 'ball']):
+        cols.add('ball')
+        cols.add('equipment')
+        is_equipment = True
+        if 'leather' in full_text:
+            cols.add('leather-ball')
+        elif 'tennis' in full_text:
+            cols.add('tennis-ball')
+
+    # Gloves
+    if any(k in full_text for k in ['batting gloves', 'keeping gloves', 'goalkeeper gloves', 'gloves']):
+        cols.add('gloves')
+        cols.add('equipment')
+        is_equipment = True
+
+    # Guard
+    if any(k in full_text for k in ['thigh guard', 'leg guard', 'guard', 'pad']):
+        cols.add('guard')
+        cols.add('equipment')
+        is_equipment = True
+
+    # Band / Resistance
+    if any(k in full_text for k in ['resistance band', 'resistance bands', 'wrist band', 'bands', 'band']):
+        cols.add('band')
+        cols.add('resistance')
+        cols.add('equipment')
+        is_equipment = True
+
+    # Yoga Mat
+    if any(k in full_text for k in ['yoga mat', 'exercise mat', 'mat']):
+        cols.add('yoga-mat')
+        cols.add('mat')
+        cols.add('equipment')
+        is_equipment = True
+
+    # Eyewear / Goggles
+    if any(k in full_text for k in ['goggle', 'goggles', 'eyewear']):
+        cols.add('eyewear')
+        cols.add('goggles')
+        cols.add('swimming-goggles')
+        cols.add('equipment')
+        is_equipment = True
+
+    # Paddle / Raquet
+    if any(k in full_text for k in ['paddle', 'pickleball', 'carbon fiber', 'glass fiber']):
+        cols.add('paddle')
+        cols.add('paddle-raquet')
+        cols.add('equipment')
+        is_equipment = True
+        if 'carbon fiber' in full_text or 't700' in full_text:
+            cols.add('carbon-fiber')
+        elif 'glass fiber' in full_text:
+            cols.add('glass-fiber')
+
+    # Sets & Combos
+    if any(k in full_text for k in ['combo', 'set', 'cricket set', 'bath & towel set']):
+        cols.add('set')
+        cols.add('combo')
+        cols.add('equipment')
+        is_equipment = True
+
+    # =========================================================
+    # 4. CATEGORY - ACCESSORIES
+    # =========================================================
+    # Bags
+    if any(k in full_text for k in ['backpack', 'back pack', 'bag', 'duffle', 'kitbag', 'sling bag', 'string bag', 'sports gym bag', 'travel luggage']):
         cols.add('bag')
         cols.add('accessories')
-    if any(k in full_text for k in ['sipper', 'shaker', 'bottle', 'mug']):
+        if any(k in full_text for k in ['backpack', 'back pack', 'laptop backpack']):
+            cols.add('backpack')
+        elif 'kitbag' in full_text:
+            cols.add('kitbag')
+        elif 'sling' in full_text:
+            cols.add('sling')
+
+    # Headwear / Caps
+    if any(k in full_text for k in ['cap', 'hat', 'headwear', 'woolie', 'beanie', 'swim cap', 'swimming cap']):
+        cols.add('headwear')
+        cols.add('caps')
+        cols.add('accessories')
+        if 'hat' in full_text:
+            cols.add('hat')
+
+    # Drinkware
+    if any(k in full_text for k in ['bottle', 'sipper', 'shaker', 'mug', 'ceramic mug', 'bottles']):
         cols.add('drinkware')
         cols.add('accessories')
-    if any(k in full_text for k in ['sock', 'socks']):
+        if 'sipper' in full_text or 'bottle' in full_text:
+            cols.add('sipper')
+        if 'shaker' in full_text:
+            cols.add('shaker')
+        if 'mug' in full_text:
+            cols.add('mug')
+
+    # Socks
+    if any(k in full_text for k in ['sock', 'socks', 'crew socks', 'ankle socks', 'knee sock']):
+        cols.add('socks')
+        cols.add('accessories')
+        if 'crew' in full_text:
+            cols.add('crew-socks')
+        elif 'ankle' in full_text:
+            cols.add('ankle-socks')
+
+    # Cushion & Living
+    if any(k in full_text for k in ['cushion', 'back cushion', 'neck cushion', 'eye cushion', 'cushion cover']):
+        cols.add('cushion')
         cols.add('accessories')
 
-    # Demographics
-    if 'women' in full_text or 'womens' in full_text:
+    # Towels
+    if any(k in full_text for k in ['towel', 'bath & towel set']):
+        cols.add('towel')
+        cols.add('accessories')
+
+    # Footwear
+    if any(k in full_text for k in ['shoes', 'slipper', 'flip flops', 'sandals']):
+        cols.add('footwear')
+        cols.add('accessories')
+
+    # =========================================================
+    # 5. BRANDS & CLUBS (Header Brand & Club Tabs)
+    # =========================================================
+    v_low = vendor.lower()
+    
+    # Chennai Super Kings
+    if 'chennai' in v_low or 'csk' in full_text:
+        cols.add('chennai-super-kings')
+        cols.add('playr-x-chennai-super-kings')
+        cols.add('csk')
+
+    # Lucknow Super Giants
+    if 'lucknow' in v_low or 'lsg' in full_text:
+        cols.add('lucknow-super-giants')
+        cols.add('playr-x-lucknow-super-giants')
+        cols.add('lsg')
+
+    # Sunrisers Hyderabad
+    if 'sunrisers' in v_low or 'srh' in full_text:
+        cols.add('sunrisers-hyderabad')
+        cols.add('playr-x-sunrisers-hyderabad')
+        cols.add('srh')
+
+    # Mumbai Indians
+    if 'mumbai' in v_low or 'mi' in full_text:
+        cols.add('mumbai-indians')
+        cols.add('playr-x-mumbai-indians')
+
+    # Rajasthan Royals
+    if 'rajasthan' in v_low or 'rr' in full_text or 'royals' in full_text:
+        cols.add('rajasthan-royals')
+        cols.add('playr-x-rajasthan-royals')
+
+    # Punjab Kings
+    if 'punjab' in v_low or 'pbks' in full_text:
+        cols.add('punjab-kings')
+        cols.add('playr-x-punjab-kings')
+
+    # Kolkata Knight Riders
+    if 'kolkata' in v_low or 'kkr' in full_text or 'knight riders' in full_text:
+        cols.add('kolkata-knight-riders')
+        cols.add('playr-x-kolkata-knight-riders')
+
+    # Gujarat Titans
+    if 'gujarat' in v_low or 'gt' in full_text:
+        cols.add('gujarat-titans')
+        cols.add('playr-x-gujarat-titans')
+
+    # Seattle Orcas
+    if 'seattle' in v_low or 'orcas' in full_text:
+        cols.add('seattle-orcas')
+        cols.add('playr-x-seattle-orcas')
+
+    # UP Yoddhas
+    if 'yoddha' in v_low or 'yoddhas' in full_text:
+        cols.add('up-yoddha')
+        cols.add('up-yoddhas')
+        cols.add('playr-x-up-yoddha')
+
+    # Adidas
+    if 'adidas' in v_low or 'adidas' in full_text:
+        cols.add('adidas')
+
+    # Reebok
+    if 'reebok' in v_low or 'reebok' in full_text:
+        cols.add('reebok')
+
+    # ICC
+    if 'icc' in v_low or 'icc' in full_text:
+        cols.add('icc')
+
+    # playR Street
+    if 'street' in full_text:
+        cols.add('playr-street')
+
+    # Base playR brand
+    cols.add('playr')
+    cols.add('playr-official-merchandise')
+
+    # =========================================================
+    # 6. DEMOGRAPHICS (Men, Women, Kids, Unisex)
+    # =========================================================
+    if 'women' in full_text or 'womens' in full_text or 'women\'s' in full_text or 'girls' in full_text:
         cols.add('women')
-    elif 'kids' in full_text or 'junior' in full_text or 'boys' in full_text or 'girls' in full_text:
+    elif 'kids' in full_text or 'junior' in full_text or 'boys' in full_text or 'boy' in full_text or 'girl' in full_text:
         cols.add('kids')
-    elif 'men' in full_text or 'mens' in full_text:
+    elif 'men' in full_text or 'mens' in full_text or 'men\'s' in full_text:
         cols.add('men')
     else:
         cols.add('unisex')
@@ -200,7 +461,7 @@ def main():
                         'title': r[t_idx],
                         'body_html': r[b_idx],
                         'vendor': r[v_idx],
-                        'type': r[type_idx] or 'Sportswear',
+                        'type': r[type_idx] or 'Activewear',
                         'tags': r[tags_idx],
                         'status': r[status_idx].lower() if status_idx < len(r) else '',
                         'seo_title': r[seo_title_idx] if seo_title_idx < len(r) else '',
@@ -249,18 +510,17 @@ def main():
 
     print(f"Total raw products in export: {len(products)}")
 
-    # Filter to active or valid products with images and price
+    # Include all valid products that have images and a valid price
     clean_catalog = []
     skipped_no_img = 0
+    skipped_no_price = 0
 
     for h, p in products.items():
-        # Keep active products, or draft products that have real images and valid price
-        if p['status'] not in ('active', 'draft', ''):
-            continue
         if not p['images']:
             skipped_no_img += 1
             continue
         if p['min_price'] is None or p['min_price'] <= 0:
+            skipped_no_price += 1
             continue
 
         clean_title = clean_copy_title(p['title'])
@@ -275,12 +535,17 @@ def main():
         colors_list = sorted(list(p['colors']))
         sizes_list = sorted(list(p['sizes']))
 
+        # Determine clean display type
+        display_type = p['type'].strip() if p['type'] else 'Sportswear'
+        if display_type in ['PPLR_HIDDEN_PRODUCT', '']:
+            display_type = 'Sportswear'
+
         clean_catalog.append({
             'handle': h,
             'title': clean_title,
             'price': int(p['min_price']),
             'compareAt': int(p['compare_price']) if p['compare_price'] and p['compare_price'] > p['min_price'] else None,
-            'type': p['type'] or 'Activewear',
+            'type': display_type,
             'collections': cols,
             'images': p['images'],
             'description': body_text[:400].strip(),
@@ -290,7 +555,7 @@ def main():
             'seoDescription': seo_desc,
         })
 
-    print(f"Clean, copy-edited catalog count: {len(clean_catalog)} products (skipped {skipped_no_img} with no images).")
+    print(f"Clean, copy-edited catalog count: {len(clean_catalog)} products (skipped {skipped_no_img} with no images, {skipped_no_price} with no price).")
 
     # Generate TypeScript file
     ts_code = """// playR Master Catalog — Cleaned and copy-edited from Shopify Master Export

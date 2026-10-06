@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import ProductCard from './ProductCard';
 import Reveal from './Reveal';
-import { collections, getCollectionProducts, filterChips, formatCollectionTitle } from '@/lib/bluorng-data';
+import { collections, getCollectionProducts, formatCollectionTitle } from '@/lib/bluorng-data';
 import { useCart } from './CartContext';
 
 interface CollectionViewProps {
@@ -19,6 +19,10 @@ export default function CollectionView({ handle }: CollectionViewProps) {
   const [gridCols, setGridCols] = useState<2 | 4>(4);
   const [sortOrder, setSortOrder] = useState<string>('default');
   const cart = useCart();
+
+  // Dynamically compute available product types in this collection
+  const availableTypes = Array.from(new Set(all.map((p) => p.type).filter(Boolean))).sort();
+  const dynamicChips = ['View all', ...availableTypes.slice(0, 8)];
 
   let items = chip === 'View all' ? [...all] : all.filter((p) => p.type === chip);
 
@@ -97,13 +101,15 @@ export default function CollectionView({ handle }: CollectionViewProps) {
       </div>
 
       {/* Category Chips */}
-      <div className="chips mb-6">
-        {filterChips.map((c) => (
-          <button key={c} className={`chip ${chip === c ? 'active' : ''}`} onClick={() => setChip(c)}>
-            {c}
-          </button>
-        ))}
-      </div>
+      {dynamicChips.length > 1 && (
+        <div className="chips mb-6">
+          {dynamicChips.map((c) => (
+            <button key={c} className={`chip ${chip === c ? 'active' : ''}`} onClick={() => setChip(c)}>
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Product Grid */}
       <Reveal stagger className={`pgrid ${gridCols === 2 ? 'pgrid--2col' : 'pgrid--4col'}`} as="div">
