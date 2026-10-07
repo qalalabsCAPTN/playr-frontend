@@ -4,14 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/components/bluorng/CartContext';
 import LoginModal from '@/components/auth/LoginModal';
+import StoryViewer from '@/components/bluorng/StoryViewer';
+import { stories, products } from '@/lib/bluorng-data';
 
 const Icon = {
-  compass: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
-      <circle cx="12" cy="12" r="9" />
-      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
-    </svg>
-  ),
   user: (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
       <circle cx="12" cy="8" r="4" />
@@ -40,28 +36,74 @@ const Icon = {
 
 export function MobileNavDock() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [storyOpen, setStoryOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const cart = useCart();
+
+  const filteredProducts = products.filter((p) =>
+    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (p.type && p.type.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <>
       <nav className="mobilenav-dock" aria-label="Mobile Navigation Dock">
-        <Link href="/" className="mobilenav-dock__item">
-          {Icon.compass}
-          <span>Explore</span>
-        </Link>
-        <button className="mobilenav-dock__item" onClick={() => setLoginOpen(true)}>
+        {/* 1. Stories Launcher Button */}
+        <button
+          className="mobilenav-dock__item mobilenav__item--story"
+          onClick={() => setStoryOpen(true)}
+          aria-label="Lookbook Stories"
+        >
+          <span className="w-5 h-5 rounded-full p-[1.5px] bg-gradient-to-tr from-[#ff5a1f] to-[#1f6bff] inline-flex items-center justify-center">
+            <img
+              src={stories[0]?.image}
+              alt=""
+              className="w-full h-full rounded-full object-cover"
+            />
+          </span>
+          <span>Stories</span>
+        </button>
+
+        {/* 2. Account Nav Button */}
+        <button
+          className="mobilenav-dock__item mobilenav__item"
+          onClick={() => setLoginOpen(true)}
+          aria-label="Account"
+        >
           {Icon.user}
           <span>Account</span>
         </button>
-        <Link href="/collections/seattle-orcas" className="mobilenav-dock__item">
+
+        {/* 3. Stores Pin Nav Button */}
+        <Link
+          href="/collections/seattle-orcas"
+          className="mobilenav-dock__item mobilenav__item"
+          aria-label="Stores"
+        >
           {Icon.pin}
           <span>Stores</span>
         </Link>
-        <Link href="/collections/all-products" className="mobilenav-dock__item">
+
+        {/* 4. Search Nav Button */}
+        <button
+          className="mobilenav-dock__item mobilenav__item"
+          onClick={() => {
+            setSearchOpen(true);
+            setSearchQuery('');
+          }}
+          aria-label="Search"
+        >
           {Icon.search}
           <span>Search</span>
-        </Link>
-        <button className="mobilenav-dock__item" onClick={() => cart.setOpen(true)}>
+        </button>
+
+        {/* 5. Bag Nav Button */}
+        <button
+          className="mobilenav-dock__item mobilenav__item"
+          onClick={() => cart.setOpen(true)}
+          aria-label="Bag"
+        >
           {Icon.bag}
           <span>Bag</span>
           {cart.count > 0 && (
@@ -70,6 +112,72 @@ export function MobileNavDock() {
         </button>
       </nav>
 
+      {/* Mobile Search Overlay Modal */}
+      {searchOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start p-4 pt-16"
+          onClick={() => setSearchOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg mx-auto bg-[var(--panel)] border border-[var(--line)] rounded-[var(--radius-lg)] p-4 shadow-2xl relative text-[var(--fg)] max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-2 pb-3 border-b border-[var(--line)]">
+              <span className="text-[var(--muted)]">{Icon.search}</span>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search products, caps, jerseys..."
+                className="w-full bg-transparent text-sm font-medium text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none"
+                autoFocus
+              />
+              <button
+                onClick={() => setSearchOpen(false)}
+                className="text-lg font-bold text-[var(--muted)] hover:text-[var(--fg)] p-1"
+                aria-label="Close search"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="overflow-y-auto flex-1 mt-3 space-y-2">
+              {searchQuery ? (
+                filteredProducts.length > 0 ? (
+                  filteredProducts.slice(0, 10).map((p) => (
+                    <Link
+                      key={p.handle}
+                      href={`/products/${p.handle}`}
+                      onClick={() => setSearchOpen(false)}
+                      className="flex items-center gap-3 p-2 rounded-[var(--radius-sm)] hover:bg-[var(--chip)] transition-colors"
+                    >
+                      <img
+                        src={p.images[0]}
+                        alt={p.title}
+                        className="w-12 h-12 rounded-[var(--radius-sm)] object-cover bg-neutral-200"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs font-bold truncate">{p.title}</div>
+                        <div className="text-[11px] text-[var(--muted)]">₹{p.price}</div>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-xs text-[var(--muted)]">
+                    No products found for &quot;{searchQuery}&quot;
+                  </div>
+                )
+              ) : (
+                <div className="text-center py-8 text-xs text-[var(--muted)]">
+                  Start typing to search catalog...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

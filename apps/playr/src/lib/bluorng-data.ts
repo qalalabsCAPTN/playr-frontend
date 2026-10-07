@@ -2,6 +2,21 @@
 const CDN = 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files';
 const img = (f: string) => `${CDN}/${f}`;
 
+/**
+ * Shopify Image Resizer helper:
+ * Appends width parameters (?width=N or &width=N) to Shopify CDN URLs,
+ * serving optimal image payloads according to device screens.
+ */
+export function imgUrl(url: string, width: number = 640): string {
+  if (!url) return '';
+  if (!url.includes('cdn.shopify.com')) return url;
+  if (/([?&])width=\d+/.test(url)) {
+    return url.replace(/([?&])width=\d+/, `$1width=${width}`);
+  }
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}width=${width}`;
+}
+
 export interface BluorngProduct {
   handle: string;
   title: string;

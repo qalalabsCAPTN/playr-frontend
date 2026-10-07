@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from './CartContext';
@@ -9,6 +10,19 @@ export default function CartDrawer() {
   const router = useRouter();
   const cart = useCart();
   const suggestions = products.slice(0, 6);
+  const [showNote, setShowNote] = useState(false);
+  const [note, setNote] = useState('');
+  const [showCoupon, setShowCoupon] = useState(false);
+  const [couponCode, setCouponCode] = useState('');
+
+  useEffect(() => {
+    try {
+      const savedNote = localStorage.getItem('playr_order_note');
+      if (savedNote) setNote(savedNote);
+    } catch (e) {
+      console.debug('Failed to read saved note', e);
+    }
+  }, []);
 
   return (
     <>
@@ -73,6 +87,69 @@ export default function CartDrawer() {
 
         {cart.items.length > 0 && (
           <div className="drawer__foot">
+            {/* Special Instructions / Order Note */}
+            <div className="border-t border-[var(--line)] pt-2 pb-1">
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-xs font-semibold text-[var(--muted)] hover:text-[var(--fg)] py-1.5 transition-colors"
+                onClick={() => setShowNote((v) => !v)}
+              >
+                <span>Special instructions / Order note</span>
+                <span className="text-sm font-bold">{showNote ? '−' : '+'}</span>
+              </button>
+              {showNote && (
+                <div className="mt-1.5 mb-2">
+                  <textarea
+                    rows={2}
+                    value={note}
+                    onChange={(e) => {
+                      setNote(e.target.value);
+                      try {
+                        localStorage.setItem('playr_order_note', e.target.value);
+                      } catch (err) {
+                        console.debug('Failed to persist order note', err);
+                      }
+                    }}
+                    placeholder="Add special instructions or delivery note..."
+                    className="w-full p-2 text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none focus:border-[var(--fg)] resize-none"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Coupon Code Toggle */}
+            <div className="border-t border-[var(--line)] pt-1 pb-2">
+              <button
+                type="button"
+                className="flex items-center justify-between w-full text-xs font-semibold text-[var(--muted)] hover:text-[var(--fg)] py-1.5 transition-colors"
+                onClick={() => setShowCoupon((v) => !v)}
+              >
+                <span>Have a discount code?</span>
+                <span className="text-sm font-bold">{showCoupon ? '−' : '+'}</span>
+              </button>
+              {showCoupon && (
+                <div className="mt-1.5 mb-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="PROMO CODE"
+                    className="flex-1 px-2.5 py-1.5 text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] font-semibold uppercase focus:outline-none focus:border-[var(--fg)]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!couponCode.trim()) return;
+                      cart.showToast(`Coupon "${couponCode}" applied!`);
+                    }}
+                    className="px-3 py-1.5 bg-[var(--fg)] text-[var(--panel)] text-xs font-bold rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity"
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="drawer__total">
               <span>Estimated total</span>
               <span>{formatPrice(cart.total)}</span>

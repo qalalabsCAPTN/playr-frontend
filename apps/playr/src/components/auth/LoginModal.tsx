@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, MouseEvent } from 'react';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -8,17 +10,78 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  const router = useRouter();
   const [tab, setTab] = useState<'login' | 'register'>('login');
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onClose();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      if (tab === 'login') {
+        const res = await signIn('credentials', {
+          redirect: false,
+          email,
+          password,
+        });
+
+        if (res?.error) {
+          setError('Invalid email or password.');
+        } else {
+          onClose();
+          router.push('/account');
+          router.refresh();
+        }
+      } else {
+        const parts = name.trim().split(' ');
+        const firstName = parts[0] || 'User';
+        const lastName = parts.slice(1).join(' ') || 'Customer';
+
+        const regRes = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            firstName,
+            lastName,
+            email,
+            password,
+          }),
+        });
+
+        const data = await regRes.json();
+        if (!regRes.ok) {
+          setError(data.error || 'Failed to create account.');
+        } else {
+          // Auto sign in on successful registration
+          const signRes = await signIn('credentials', {
+            redirect: false,
+            email,
+            password,
+          });
+          if (signRes?.error) {
+            setError('Registration succeeded. Please sign in.');
+            setTab('login');
+          } else {
+            onClose();
+            router.push('/account');
+            router.refresh();
+          }
+        }
+      }
+    } catch {
+      setError('An unexpected error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -62,6 +125,12 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
             )}
           </button>
         </div>
+
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-[var(--radius-sm)] text-xs mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {tab === 'register' && (
@@ -119,9 +188,10 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
           <button
             type="submit"
-            className="w-full py-3 bg-[var(--fg)] text-[var(--panel)] font-bold text-sm rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity mt-4"
+            disabled={isLoading}
+            className="w-full py-3 bg-[var(--fg)] text-[var(--panel)] font-bold text-sm rounded-[var(--radius-sm)] hover:opacity-90 transition-opacity mt-4 disabled:opacity-50"
           >
-            {tab === 'login' ? 'SIGN IN' : 'CONTINUE'}
+            {isLoading ? 'PLEASE WAIT...' : tab === 'login' ? 'SIGN IN' : 'CONTINUE'}
           </button>
         </form>
 

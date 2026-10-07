@@ -41,6 +41,39 @@ body.theme-dark .header__logo img {
 }
 
 /* Inverted / Negative Corner SVG Fill System */
+.header__corners,
+.mega__corners,
+.search__corners {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 24px;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  z-index: 50;
+}
+.header__corners {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.header--solid .header__corners {
+  opacity: 1;
+}
+.header__corners .corner,
+.mega__corners .corner,
+.search__corners .corner {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+.header__corners .corner--right,
+.mega__corners .corner--right,
+.search__corners .corner--right {
+  transform: scaleX(-1);
+}
 .header__corners path,
 .mega__corners path,
 .search__corners path {
@@ -163,12 +196,23 @@ body.theme-dark .theme-toggle__thumb {
 .pgrid--2col {
   grid-template-columns: repeat(2, 1fr) !important;
 }
+.pgrid--3col {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
 .pgrid--4col {
   grid-template-columns: repeat(4, 1fr) !important;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .pgrid--3col,
   .pgrid--4col {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 520px) {
+  .pgrid--2col,
+  .pgrid--3col,
+  .pgrid--4col {
+    grid-template-columns: 1fr !important;
   }
 }
 

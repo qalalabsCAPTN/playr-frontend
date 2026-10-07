@@ -372,7 +372,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
         return NextResponse.json({ error: "No account found with this email" }, { status: 404 });
       }
       await addDbAuditLog(user.id, 'forgot_password_request', `Requested password reset link / OTP`);
-      // Simulate sending OTP (SMS/Email)
+      
+      const { sendOtpEmail } = require('@/lib/notifications/email');
+      const otp = '123456';
+      await sendOtpEmail(body.email, otp);
+
       return NextResponse.json({ success: true, message: "OTP sent successfully" });
     }
 
@@ -762,6 +766,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
           });
         }
       }
+
+      // Send order confirmation email via SMTP (StreetPlayR architecture)
+      try {
+        const customerEmail = body.shippingAddress?.email || body.email;
+        if (customerEmail) {
+          const { sendOrderConfirmationEmail } = require('@/lib/notifications/email');
+          sendOrderConfirmationEmail(customerEmail, result.order.displayId, {
+            items: (body.items || []).map((it: any) => ({
+              title: it.title || it.name || 'playR Item',
+              quantity: it.quantity || 1,
+              price: it.price || 0,
+            })),
+            total: body.total,
+          }).catch((err: any) => console.error('[playR] Order email failed:', err));
+        }
+      } catch (err) {
+        console.error('[playR] Order confirmation email trigger error:', err);
+      }
+
       return NextResponse.json(result);
     }
 

@@ -16,7 +16,7 @@ export default function CollectionView({ handle }: CollectionViewProps) {
   const col = collections[handle] || { title: collectionTitle, description: `Explore playR ${collectionTitle} products` };
   const all = getCollectionProducts(handle);
   const [chip, setChip] = useState('View all');
-  const [gridCols, setGridCols] = useState<2 | 4>(4);
+  const [gridCols, setGridCols] = useState<2 | 3 | 4>(4);
   const [sortOrder, setSortOrder] = useState<string>('default');
   const cart = useCart();
 
@@ -86,6 +86,13 @@ export default function CollectionView({ handle }: CollectionViewProps) {
               2 Col
             </button>
             <button
+              onClick={() => setGridCols(3)}
+              className={`px-2 py-1 text-xs font-bold rounded ${gridCols === 3 ? 'bg-[var(--fg)] text-[var(--panel)]' : 'text-[var(--muted)]'}`}
+              aria-label="3 Columns Grid"
+            >
+              3 Col
+            </button>
+            <button
               onClick={() => setGridCols(4)}
               className={`px-2 py-1 text-xs font-bold rounded ${gridCols === 4 ? 'bg-[var(--fg)] text-[var(--panel)]' : 'text-[var(--muted)]'}`}
               aria-label="4 Columns Grid"
@@ -112,7 +119,7 @@ export default function CollectionView({ handle }: CollectionViewProps) {
       )}
 
       {/* Product Grid */}
-      <Reveal stagger className={`pgrid ${gridCols === 2 ? 'pgrid--2col' : 'pgrid--4col'}`} as="div">
+      <Reveal stagger className={`pgrid ${gridCols === 2 ? 'pgrid--2col' : gridCols === 3 ? 'pgrid--3col' : 'pgrid--4col'}`} as="div">
         {items.map((p) => (
           <ProductCard key={p.handle} product={p} gallery={true} />
         ))}

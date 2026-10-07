@@ -59,6 +59,19 @@ const ThemeIcon = {
   ),
 };
 
+function CornerCutouts({ className }: { className: string }) {
+  return (
+    <div className={className} aria-hidden="true">
+      <svg viewBox="0 0 24 24" className="corner corner--left">
+        <path d="M 0 0 L 24 0 A 24 24 0 0 0 0 24 Z" />
+      </svg>
+      <svg viewBox="0 0 24 24" className="corner corner--right">
+        <path d="M 0 0 L 24 0 A 24 24 0 0 0 0 24 Z" />
+      </svg>
+    </div>
+  );
+}
+
 const menuData = {
   category: {
     apparels: ['Topwear', 'Bottomwear', 'Suit', 'Innerwear'],
@@ -365,6 +378,7 @@ export default function Header() {
                 )}
               </div>
             )}
+            <CornerCutouts className="search__corners" />
           </div>
         )}
 
@@ -466,7 +480,9 @@ export default function Header() {
               </div>
             </>
           )}
+          <CornerCutouts className="mega__corners" />
         </div>
+        <CornerCutouts className="header__corners" />
       </header>
 
       {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
