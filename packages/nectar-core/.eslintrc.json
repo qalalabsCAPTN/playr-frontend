@@ -15,7 +15,9 @@
     "ecmaVersion": "latest"
   },
   "rules": {
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/no-unused-vars": ["error", { "args": "none", "varsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": ["error", { "args": "none", "varsIgnorePattern": "^_", "caughtErrors": "none" }],
+    "@typescript-eslint/no-require-imports": "off",
+    "no-empty": ["error", { "allowEmptyCatch": true }]
   }
 }

@@ -20,13 +20,17 @@ export default function NewsletterSection() {
       {subscribed ? (
         <p className="newsletter__success">You&apos;re on the list — welcome to playR.</p>
       ) : (
-        <form className="newsletter__form" onSubmit={submit}>
+        <form className="newsletter__form" onSubmit={submit} aria-label="Newsletter subscription form">
+          <label htmlFor="newsletter-email" className="sr-only">Email address</label>
           <input
+            id="newsletter-email"
+            name="email"
             type="email"
             placeholder="Enter your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            aria-label="Enter your email address to subscribe"
           />
           <button type="submit">Subscribe</button>
         </form>

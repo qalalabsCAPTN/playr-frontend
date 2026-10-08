@@ -39,7 +39,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('playr-theme');if(t==='dark'){document.documentElement.classList.add('theme-dark');document.body&&document.body.classList.add('theme-dark');}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className={`${chivo.variable} ${inter.variable} min-h-screen flex flex-col`}>
         <Providers>
           <StorefrontShell>

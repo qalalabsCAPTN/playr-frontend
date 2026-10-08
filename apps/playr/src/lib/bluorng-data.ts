@@ -697,6 +697,50 @@ export const stores: StoreLocation[] = [
   },
 ];
 
+// Full playR SKU catalog -- imported from sku-catalog.ts (sourced from 'playR new website product.xlsx'
+// and mapped to 'playR Website listings - sport.xlsx' taxonomy).
+import { skuCatalog } from './sku-catalog';
+export { skuCatalog };
+
+// Deduplicate catalog entries to prevent React key collision and duplicated collection tiles
+const existingHandles = new Set(products.map((p) => p.handle));
+for (const item of skuCatalog) {
+  if (!existingHandles.has(item.handle)) {
+    products.push(item);
+    existingHandles.add(item.handle);
+  }
+}
+
+// Map and merge local DB products into Bluorng catalog for a unified experience
+try {
+  // eslint-disable-next-line
+  const dbData = require('../../../../db_store.json');
+  if (dbData && Array.isArray(dbData.products)) {
+    for (const dbp of dbData.products) {
+      const handle = dbp.slug || dbp.id;
+      if (!existingHandles.has(handle)) {
+        products.push({
+          handle,
+          title: dbp.title,
+          price: dbp.price,
+          compareAt: dbp.compareAtPrice || null,
+          type: dbp.category || 'Apparel',
+          collections: [dbp.category ? dbp.category.toLowerCase() : 'all'],
+          images: dbp.gallery && dbp.gallery.length > 0 ? dbp.gallery : (dbp.imageSrc ? [dbp.imageSrc] : []),
+          description: dbp.description || '',
+          details: dbp.specifications || [],
+          colors: dbp.colors ? dbp.colors.map((c: any) => c.name || c) : [],
+          sizes: dbp.sizes || ['S', 'M', 'L', 'XL'],
+          customizable: dbp.customizable || handle.includes('jersey')
+        });
+        existingHandles.add(handle);
+      }
+    }
+  }
+} catch {
+  // Graceful fallback if db_store is not accessible in specific bundling contexts
+}
+
 export interface CategoryTile {
   handle: string;
   title: string;
@@ -704,15 +748,8 @@ export interface CategoryTile {
 }
 
 export const categoryTiles: CategoryTile[] = [
-  { handle: 'topwear', title: 'Topwear', image: getProduct('playr-mesh-cap-red')?.images[0] || '' },
-  { handle: 'bottomwear', title: 'Bottomwear', image: getProduct('playr-mesh-cap-maroon')?.images[0] || '' },
+  { handle: 'topwear', title: 'Topwear', image: getProduct('lucknow-super-giants-authentic-match-jersey-ipl-2026-adult-half-sleeve')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/cxzxc.jpg?v=1773746369' },
+  { handle: 'bottomwear', title: 'Bottomwear', image: getProduct('skin-pants-1')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/PRSKNLR23-154-3-1.jpg?v=1770793768' },
   { handle: 'headwear', title: 'Headwear', image: getProduct('playr-mesh-cap-dark-grey')?.images[0] || '' },
   { handle: 'swimming', title: 'Swim Gear', image: getProduct('goggles-performance-neon-orange')?.images[0] || '' },
 ];
-
-
-// Full playR SKU catalog -- imported from sku-catalog.ts (sourced from 'playR new website product.xlsx'
-// and mapped to 'playR Website listings - sport.xlsx' taxonomy).
-import { skuCatalog } from './sku-catalog';
-export { skuCatalog };
-products.push(...skuCatalog);

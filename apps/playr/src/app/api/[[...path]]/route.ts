@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth';
 import {
   getDbUserById,
   getDbOrdersByUserId,
@@ -264,6 +266,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ path
       return NextResponse.json(feed);
     }
 
+    // Admin Authorization Guard for GET requests
+    if (path[0] === 'admin') {
+      const session = await getServerSession(authOptions);
+      if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized: Admin session required" }, { status: 401 });
+      }
+    }
+
     // 14. GET /api/admin/audit-logs (CRM logs)
     if (path[0] === 'admin' && path[1] === 'audit-logs') {
       const logs = await getDbAuditLogs();
@@ -438,6 +448,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
 
     // Wallet Topup
     if (path[0] === 'identity' && path[1] === 'users' && path[2] && path[3] === 'wallet' && path[4] === 'topup') {
+      const session = await getServerSession(authOptions);
+      if (!session?.user || (session.user as any).id !== path[2]) {
+        return NextResponse.json({ error: "Unauthorized: Active user session required" }, { status: 401 });
+      }
+
       const { getDbUserById, updateDbUser, addDbAuditLog } = require('@playr/nectar-core');
       const user = await getDbUserById(path[2]);
       if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -576,6 +591,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pat
       });
 
       return NextResponse.json({ success: true, rewardsPoints: user.rewardsPoints - reward.cost, rewardsTransactions: updatedTxns });
+    }
+
+    // Admin Authorization Guard for POST mutations
+    if (path[0] === 'admin') {
+      const session = await getServerSession(authOptions);
+      if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized: Admin session required" }, { status: 401 });
+      }
     }
 
     // 4. POST /api/admin/coupons (Add coupon)

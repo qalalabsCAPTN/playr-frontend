@@ -86,7 +86,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div 
@@ -95,7 +95,7 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       >
         <button 
           onClick={onClose}
-          className="absolute top-4 right-4 text-xl font-bold text-[var(--muted)] hover:text-[var(--fg)]"
+          className="absolute top-3 right-3 w-11 h-11 flex items-center justify-center text-2xl font-bold text-[var(--muted)] hover:text-[var(--fg)] rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
           aria-label="Close modal"
         >
           &times;
@@ -135,12 +135,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
         <form onSubmit={handleSubmit} className="space-y-4">
           {tab === 'register' && (
             <div>
-              <label className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
+              <label htmlFor="auth-name" className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
                 Full Name
               </label>
               <input
+                id="auth-name"
+                name="name"
                 type="text"
                 required
+                autoComplete="name"
                 placeholder="Enter your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -150,12 +153,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           )}
 
           <div>
-            <label className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
+            <label htmlFor="auth-email" className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
               Email Address
             </label>
             <input
+              id="auth-email"
+              name="email"
               type="email"
               required
+              autoComplete="email"
               placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -164,13 +170,16 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
+            <label htmlFor="auth-password" className="block text-xs font-semibold uppercase text-[var(--muted)] mb-1">
               Password
             </label>
             <div className="relative">
               <input
+                id="auth-password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
                 required
+                autoComplete={tab === 'login' ? 'current-password' : 'new-password'}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

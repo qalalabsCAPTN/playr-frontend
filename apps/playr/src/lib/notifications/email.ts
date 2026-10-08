@@ -64,6 +64,10 @@ export async function sendTransactionalEmail(params: {
     }
 
     console.info(`[playR SMTP] Sent ${params.template} successfully to ${params.to}`);
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (previewUrl) {
+      console.info(`[playR SMTP] Email Preview URL: ${previewUrl}`);
+    }
     return { sent: true };
   } catch (e) {
     const error = e instanceof Error ? e.message : 'Unknown SMTP send failure.';

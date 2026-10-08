@@ -115,7 +115,7 @@ export function MobileNavDock() {
       {/* Mobile Search Overlay Modal */}
       {searchOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-start p-4 pt-16"
+          className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex flex-col justify-start p-4 pt-16"
           onClick={() => setSearchOpen(false)}
         >
           <div

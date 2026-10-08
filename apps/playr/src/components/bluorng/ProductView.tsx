@@ -308,7 +308,8 @@ export default function ProductView({ product }: ProductViewProps) {
     : (SIZE_SETS[product.type] || ['S', 'M', 'L', 'XL']);
   const unavailable = UNAVAILABLE[product.type] || [];
   const firstAvailable = sizes.find((s) => !unavailable.includes(s)) || sizes[0] || 'One Size';
-  const [size, setSize] = useState(sizes.length === 1 ? sizes[0] : firstAvailable);
+  const [size, setSize] = useState<string>(sizes.length === 1 ? sizes[0] : firstAvailable);
+  const [sizeShake, setSizeShake] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [tab, setTab] = useState<'details' | 'care' | 'shipping'>('details');
   const [guideOpen, setGuideOpen] = useState(false);
@@ -356,14 +357,27 @@ export default function ProductView({ product }: ProductViewProps) {
     };
   };
 
+  const triggerSizePrompt = () => {
+    setSizeShake(true);
+    setTimeout(() => setSizeShake(false), 500);
+  };
+
   const addToBag = () => {
     if (product.soldOut) return;
+    if (!size) {
+      triggerSizePrompt();
+      return;
+    }
     const customPayload = getCustomizationPayload();
     cart.addItem(product, size, quantity, customPayload);
   };
 
   const buyNow = () => {
     if (product.soldOut) return;
+    if (!size) {
+      triggerSizePrompt();
+      return;
+    }
     const customPayload = getCustomizationPayload();
     cart.addItem(product, size, quantity, customPayload);
     router.push('/checkout');
@@ -455,7 +469,7 @@ export default function ProductView({ product }: ProductViewProps) {
               </div>
             )}
 
-            <div className="sizes">
+            <div className={`sizes ${sizeShake ? 'sizes--shake' : ''}`}>
               {sizes.map((s) => {
                 const off = unavailable.includes(s) || product.soldOut;
                 return (

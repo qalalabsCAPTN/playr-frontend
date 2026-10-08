@@ -30,21 +30,21 @@ export default function Footer() {
           </div>
           <div>
             <h4>Order Support</h4>
-            <Link href="/">Make a return/Exchange</Link>
-            <Link href="/">Refund/Exchange policy</Link>
-            <Link href="/">Track your order</Link>
-            <Link href="/">Shipping policy</Link>
-            <Link href="/">FAQ&apos;s</Link>
-            <Link href="/">Terms</Link>
+            <Link href="/pages/returns">Make a return/Exchange</Link>
+            <Link href="/pages/returns">Refund/Exchange policy</Link>
+            <Link href="/account/orders">Track your order</Link>
+            <Link href="/pages/terms">Shipping policy</Link>
+            <Link href="/pages/faq">FAQ&apos;s</Link>
+            <Link href="/pages/terms">Terms</Link>
           </div>
           <div>
             <h4>We are playR</h4>
-            <Link href="/">Our story</Link>
-            <Link href="/">Walk-in Stores</Link>
-            <Link href="/">Collaborations</Link>
-            <Link href="/">Careers</Link>
-            <Link href="/">Media</Link>
-            <Link href="/">Blogs</Link>
+            <Link href="/about">Our story</Link>
+            <Link href="/collections/seattle-orcas">Walk-in Stores</Link>
+            <Link href="/b2b">Collaborations</Link>
+            <Link href="/contact">Careers</Link>
+            <Link href="/media">Media</Link>
+            <Link href="/community">Blogs</Link>
           </div>
           <div className="footer__bag" aria-hidden>
             <div className="footer__bag-shape">

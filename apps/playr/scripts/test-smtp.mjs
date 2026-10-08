@@ -91,6 +91,10 @@ async function main() {
         text: 'playR SMTP Test: Your test OTP is 123456',
       });
       console.log(`Email dispatched! Accepted recipients: ${JSON.stringify(info.accepted)}`);
+      const previewUrl = nodemailer.getTestMessageUrl(info);
+      if (previewUrl) {
+        console.log(`\nView Sent Email in Web Browser:\n  ${previewUrl}\n`);
+      }
     } else {
       console.log('Provide a recipient email to send a test email, e.g.:');
       console.log('  node scripts/test-smtp.mjs user@example.com');

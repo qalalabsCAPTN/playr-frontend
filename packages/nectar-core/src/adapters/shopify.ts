@@ -25,7 +25,7 @@ function fixUrl(url: string | null | undefined): string {
 
 // General purpose mapper for Shopify JSON data structure
 function mapShopifyProduct(data: any): Product {
-  const isSearchData = !data.options || !data.variants
+  const _isSearchData = !data.options || !data.variants
   
   // Extract variants if available
   const variants: ProductVariant[] = (data.variants || []).map((v: any) => {

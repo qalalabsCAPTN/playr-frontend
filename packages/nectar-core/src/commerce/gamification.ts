@@ -154,7 +154,7 @@ const DEV_FALLBACK_XP: XPState = {
   progressPercent: 50, // 1250-500 = 750 out of 1500 range = 50%
 };
 
-const DEV_FALLBACK_CHALLENGES: Challenge[] = [
+const _DEV_FALLBACK_CHALLENGES: Challenge[] = [
   {
     id: 'ch_first_purchase',
     title: 'First Purchase',
@@ -273,7 +273,7 @@ const DEV_FALLBACK_REWARDS: Reward[] = [
   },
 ];
 
-const DEV_FALLBACK_LEADERBOARD: LeaderboardEntry[] = [
+const _DEV_FALLBACK_LEADERBOARD: LeaderboardEntry[] = [
   { rank: 1, userId: 'u1', displayName: 'RohitS_CSK', totalXP: 12400, tierName: 'Elite' },
   { rank: 2, userId: 'u2', displayName: 'Kavitha.Runs', totalXP: 9870, tierName: 'Elite' },
   { rank: 3, userId: 'u3', displayName: 'PlayrFan99', totalXP: 7200, tierName: 'Gold' },

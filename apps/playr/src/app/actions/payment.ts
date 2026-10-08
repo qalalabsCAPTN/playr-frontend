@@ -42,15 +42,24 @@ export async function verifyPaymentSignatureAction(
   }
 
   // Security Verification (Production standard)
-  const secret = process.env.RAZORPAY_SECRET || "development_secret";
+  const secret = process.env.RAZORPAY_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error("Payment gateway configuration missing on server.");
+    }
+  }
+
+  const effectiveSecret = secret || "development_secret";
   const body = razorpayOrderId + "|" + razorpayPaymentId;
   const expectedSignature = crypto
-    .createHmac("sha256", secret)
+    .createHmac("sha256", effectiveSecret)
     .update(body.toString())
     .digest("hex");
 
-  // Simulate success for dev environment if secrets match or if in mock mode
-  const isAuthentic = expectedSignature === razorpaySignature || process.env.NODE_ENV === 'development';
+  // In production, expectedSignature MUST match razorpaySignature exactly
+  const isAuthentic = process.env.NODE_ENV === 'production'
+    ? expectedSignature === razorpaySignature
+    : (expectedSignature === razorpaySignature || (!secret && process.env.NODE_ENV === 'development'));
 
   if (!isAuthentic) {
     throw new Error("Invalid payment signature");

@@ -283,7 +283,7 @@ export default function Header() {
 
           <div className="flex items-center gap-2">
             <button 
-              className={`header__pill-plus ${megaOpen ? 'active' : ''}`}
+              className={`header__pill-plus hidden md:inline-flex ${megaOpen ? 'active' : ''}`}
               onClick={() => setMegaOpen((v) => !v)}
               aria-label="Toggle menu"
             >
@@ -295,14 +295,15 @@ export default function Header() {
           </div>
 
           <div className="header__right">
-            <button className="iconbtn iconbtn--story" onClick={() => setStoryOpen(true)} aria-label="Stories">
+            {/* Desktop-only secondary icons (already in bottom MobileNavDock on mobile) */}
+            <button className="iconbtn iconbtn--story iconbtn--desktop-only" onClick={() => setStoryOpen(true)} aria-label="Stories">
               <img src={stories[0].image} alt="" />
             </button>
-            <Link href="/collections/seattle-orcas" className="iconbtn" aria-label="Stores">
+            <Link href="/collections/seattle-orcas" className="iconbtn iconbtn--desktop-only" aria-label="Stores">
               {Icon.pin}
             </Link>
             <button 
-              className={`iconbtn ${searchOpen ? 'active' : ''}`} 
+              className={`iconbtn iconbtn--desktop-only ${searchOpen ? 'active' : ''}`} 
               onClick={() => {
                 setSearchOpen((v) => !v);
                 setMegaOpen(false);
@@ -312,10 +313,10 @@ export default function Header() {
             >
               {Icon.search}
             </button>
-            <button className="iconbtn" onClick={() => setLoginOpen(true)} aria-label="Account">
+            <button className="iconbtn iconbtn--desktop-only" onClick={() => setLoginOpen(true)} aria-label="Account">
               {Icon.user}
             </button>
-            <Link href="/wishlist" className="iconbtn relative" aria-label="Wishlist">
+            <Link href="/wishlist" className="iconbtn relative iconbtn--desktop-only" aria-label="Wishlist">
               {Icon.bookmark}
               {cart.wishlistCount > 0 && <span className="iconbtn__count">{cart.wishlistCount}</span>}
             </Link>
