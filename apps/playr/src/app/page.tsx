@@ -1,6 +1,6 @@
 import React from 'react';
 import Hero from '@/components/bluorng/Hero';
-import StoriesBar from '@/components/bluorng/StoriesBar';
+import PartnershipBanners from '@/components/bluorng/PartnershipBanners';
 import CategoryTiles from '@/components/bluorng/CategoryTiles';
 import ProductSection from '@/components/bluorng/ProductSection';
 import JerseyBanner from '@/components/bluorng/JerseyBanner';
@@ -10,7 +10,6 @@ import DiscoverCollections from '@/components/bluorng/DiscoverCollections';
 import XPProgramTeaser from '@/components/bluorng/XPProgramTeaser';
 import DefyLimits from '@/components/bluorng/DefyLimits';
 import BrandStorySection from '@/components/bluorng/BrandStorySection';
-import StoresSection from '@/components/bluorng/StoresSection';
 import RecentlyVisited from '@/components/bluorng/RecentlyVisited';
 import SeoBlock from '@/components/bluorng/SeoBlock';
 import NewsletterSection from '@/components/bluorng/NewsletterSection';
@@ -23,9 +22,9 @@ export default function HomePage() {
   const swimCaps = getCollectionProducts('swim-caps').slice(0, 8);
 
   return (
-    <div>
+    <div className="space-y-1">
       <Hero />
-      <StoriesBar />
+      <PartnershipBanners />
       <CategoryTiles />
       <ProductSection
         title="Latest drop"
@@ -59,7 +58,6 @@ export default function HomePage() {
         gallery={true}
       />
       <BrandStorySection />
-      <StoresSection />
       <RecentlyVisited />
       <SeoBlock />
       <NewsletterSection />

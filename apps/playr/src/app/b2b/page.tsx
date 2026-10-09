@@ -1,135 +1,237 @@
-"use client"
+'use client';
 
-import React, { useState } from "react"
+import React, { useState } from 'react';
 
 export default function B2BPage() {
-  const [status, setStatus] = useState("")
+  const [status, setStatus] = useState('');
+  const [formData, setFormData] = useState({
+    company: '',
+    contactPerson: '',
+    email: '',
+    phone: '',
+    inquiryType: 'Custom Teamwear (Jerseys, Kits)',
+    requirements: '',
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setStatus("Your corporate inquiry has been submitted. Our B2B team will contact you within 24 hours.")
-  }
+    e.preventDefault();
+    setStatus('Thank you! Your corporate inquiry has been submitted. Our B2B partnership team will contact you within 24 hours.');
+  };
 
   return (
-    <div className="bg-[#fdf9f0] min-h-screen text-on-surface">
+    <div className="min-h-screen bg-[var(--page-bg)] text-[var(--fg)] pb-20">
       {/* Hero Section */}
-      <section className="relative py-24 bg-on-surface overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent"></div>
-        </div>
-        <div className="relative z-10 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center">
-          <span className="inline-block px-4 py-1 bg-action-yellow text-on-surface rounded-full mb-6 font-label-bold uppercase tracking-widest">
-            Corporate & Bulk
+      <section className="relative pt-28 pb-16 px-4 md:px-8 border-b border-[var(--line)] overflow-hidden">
+        <div className="max-w-5xl mx-auto text-center relative z-10">
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest bg-[var(--chip)] text-[var(--fg)] border border-[var(--line)] mb-4">
+            B2B &amp; Corporate Partnerships
           </span>
-          <h1 className="font-headline-xl text-4xl md:text-6xl text-white uppercase tracking-tighter font-black mb-6">
-            Equip Your Team
+          <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tight mb-4">
+            Equip Your Team With playR
           </h1>
-          <p className="font-body-lg text-white/80 max-w-2xl mx-auto mb-10 text-lg">
-            From professional sporting franchises to corporate wellness programs, playR delivers high-performance teamwear and bulk equipment at scale.
+          <p className="text-sm md:text-base text-[var(--muted)] max-w-2xl mx-auto mb-8 leading-relaxed">
+            From premier sporting franchises and academies to corporate wellness programs, playR delivers high-performance teamwear, customized kits, and bulk equipment at scale.
           </p>
-          <a href="#inquiry" className="inline-block bg-action-yellow text-on-surface font-label-bold uppercase px-10 py-4 rounded-full hover:scale-105 transition-transform tracking-widest shadow-xl">
-            Request Catalogue
-          </a>
-        </div>
-      </section>
-
-      {/* Services Grid */}
-      <section className="py-24 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-surface-container-lowest p-10 rounded-2xl border border-outline-variant/30 text-center shadow-sm hover:shadow-xl transition-shadow group">
-            <div className="w-20 h-20 mx-auto bg-surface-container rounded-full flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-4xl">styler</span>
-            </div>
-            <h3 className="font-headline-md text-2xl uppercase tracking-tight font-bold mb-4">Custom Teamwear</h3>
-            <p className="text-secondary font-body-md">
-              Fully customized jerseys, training gear, and travel kits engineered with our AERODRY technology for your specific squad.
-            </p>
-          </div>
-
-          <div className="bg-surface-container-lowest p-10 rounded-2xl border border-outline-variant/30 text-center shadow-sm hover:shadow-xl transition-shadow group">
-            <div className="w-20 h-20 mx-auto bg-surface-container rounded-full flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-4xl">inventory_2</span>
-            </div>
-            <h3 className="font-headline-md text-2xl uppercase tracking-tight font-bold mb-4">Bulk Equipment</h3>
-            <p className="text-secondary font-body-md">
-              Wholesale pricing on official cricket, pickleball, and fitness equipment for academies and corporate tournaments.
-            </p>
-          </div>
-
-          <div className="bg-surface-container-lowest p-10 rounded-2xl border border-outline-variant/30 text-center shadow-sm hover:shadow-xl transition-shadow group">
-            <div className="w-20 h-20 mx-auto bg-surface-container rounded-full flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-4xl">corporate_fare</span>
-            </div>
-            <h3 className="font-headline-md text-2xl uppercase tracking-tight font-bold mb-4">Corporate Gifting</h3>
-            <p className="text-secondary font-body-md">
-              Premium co-branded merchandise perfect for employee wellness initiatives, client gifts, and event giveaways.
-            </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <a
+              href="#inquiry"
+              className="px-6 py-3 rounded-md bg-[var(--fg)] text-[var(--panel)] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+            >
+              Request Catalogue &amp; Quote
+            </a>
+            <a
+              href="mailto:corporate@playr.in"
+              className="px-6 py-3 rounded-md border border-[var(--line)] bg-[var(--panel)] text-[var(--fg)] font-bold text-xs uppercase tracking-widest hover:bg-[var(--chip)] transition-colors"
+            >
+              corporate@playr.in
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Lead Capture Form */}
-      <section id="inquiry" className="py-24 bg-surface-container-low border-t border-outline-variant/20">
-        <div className="max-w-3xl mx-auto px-margin-mobile md:px-margin-desktop">
-          <div className="bg-surface-container-lowest p-10 md:p-16 rounded-3xl border border-outline-variant/30 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-2 bg-action-yellow"></div>
-            
-            <div className="text-center mb-10">
-              <h2 className="font-headline-xl text-3xl uppercase tracking-tight font-black mb-4">Corporate Inquiry</h2>
-              <p className="text-secondary font-body-md">Fill out the form below to download our B2B catalogue and receive a custom quote.</p>
+      {/* Pillars Grid */}
+      <section className="py-14 px-4 md:px-8 max-w-6xl mx-auto">
+        <div className="text-center mb-10">
+          <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--muted)]">
+            Our Enterprise Capabilities
+          </span>
+          <h2 className="text-2xl font-black uppercase tracking-tight mt-1">
+            Solutions Tailored For Scale
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="p-6 rounded-[var(--radius)] bg-[var(--panel)] border border-[var(--line)] flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center justify-center font-black text-sm mb-4">
+                01
+              </div>
+              <h3 className="text-base font-extrabold uppercase tracking-tight mb-2">
+                Custom Teamwear &amp; Kits
+              </h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                Full-sublimation match jerseys, training tees, tracksuits, and travel kits engineered with moisture-wicking AERODRY fabrics and official federation standards.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-[var(--line)] text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+              Min. Order: 25 Units
+            </div>
+          </div>
+
+          <div className="p-6 rounded-[var(--radius)] bg-[var(--panel)] border border-[var(--line)] flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center justify-center font-black text-sm mb-4">
+                02
+              </div>
+              <h3 className="text-base font-extrabold uppercase tracking-tight mb-2">
+                Bulk Equipment &amp; Academies
+              </h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                Wholesale pricing on professional-grade cricket bats, balls, protective pads, pickleball paddles, and swim training gear for institutions and tournament organizers.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-[var(--line)] text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+              Tiered Wholesale Pricing
+            </div>
+          </div>
+
+          <div className="p-6 rounded-[var(--radius)] bg-[var(--panel)] border border-[var(--line)] flex flex-col justify-between">
+            <div>
+              <div className="w-10 h-10 rounded-lg bg-[var(--chip)] border border-[var(--line)] flex items-center justify-center font-black text-sm mb-4">
+                03
+              </div>
+              <h3 className="text-base font-extrabold uppercase tracking-tight mb-2">
+                Corporate Gifting &amp; Co-Branding
+              </h3>
+              <p className="text-xs text-[var(--muted)] leading-relaxed">
+                Premium co-branded merchandise, caps, hydration bottles, and fitness kits tailored for employee welcome boxes, annual sports days, and executive gifting.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-[var(--line)] text-[11px] font-bold uppercase tracking-wider text-[var(--muted)]">
+              Custom Packaging Available
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Inquiry Form */}
+      <section id="inquiry" className="py-10 px-4 md:px-8 max-w-3xl mx-auto">
+        <div className="p-6 md:p-10 rounded-[var(--radius-lg)] bg-[var(--panel)] border border-[var(--line)] shadow-xl">
+          <div className="mb-8">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-[var(--muted)]">
+              Direct B2B Desk
+            </span>
+            <h2 className="text-2xl font-black uppercase tracking-tight mt-1">
+              Submit Corporate Inquiry
+            </h2>
+            <p className="text-xs text-[var(--muted)] mt-1">
+              Complete the form below to receive our digital B2B catalog, size charts, and wholesale price sheets.
+            </p>
+          </div>
+
+          {status ? (
+            <div className="p-4 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm font-semibold text-center mb-6">
+              {status}
+            </div>
+          ) : null}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                  Company / Organization *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.company}
+                  onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                  placeholder="e.g. Acme Corp / Elite Cricket Club"
+                  className="w-full h-11 px-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                  Contact Person *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.contactPerson}
+                  onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                  placeholder="Full Name"
+                  className="w-full h-11 px-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors"
+                />
+              </div>
             </div>
 
-            {status && (
-              <div className="mb-8 p-4 bg-green-100 text-green-800 rounded-lg border border-green-200 font-label-bold text-center">
-                {status}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                  Work Email *
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="name@company.com"
+                  className="w-full h-11 px-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors"
+                />
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Company / Team Name</label>
-                  <input type="text" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Contact Person</label>
-                  <input type="text" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
-                </div>
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                  Phone / WhatsApp *
+                </label>
+                <input
+                  type="tel"
+                  required
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="+91 98765 43210"
+                  className="w-full h-11 px-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors"
+                />
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Email Address</label>
-                  <input type="email" required className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Phone Number</label>
-                  <input type="tel" className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" />
-                </div>
-              </div>
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                Inquiry Type *
+              </label>
+              <select
+                value={formData.inquiryType}
+                onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value })}
+                className="w-full h-11 px-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors"
+              >
+                <option>Custom Teamwear (Jerseys, Kits)</option>
+                <option>Bulk Equipment Order (Cricket, Pickleball, Swim)</option>
+                <option>Corporate Gifting &amp; Employee Wellness</option>
+                <option>Franchise / Academy Distribution</option>
+              </select>
+            </div>
 
-              <div className="space-y-2">
-                <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Inquiry Type</label>
-                <select className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all">
-                  <option>Custom Teamwear (Jerseys, Kits)</option>
-                  <option>Bulk Equipment Order</option>
-                  <option>Corporate Gifting / Wellness</option>
-                  <option>Franchise / Academy Partnership</option>
-                </select>
-              </div>
+            <div>
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
+                Requirements &amp; Estimated Quantity
+              </label>
+              <textarea
+                rows={3}
+                value={formData.requirements}
+                onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
+                placeholder="Mention estimated quantities, target delivery date, customization requirements..."
+                className="w-full p-3.5 rounded-md bg-[var(--chip)] border border-[var(--line)] text-sm text-[var(--fg)] outline-none focus:border-[var(--fg)] transition-colors resize-none"
+              />
+            </div>
 
-              <div className="space-y-2">
-                <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Additional Requirements</label>
-                <textarea rows={4} className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all resize-none" placeholder="Tell us about quantities, specific timelines, etc."></textarea>
-              </div>
-
-              <button type="submit" className="w-full bg-action-yellow text-on-surface font-label-bold text-lg uppercase tracking-widest px-8 py-4 rounded-lg hover:scale-[1.02] transition-transform shadow-lg mt-4">
-                Submit & Download Catalogue
-              </button>
-            </form>
-          </div>
+            <button
+              type="submit"
+              className="w-full h-12 rounded-md bg-[var(--fg)] text-[var(--panel)] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity mt-4 cursor-pointer"
+            >
+              Submit Inquiry &amp; Download B2B Deck
+            </button>
+          </form>
         </div>
       </section>
     </div>
-  )
+  );
 }

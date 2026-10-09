@@ -37,7 +37,7 @@ export default function CollectionView({ handle }: CollectionViewProps) {
   const coverImage = all[0]?.images[0];
 
   return (
-    <div className="listing w-full max-w-[1720px] mx-auto px-6 sm:px-10 py-6 md:py-8">
+    <div className="listing w-full max-w-[1720px] mx-auto px-2 sm:px-6 md:px-10 py-4 md:py-8">
       {/* Collection Header Banner (1920:400) */}
       <div className="cat-banner relative w-full aspect-[1920/400] min-h-[160px] md:min-h-[220px] rounded-[var(--radius-lg)] overflow-hidden mb-6 flex flex-col justify-end p-6 md:p-10 bg-gradient-to-r from-black/80 via-black/40 to-transparent">
         {coverImage && (

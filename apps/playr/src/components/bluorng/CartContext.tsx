@@ -26,6 +26,7 @@ interface CartContextType {
   toast: string;
   showToast(msg: string): void;
 
+  clearCart(): void;
   wishlist: BluorngProduct[];
   wishlistCount: number;
   toggleWishlist(product: BluorngProduct): void;
@@ -122,6 +123,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => prev.filter((i) => i.key !== key));
   }, []);
 
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
+
   const showToast = useCallback((msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(''), 2400);
@@ -174,6 +179,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       addItem,
       updateQty,
       removeItem,
+      clearCart,
       toast,
       showToast,
       wishlist,
@@ -183,7 +189,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeFromWishlist,
       addAllWishlistToCart,
     };
-  }, [items, open, addItem, updateQty, removeItem, toast, showToast, wishlist, toggleWishlist, isInWishlist, removeFromWishlist, addAllWishlistToCart]);
+  }, [items, open, addItem, updateQty, removeItem, clearCart, toast, showToast, wishlist, toggleWishlist, isInWishlist, removeFromWishlist, addAllWishlistToCart]);
 
   return <CartCtx.Provider value={value}>{children}</CartCtx.Provider>;
 }

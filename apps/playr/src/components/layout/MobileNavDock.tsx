@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/components/bluorng/CartContext';
 import LoginModal from '@/components/auth/LoginModal';
-import StoryViewer from '@/components/bluorng/StoryViewer';
-import { stories, products } from '@/lib/bluorng-data';
+import { products } from '@/lib/bluorng-data';
 
 const Icon = {
   user: (
@@ -32,11 +31,16 @@ const Icon = {
       <path d="M9 10V6a3 3 0 0 1 6 0v4" />
     </svg>
   ),
+  b2b: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+      <rect width="20" height="14" x="2" y="6" rx="2" />
+    </svg>
+  ),
 };
 
 export function MobileNavDock() {
   const [loginOpen, setLoginOpen] = useState(false);
-  const [storyOpen, setStoryOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const cart = useCart();
@@ -49,23 +53,7 @@ export function MobileNavDock() {
   return (
     <>
       <nav className="mobilenav-dock" aria-label="Mobile Navigation Dock">
-        {/* 1. Stories Launcher Button */}
-        <button
-          className="mobilenav-dock__item mobilenav__item--story"
-          onClick={() => setStoryOpen(true)}
-          aria-label="Lookbook Stories"
-        >
-          <span className="w-5 h-5 rounded-full p-[1.5px] bg-gradient-to-tr from-[#ff5a1f] to-[#1f6bff] inline-flex items-center justify-center">
-            <img
-              src={stories[0]?.image}
-              alt=""
-              className="w-full h-full rounded-full object-cover"
-            />
-          </span>
-          <span>Stories</span>
-        </button>
-
-        {/* 2. Account Nav Button */}
+        {/* 1. Account Nav Button */}
         <button
           className="mobilenav-dock__item mobilenav__item"
           onClick={() => setLoginOpen(true)}
@@ -75,7 +63,7 @@ export function MobileNavDock() {
           <span>Account</span>
         </button>
 
-        {/* 3. Stores Pin Nav Button */}
+        {/* 2. Stores Pin Nav Button */}
         <Link
           href="/collections/seattle-orcas"
           className="mobilenav-dock__item mobilenav__item"
@@ -83,6 +71,16 @@ export function MobileNavDock() {
         >
           {Icon.pin}
           <span>Stores</span>
+        </Link>
+
+        {/* 3. B2B Nav Button */}
+        <Link
+          href="/b2b"
+          className="mobilenav-dock__item mobilenav__item"
+          aria-label="B2B"
+        >
+          {Icon.b2b}
+          <span>B2B</span>
         </Link>
 
         {/* 4. Search Nav Button */}
@@ -177,7 +175,6 @@ export function MobileNavDock() {
         </div>
       )}
 
-      {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

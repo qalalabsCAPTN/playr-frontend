@@ -1,12 +1,8 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Chivo, Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/layout/Providers';
 import { StorefrontShell } from '@/components/layout/StorefrontShell';
-
-const chivo = Chivo({ subsets: ['latin'], variable: '--font-chivo' });
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://playr.in'),
@@ -47,7 +43,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${chivo.variable} ${inter.variable} min-h-screen flex flex-col`}>
+      <body className="min-h-screen flex flex-col antialiased">
         <Providers>
           <StorefrontShell>
             {children}

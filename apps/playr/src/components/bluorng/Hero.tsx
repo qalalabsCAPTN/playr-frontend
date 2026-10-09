@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 
 const CDN = 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files';
@@ -16,62 +16,89 @@ const SLIDES = [
 ];
 
 export default function Hero() {
-  const [slides, setSlides] = useState(SLIDES);
+  const [slides] = useState(SLIDES);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
-
-  const dropSlide = useCallback((src: string) => {
-    setSlides((prev) => {
-      const next = prev.filter((s) => s.src !== src);
-      return next.length ? next : prev.slice(0, 1);
-    });
-    setIdx(0);
-  }, []);
+  const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
     if (paused || slides.length < 2) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5500);
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 5000);
     return () => clearInterval(t);
   }, [paused, slides.length]);
 
-  const step = (dir: number) => setIdx((i) => (i + dir + slides.length) % slides.length);
-  const current = slides[Math.min(idx, slides.length - 1)];
+  const step = useCallback((dir: number) => {
+    setIdx((i) => (i + dir + slides.length) % slides.length);
+  }, [slides.length]);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      step(diff > 0 ? 1 : -1);
+    }
+    touchStartX.current = null;
+  };
 
   return (
     <section
-      className="hero hero--banner"
+      className="hero hero--banner relative overflow-hidden select-none"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {slides.map((s, i) => (
-        <img
+        <Link
           key={s.src}
-          className={`hslide ${i === idx ? 'active' : ''}`}
-          src={s.src}
-          alt={s.alt}
-          onError={() => dropSlide(s.src)}
-        />
+          href={s.href}
+          className={`hslide block w-full h-full ${i === idx ? 'active' : ''}`}
+          aria-label={s.alt}
+        >
+          <img
+            className="w-full h-full object-cover"
+            src={s.src}
+            alt={s.alt}
+            loading={i === 0 ? 'eager' : 'lazy'}
+          />
+        </Link>
       ))}
 
       {slides.length > 1 && (
         <>
-          <button className="hero__arrow hero__arrow--prev" onClick={() => step(-1)} aria-label="Previous banner">
+          <button 
+            type="button"
+            className="hero__arrow hero__arrow--prev" 
+            onClick={(e) => { e.preventDefault(); step(-1); }} 
+            aria-label="Previous banner"
+          >
             ←
           </button>
-          <button className="hero__arrow hero__arrow--next" onClick={() => step(1)} aria-label="Next banner">
+          <button 
+            type="button"
+            className="hero__arrow hero__arrow--next" 
+            onClick={(e) => { e.preventDefault(); step(1); }} 
+            aria-label="Next banner"
+          >
             →
           </button>
           <div className="hero__dots">
             {slides.map((_, i) => (
-              <button key={i} className={`hero__dot ${i === idx ? 'active' : ''}`} onClick={() => setIdx(i)} aria-label={`Banner ${i + 1}`} />
+              <button 
+                key={i} 
+                type="button"
+                className={`hero__dot ${i === idx ? 'active' : ''}`} 
+                onClick={(e) => { e.preventDefault(); setIdx(i); }} 
+                aria-label={`Banner slide ${i + 1}`} 
+              />
             ))}
           </div>
         </>
       )}
-
-      <Link href={current?.href || '/collections/all-products'} className="hero__shop hero__shop--dark">
-        Shop now
-      </Link>
     </section>
   );
 }

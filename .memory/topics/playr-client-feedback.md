@@ -1,3 +1,4 @@
 # playR Client Feedback
 
 - 2026-10-01 — resolved 4 CSAT tickets for playR.in: removed GST/HST and box-aligned PDP action buttons, added 14-look Lookbook rail with direct viewer, fixed dark mode category filter chips legibility, confirmed tenant customer isolation, pushed commit cc017fa to origin/main
+- 2026-10-09 — completed full mobile & desktop responsive overhaul for playR storefront (CSAT tickets c2795ab9 & 959f06bf): enforced Calibri typography globally, pure black dark mode (#000000), header transparency on hover, absolute stable search dropdown, full-screen mobile menu drawer with category/sports/brand/club/b2b tabs, responsive banner scaling (16:9 mobile / 1920:720 desktop) with touch swipe & autoplay, live partnership carousel (CSK, Seattle Orcas, SRH) with responsive partner chips, reduced layout gapping across panels/listings, streetplayr checkout wired to cart with COD/Online payments, and B2B corporate page

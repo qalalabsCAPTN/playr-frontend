@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from './CartContext';
-import StoryViewer from './StoryViewer';
 import LoginModal from '@/components/auth/LoginModal';
-import { stories, products } from '@/lib/bluorng-data';
+import { products } from '@/lib/bluorng-data';
 
 const Icon = {
   pin: (
@@ -117,7 +116,7 @@ type MenuTab = 'category' | 'sports' | 'brand' | 'club';
 export default function Header() {
   const [megaOpen, setMegaOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<MenuTab>('category');
-  const [storyOpen, setStoryOpen] = useState(false);
+  const [clubOpen, setClubOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -133,7 +132,7 @@ export default function Header() {
     (p.type && p.type.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const solid = pathname !== '/' || scrolled || megaOpen || searchOpen;
+  const solid = pathname !== '/' || scrolled || megaOpen || clubOpen || searchOpen;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -172,13 +171,19 @@ export default function Header() {
   }, [solid]);
 
   const openTab = (tab: MenuTab) => {
+    setClubOpen(false);
     setActiveTab(tab);
     setMegaOpen(true);
   };
 
+  const toggleClub = () => {
+    setMegaOpen(false);
+    setClubOpen((prev) => !prev);
+  };
+
   return (
     <>
-      <header className={`header ${solid ? 'header--solid' : ''}`} onMouseLeave={() => setMegaOpen(false)}>
+      <header className={`header ${solid ? 'header--solid' : ''}`} onMouseLeave={() => { setMegaOpen(false); setClubOpen(false); }}>
         <div className="header__inner">
           <nav className="header__nav header__nav--desktop">
             <button 
@@ -213,26 +218,29 @@ export default function Header() {
             </button>
 
             {/* Club Nav Button with Dedicated Popover Dropdown */}
-            <div className="relative" onMouseEnter={() => openTab('club')}>
+            <div className="relative">
               <button 
-                className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'club' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
-                onClick={() => openTab('club')}
+                type="button"
+                className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${clubOpen ? 'opacity-100 font-extrabold' : ''}`} 
+                onClick={toggleClub}
+                onMouseEnter={() => { setMegaOpen(false); setClubOpen(true); }}
               >
                 <span>Club</span>
-                <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'club' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-3 h-3 transition-transform duration-200 ${clubOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {/* Popover Dropdown under CLUB */}
-              {activeTab === 'club' && megaOpen && (
+              {clubOpen && (
                 <div 
                   className="absolute top-full left-0 mt-2 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-sm py-2 z-50"
+                  onMouseLeave={() => setClubOpen(false)}
                 >
                   <Link 
                     href="/earn-points" 
                     className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                    onClick={() => setMegaOpen(false)}
+                    onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                   >
                     Player Club
                   </Link>
@@ -255,14 +263,14 @@ export default function Header() {
                       <Link 
                         href="/earn-points" 
                         className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                        onClick={() => setMegaOpen(false)}
+                        onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                       >
                         Win Giveaways
                       </Link>
                       <Link 
                         href="/earn-points" 
                         className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                        onClick={() => setMegaOpen(false)}
+                        onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                       >
                         Earn points
                       </Link>
@@ -272,33 +280,45 @@ export default function Header() {
                   <Link 
                     href="/offer" 
                     className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                    onClick={() => setMegaOpen(false)}
+                    onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                   >
                     Offer
                   </Link>
                 </div>
               )}
             </div>
+
+            {/* B2B Link */}
+            <Link 
+              href="/b2b" 
+              className="header__link uppercase font-bold tracking-wider hover:opacity-100 transition-opacity"
+              onClick={() => { setMegaOpen(false); setClubOpen(false); }}
+              onMouseEnter={() => { setMegaOpen(false); setClubOpen(false); }}
+            >
+              B2B
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2">
             <button 
               className={`header__pill-plus hidden md:inline-flex ${megaOpen ? 'active' : ''}`}
-              onClick={() => setMegaOpen((v) => !v)}
+              onClick={() => { setMegaOpen((v) => !v); setClubOpen(false); }}
               aria-label="Toggle menu"
             >
               +
             </button>
-            <Link href="/" className="header__logo">
-              <img src="/logo.png" alt="playR" />
+            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '120px' }}>
+              <img 
+                src="/logo.png" 
+                alt="playR" 
+                className="h-7 w-auto object-contain flex-shrink-0"
+                style={{ aspectRatio: '402 / 165' }}
+              />
             </Link>
           </div>
 
           <div className="header__right">
-            {/* Desktop-only secondary icons (already in bottom MobileNavDock on mobile) */}
-            <button className="iconbtn iconbtn--story iconbtn--desktop-only" onClick={() => setStoryOpen(true)} aria-label="Stories">
-              <img src={stories[0].image} alt="" />
-            </button>
+            {/* Desktop-only secondary icons */}
             <Link href="/collections/seattle-orcas" className="iconbtn iconbtn--desktop-only" aria-label="Stores">
               {Icon.pin}
             </Link>
@@ -307,6 +327,7 @@ export default function Header() {
               onClick={() => {
                 setSearchOpen((v) => !v);
                 setMegaOpen(false);
+                setClubOpen(false);
                 setSearchQuery('');
               }} 
               aria-label="Search"
@@ -333,7 +354,7 @@ export default function Header() {
               {Icon.bag}
               {cart.count > 0 && <span className="iconbtn__count">{cart.count}</span>}
             </button>
-            <button className="iconbtn iconbtn--menu" onClick={() => setMegaOpen((v) => !v)} aria-label="Menu">
+            <button className="iconbtn iconbtn--menu" onClick={() => { setMegaOpen((v) => !v); setClubOpen(false); }} aria-label="Menu">
               {Icon.menu}
             </button>
           </div>
@@ -383,110 +404,226 @@ export default function Header() {
           </div>
         )}
 
-        {/* Original Sleek Mega Menu Panel (For Category, Sports, Brand) */}
-        <div className={`mega ${megaOpen && activeTab !== 'club' ? 'open' : ''}`}>
-          {activeTab === 'category' && (
-            <>
-              <div>
-                <h4>Apparels</h4>
-                {menuData.category.apparels.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Equipment</h4>
-                {menuData.category.equipment.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Accessories</h4>
-                {menuData.category.accessories.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Shop All</h4>
-                <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Products</Link>
-                <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>New In</Link>
-              </div>
-            </>
-          )}
+        {/* Original Sleek Mega Menu Panel with Responsive Mobile Drawer Support */}
+        <div className={`mega ${megaOpen ? 'open' : ''}`}>
+          {/* Mobile-Only Drawer Header */}
+          <div className="mega__mobile-header md:hidden flex items-center justify-between pb-3 mb-3 border-b border-[var(--line)]">
+            <span className="font-extrabold uppercase tracking-wider text-base text-[var(--fg)]">Navigation Menu</span>
+            <button
+              type="button"
+              onClick={() => setMegaOpen(false)}
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-[var(--chip)] text-[var(--fg)] text-lg font-bold hover:bg-[var(--line)] transition-colors"
+              aria-label="Close menu"
+            >
+              ✕
+            </button>
+          </div>
 
-          {activeTab === 'sports' && (
-            <>
-              <div>
-                <h4>Popular Sports</h4>
-                {menuData.sports.popular.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Performance Sports</h4>
-                {menuData.sports.performance.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Field, Court &amp; Leisure</h4>
-                {menuData.sports.courtField.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Shop All Sports</h4>
-                <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Gear</Link>
-                <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>Latest Drops</Link>
-              </div>
-            </>
-          )}
+          {/* Mobile-Only Tab Switcher */}
+          <div className="mega__mobile-tabs md:hidden flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 scrollbar-none">
+            {(['category', 'sports', 'brand', 'club'] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setActiveTab(tab)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap transition-colors ${
+                  activeTab === tab
+                    ? 'bg-[var(--fg)] text-[var(--panel)]'
+                    : 'bg-[var(--chip)] text-[var(--fg)] hover:bg-[var(--line)]'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+            <Link
+              href="/b2b"
+              onClick={() => setMegaOpen(false)}
+              className="px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider whitespace-nowrap bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+            >
+              B2B
+            </Link>
+          </div>
 
-          {activeTab === 'brand' && (
-            <>
-              <div>
-                <h4>Official Brand</h4>
-                {menuData.brand.official.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>IPL Collaborations</h4>
-                {menuData.brand.ipl.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-              <div>
-                <h4>Other Leagues</h4>
-                {menuData.brand.otherLeagues.map((item) => (
-                  <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                    {item}
-                  </Link>
-                ))}
-              </div>
-            </>
-          )}
-          <CornerCutouts className="mega__corners" />
+          <div className="mega__content-inner">
+            {activeTab === 'category' && (
+              <>
+                <div>
+                  <h4>Apparels</h4>
+                  {menuData.category.apparels.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Equipment</h4>
+                  {menuData.category.equipment.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Accessories</h4>
+                  {menuData.category.accessories.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Shop All</h4>
+                  <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Products</Link>
+                  <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>New In</Link>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'sports' && (
+              <>
+                <div>
+                  <h4>Popular Sports</h4>
+                  {menuData.sports.popular.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Performance Sports</h4>
+                  {menuData.sports.performance.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Field, Court &amp; Leisure</h4>
+                  {menuData.sports.courtField.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Shop All Sports</h4>
+                  <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Gear</Link>
+                  <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>Latest Drops</Link>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'brand' && (
+              <>
+                <div>
+                  <h4>Official Brand</h4>
+                  {menuData.brand.official.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>IPL Collaborations</h4>
+                  {menuData.brand.ipl.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Other Leagues</h4>
+                  {menuData.brand.otherLeagues.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Explore Brand</h4>
+                  <Link href="/about" onClick={() => setMegaOpen(false)}>Brand Story</Link>
+                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Partnerships</Link>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'club' && (
+              <>
+                <div>
+                  <h4>Player Club</h4>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Player Club Overview</Link>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Win Giveaways</Link>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Earn Points</Link>
+                  <Link href="/offer" onClick={() => setMegaOpen(false)}>Offers &amp; Promotions</Link>
+                </div>
+                <div>
+                  <h4>Official IPL Clubs</h4>
+                  {menuData.club.ipl.slice(0, 4).map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>More Franchises</h4>
+                  {menuData.club.ipl.slice(4).map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                  {menuData.club.other.map((item) => (
+                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
+                      {item}
+                    </Link>
+                  ))}
+                </div>
+                <div>
+                  <h4>Corporate &amp; Enterprise</h4>
+                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Corporate Teamwear</Link>
+                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Bulk Equipment</Link>
+                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Request Quote</Link>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Mobile-Only Drawer Footer with Quick Shortcuts */}
+          <div className="mega__mobile-footer md:hidden mt-auto pt-4 border-t border-[var(--line)] grid grid-cols-2 gap-2 text-center">
+            <Link
+              href="/b2b"
+              onClick={() => setMegaOpen(false)}
+              className="py-2.5 px-3 rounded-lg bg-[var(--chip)] text-xs font-bold uppercase tracking-wider text-[var(--fg)] border border-[var(--line)]"
+            >
+              B2B Desk
+            </Link>
+            <Link
+              href="/collections/seattle-orcas"
+              onClick={() => setMegaOpen(false)}
+              className="py-2.5 px-3 rounded-lg bg-[var(--chip)] text-xs font-bold uppercase tracking-wider text-[var(--fg)] border border-[var(--line)]"
+            >
+              Stores
+            </Link>
+            <button
+              type="button"
+              onClick={() => { setMegaOpen(false); setLoginOpen(true); }}
+              className="py-2.5 px-3 rounded-lg bg-[var(--chip)] text-xs font-bold uppercase tracking-wider text-[var(--fg)] border border-[var(--line)]"
+            >
+              Account
+            </button>
+            <Link
+              href="/wishlist"
+              onClick={() => setMegaOpen(false)}
+              className="py-2.5 px-3 rounded-lg bg-[var(--chip)] text-xs font-bold uppercase tracking-wider text-[var(--fg)] border border-[var(--line)]"
+            >
+              Wishlist {cart.wishlistCount > 0 && `(${cart.wishlistCount})`}
+            </Link>
+          </div>
+
+          <CornerCutouts className="mega__corners hidden md:block" />
         </div>
         <CornerCutouts className="header__corners" />
       </header>
 
-      {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

@@ -227,8 +227,16 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
             document.body.appendChild(script);
           });
         }
+      } else if (paymentMethod === 'cod') {
+         // Cash on Delivery — order created with pending payment status
+         await new Promise(resolve => setTimeout(resolve, 800));
+         paymentSuccess = true;
+      } else if (process.env.NODE_ENV === 'production') {
+         setError("Credit card and UPI transactions in production must be completed via the secure Razorpay payment gateway.");
+         setIsProcessing(false);
+         return;
       } else {
-         // Fallback for Credit Card / Cash on Delivery for Demo
+         // Sandbox simulation fallback for non-production environments
          await new Promise(resolve => setTimeout(resolve, 1500));
          paymentSuccess = true;
       }

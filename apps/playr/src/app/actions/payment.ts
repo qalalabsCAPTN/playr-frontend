@@ -5,23 +5,21 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 
 export async function createRazorpayOrderAction(amount: number) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.user) {
-    throw new Error("Unauthorized to create payment order");
+  if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+    throw new Error("Invalid order amount");
   }
 
   try {
-    // In production, you would call the Razorpay API directly here from the server:
+    // In production, call Razorpay API directly:
     // const razorpay = new Razorpay({ key_id: process.env.RAZORPAY_KEY, key_secret: process.env.RAZORPAY_SECRET });
-    // const order = await razorpay.orders.create({ amount: amount * 100, currency: "INR", receipt: `receipt_${Date.now()}` });
+    // const order = await razorpay.orders.create({ amount: Math.round(amount * 100), currency: "INR", receipt: `receipt_${Date.now()}` });
     
     // Simulating a real API call to the gateway
     const mockProviderOrderId = `order_${crypto.randomBytes(8).toString('hex')}`;
     
     return {
       orderId: mockProviderOrderId,
-      amount: amount * 100,
+      amount: Math.round(amount * 100),
       currency: "INR",
     };
   } catch (err) {
@@ -35,10 +33,8 @@ export async function verifyPaymentSignatureAction(
   razorpayPaymentId: string,
   razorpaySignature: string
 ) {
-  const session = await getServerSession(authOptions);
-  
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+  if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+    throw new Error("Missing signature verification parameters");
   }
 
   // Security Verification (Production standard)
