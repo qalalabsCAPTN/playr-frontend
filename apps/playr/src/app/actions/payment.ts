@@ -1,8 +1,6 @@
 "use server"
 
 import crypto from "crypto";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 
 export async function createRazorpayOrderAction(amount: number) {
   if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
