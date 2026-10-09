@@ -1,1 +1,2 @@
 - [[playr-client-feedback]] — resolution of CSAT feedback for playR.in (PDP layout, Lookbook, dark mode chips, tenant isolation)
+- [[gcr-deployment]] — GCR / Cloud Run deployment prerequisites (Easebuzz, Uniware, and SMTP settings)

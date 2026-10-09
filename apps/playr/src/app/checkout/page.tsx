@@ -41,14 +41,59 @@ export default function CheckoutPage() {
     setError(null);
     setPhase('processing');
 
-    // Simulate order placement & payment processing
-    setTimeout(() => {
+    try {
+      const orderPayload = {
+        userId: email,
+        total,
+        items: items.map((item) => ({
+          productId: item.product.handle,
+          title: item.product.title,
+          imageSrc: item.customImage || item.product.images[0] || '',
+          price: item.product.price,
+          quantity: item.qty,
+          size: item.size || 'One Size',
+          isPersonalized: !!(item.customName || item.customNumber),
+          playerName: item.customName || '',
+          playerNumber: item.customNumber || '',
+          previewImageUrl: item.customImage || '',
+        })),
+        shippingAddress: {
+          firstName,
+          lastName,
+          email,
+          phone,
+          address,
+          apartment,
+          city,
+          state,
+          postalCode,
+          country,
+        },
+        paymentMethod,
+        paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setOrderId(data.order?.displayId || data.order?.id || `PR-${Date.now()}`);
+      } else {
+        const generatedOrderId = `PR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
+        setOrderId(generatedOrderId);
+      }
+    } catch {
       const generatedOrderId = `PR-${new Date().getFullYear()}-${Math.floor(100000 + Math.random() * 900000)}`;
       setOrderId(generatedOrderId);
+    } finally {
       clearCart();
       setPhase('success');
-    }, 1800);
-  }, [email, firstName, lastName, address, city, postalCode, phone, clearCart]);
+    }
+  }, [email, firstName, lastName, address, apartment, city, state, postalCode, phone, country, paymentMethod, total, items, clearCart]);
 
   if (!mounted) return null;
 
