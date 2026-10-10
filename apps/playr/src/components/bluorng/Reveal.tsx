@@ -15,6 +15,18 @@ export default function Reveal({ children, stagger = false, className = '', as: 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+
+    // Check immediately on mount so items in or near viewport appear without delay
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight + 150 && rect.bottom > -150) {
+      el.classList.add('visible');
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      el.classList.add('visible');
+      return;
+    }
+
     const io = new IntersectionObserver(
       (entries) => {
         entries.forEach((e) => {
@@ -24,7 +36,7 @@ export default function Reveal({ children, stagger = false, className = '', as: 
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0, rootMargin: '150px 0px 150px 0px' }
     );
     io.observe(el);
     return () => io.disconnect();
