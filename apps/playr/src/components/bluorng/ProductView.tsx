@@ -336,7 +336,10 @@ export default function ProductView({ product }: ProductViewProps) {
   }, [isCustomizing, playerName, playerNumber, selectedColor, product]);
 
   const related = products.filter((p) => p.type === product.type && p.handle !== product.handle).slice(0, 8);
-  const onSale = product.compareAt && product.compareAt > product.price;
+  const onSale = Boolean(product.compareAt && product.compareAt > product.price);
+  const discountPercentage = onSale && product.compareAt
+    ? Math.round(((product.compareAt - product.price) / product.compareAt) * 100)
+    : 0;
 
   const router = useRouter();
 
@@ -435,8 +438,20 @@ export default function ProductView({ product }: ProductViewProps) {
                   </button>
                 </h1>
                 <div className="pdp__price">
-                  {onSale && product.compareAt && <s>{formatPrice(product.compareAt)}</s>}
-                  <span>{formatPrice(product.price)}</span>
+                  <span className="pdp__selling-price text-red-600 dark:text-red-500 font-bold">
+                    {formatPrice(product.price)}
+                  </span>
+                  {onSale && product.compareAt && (
+                    <>
+                      <span className="pdp__mrp text-[var(--muted)] flex items-center gap-1 text-xs">
+                        <span>MRP:</span>
+                        <s>{formatPrice(product.compareAt)}</s>
+                      </span>
+                      <span className="pdp__discount font-bold text-xs text-orange-600 dark:text-orange-500">
+                        ({discountPercentage}% OFF)
+                      </span>
+                    </>
+                  )}
                 </div>
                 <div className="mt-2 text-xs font-semibold flex items-center gap-2">
                   <span className="text-[var(--muted)] font-normal text-[11px]">(Incl. of all taxes)</span>
