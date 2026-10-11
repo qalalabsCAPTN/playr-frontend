@@ -74,28 +74,190 @@ function CornerCutouts({ className }: { className: string }) {
 
 const menuData = {
   category: {
-    apparels: ['Topwear', 'Bottomwear', 'Suit', 'Innerwear'],
-    equipment: ['Bat', 'Ball', 'Bag', 'Band', 'Gloves', 'Guard', 'Yoga Mat', 'Eyewear', 'Paddle Raquet', 'Set'],
-    accessories: ['Bag', 'Headwear', 'Drinkware', 'Socks', 'Cushion', 'Towel'],
+    apparel: {
+      title: 'Apparel',
+      href: '/collections/apparel',
+      groups: [
+        {
+          title: 'Topwear',
+          href: '/collections/topwear',
+          items: [
+            { name: 'T-Shirts & Tees', href: '/collections/t-shirt-tee' },
+            { name: 'Polo T-Shirts', href: '/collections/t-shirt-polo' },
+            { name: 'Jerseys', href: '/collections/jersey' },
+            { name: 'Hoodies', href: '/collections/hoodie' },
+            { name: 'Jackets', href: '/collections/jacket' },
+            { name: 'Singlets', href: '/collections/singlet' },
+          ],
+        },
+        {
+          title: 'Bottomwear',
+          href: '/collections/bottomwear',
+          items: [
+            { name: 'Joggers', href: '/collections/jogger' },
+            { name: 'Shorts', href: '/collections/shorts' },
+            { name: 'Pants', href: '/collections/pants' },
+          ],
+        },
+        {
+          title: 'Suit',
+          href: '/collections/suit',
+          items: [
+            { name: 'Track Sets', href: '/collections/track-set' },
+          ],
+        },
+        {
+          title: 'Innerwear',
+          href: '/collections/innerwear',
+          items: [
+            { name: 'Skin Pants', href: '/collections/skin-pants' },
+            { name: 'Skin Shorts', href: '/collections/skin-shorts' },
+            { name: 'Skin Singlets', href: '/collections/skin-singlet' },
+            { name: 'Skin Tees', href: '/collections/skin-tee' },
+          ],
+        },
+      ],
+    },
+    equipment: {
+      title: 'Equipment',
+      href: '/collections/equipment',
+      groups: [
+        {
+          title: 'Bats',
+          href: '/collections/bat',
+          items: [
+            { name: 'English Willow', href: '/collections/english-willow' },
+            { name: 'Kashmir Willow', href: '/collections/kashmir-willow' },
+            { name: 'Popular Willow', href: '/collections/popular-willow' },
+          ],
+        },
+        {
+          title: 'Balls',
+          href: '/collections/ball',
+          items: [
+            { name: 'Leather Balls', href: '/collections/leather-ball' },
+            { name: 'Tennis Balls', href: '/collections/tennis-ball' },
+          ],
+        },
+        {
+          title: 'Paddle & Raquets',
+          href: '/collections/paddle-raquet',
+          items: [
+            { name: 'Carbon Fiber', href: '/collections/carbon-fiber' },
+            { name: 'Glass Fiber', href: '/collections/glass-fiber' },
+          ],
+        },
+        {
+          title: 'Gear & Protection',
+          href: '/collections/guard',
+          items: [
+            { name: 'Gloves', href: '/collections/gloves' },
+            { name: 'Guards', href: '/collections/guard' },
+            { name: 'Kitbags', href: '/collections/kitbag' },
+            { name: 'Resistance Bands', href: '/collections/band' },
+            { name: 'Yoga Mats', href: '/collections/yoga-mat' },
+            { name: 'Eyewear & Goggles', href: '/collections/goggles' },
+            { name: 'Caps & Headwear', href: '/collections/caps' },
+            { name: 'Sets & Combos', href: '/collections/combo' },
+          ],
+        },
+      ],
+    },
+    accessories: {
+      title: 'Accessories',
+      href: '/collections/accessories',
+      groups: [
+        {
+          title: 'Bags',
+          href: '/collections/bag',
+          items: [
+            { name: 'Sling Bags', href: '/collections/sling' },
+            { name: 'Backpacks', href: '/collections/backpack' },
+            { name: 'Gym Bags', href: '/collections/gym' },
+            { name: 'Trolley Bags', href: '/collections/trolley' },
+          ],
+        },
+        {
+          title: 'Headwear',
+          href: '/collections/headwear',
+          items: [
+            { name: 'Caps', href: '/collections/caps' },
+            { name: 'Hats', href: '/collections/hat' },
+          ],
+        },
+        {
+          title: 'Drinkware',
+          href: '/collections/drinkware',
+          items: [
+            { name: 'Mugs', href: '/collections/mug' },
+            { name: 'Sippers', href: '/collections/sipper' },
+            { name: 'Shakers', href: '/collections/shaker' },
+          ],
+        },
+        {
+          title: 'Socks & Comfort',
+          href: '/collections/socks',
+          items: [
+            { name: 'Crew Socks', href: '/collections/crew-socks' },
+            { name: 'Ankle Socks', href: '/collections/ankle-socks' },
+            { name: 'Back Cushions', href: '/collections/cushion' },
+            { name: 'Bath Set Towels', href: '/collections/towel' },
+          ],
+        },
+      ],
+    },
+    genderAge: {
+      title: 'Gender & Age',
+      gender: [
+        { name: 'Men', href: '/collections/men' },
+        { name: 'Women', href: '/collections/women' },
+        { name: 'Unisex', href: '/collections/unisex' },
+        { name: 'Boys', href: '/collections/boys' },
+        { name: 'Girls', href: '/collections/girls' },
+      ],
+      age: [
+        { name: 'Adult', href: '/collections/adult' },
+        { name: 'Kids', href: '/collections/kids' },
+        { name: 'Ageless', href: '/collections/all-products' },
+      ],
+    },
   },
   sports: {
-    popular: ['Cricket', 'Running & Training', 'Gym Fitness Yoga', 'Lifestyle After Sports'],
-    performance: ['Pickleball', 'Swimming', 'Outdoor & Adventure', 'Cycling'],
-    courtField: ['Football', 'Basketball', 'Golf', 'Kabaddi', 'Home & Office'],
+    popular: [
+      { name: 'Cricket', href: '/collections/cricket' },
+      { name: 'Running & Training', href: '/collections/running-training' },
+      { name: 'Gym Fitness Yoga', href: '/collections/gym-fitness-yoga' },
+      { name: 'Cycling', href: '/collections/cycling' },
+    ],
+    performance: [
+      { name: 'Pickleball', href: '/collections/pickleball' },
+      { name: 'Swimming', href: '/collections/swimming' },
+      { name: 'Outdoor & Adventure', href: '/collections/outdoor-adventure' },
+      { name: 'Lifestyle After Sports', href: '/collections/lifestyle-after-sports' },
+    ],
+    courtField: [
+      { name: 'Football', href: '/collections/football' },
+      { name: 'Basketball', href: '/collections/basketball' },
+      { name: 'Golf', href: '/collections/golf' },
+      { name: 'Kabaddi', href: '/collections/kabaddi' },
+      { name: 'Home & Office', href: '/collections/home-office' },
+    ],
   },
   brand: {
-    official: ['playR', 'playR STREET', 'playR Official Merchandise', 'New Arrivals'],
-    ipl: [
-      'playR x Chennai Super Kings',
-      'playR x Mumbai Indians',
-      'playR x Rajasthan Royals',
-      'playR x Punjab Kings',
-      'playR x Kolkata Knight Riders',
-      'playR x Gujarat Titans',
-      'playR x Lucknow Super Giants',
-      'playR x Sunrisers Hyderabad',
+    official: [
+      { name: 'playR', href: '/collections/playr' },
+      { name: 'playR STREET', href: '/collections/playr-street' },
+      { name: 'All Official Lines', href: '/collections/all-products' },
     ],
-    otherLeagues: ['playR x UP Yoddha', 'playR x Seattle Orcas', 'Adidas', 'Reebok', 'ICC'],
+    ipl: [
+      { name: 'playR x Chennai Super Kings', href: '/collections/chennai-super-kings' },
+      { name: 'playR x Lucknow Super Giants', href: '/collections/lucknow-super-giants' },
+      { name: 'playR x Sunrisers Hyderabad', href: '/collections/sunrisers-hyderabad' },
+    ],
+    otherLeagues: [
+      { name: 'playR x Seattle Orcas', href: '/collections/seattle-orcas' },
+      { name: 'playR x UP Yoddha', href: '/collections/up-yoddha' },
+    ],
   },
   club: {
     ipl: [
@@ -474,34 +636,198 @@ export default function Header() {
           <div className="mega__content-inner">
             {activeTab === 'category' && (
               <>
-                <div>
-                  <h4>Apparels</h4>
-                  {menuData.category.apparels.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                {/* 1. APPAREL */}
+                <div className="mega__column">
+                  <div className="flex items-center justify-between mb-3 border-b border-[var(--line)] pb-1.5">
+                    <Link
+                      href={menuData.category.apparel.href}
+                      onClick={() => setMegaOpen(false)}
+                      className="text-xs font-black uppercase tracking-wider text-[var(--fg)] hover:opacity-75 !p-0"
+                    >
+                      {menuData.category.apparel.title}
                     </Link>
-                  ))}
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      Apparel
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {menuData.category.apparel.groups.map((group) => (
+                      <div key={group.title}>
+                        <Link
+                          href={group.href}
+                          onClick={() => setMegaOpen(false)}
+                          className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block hover:text-[var(--fg)] mb-1"
+                        >
+                          {group.title}
+                        </Link>
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                          {group.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => setMegaOpen(false)}
+                              className="text-[12px] sm:text-[13px] !py-0.5 text-[var(--fg)]/80 hover:text-[var(--fg)] truncate"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <h4>Equipment</h4>
-                  {menuData.category.equipment.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+
+                {/* 2. EQUIPMENT */}
+                <div className="mega__column">
+                  <div className="flex items-center justify-between mb-3 border-b border-[var(--line)] pb-1.5">
+                    <Link
+                      href={menuData.category.equipment.href}
+                      onClick={() => setMegaOpen(false)}
+                      className="text-xs font-black uppercase tracking-wider text-[var(--fg)] hover:opacity-75 !p-0"
+                    >
+                      {menuData.category.equipment.title}
                     </Link>
-                  ))}
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      Equipment
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {menuData.category.equipment.groups.map((group) => (
+                      <div key={group.title}>
+                        <Link
+                          href={group.href}
+                          onClick={() => setMegaOpen(false)}
+                          className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block hover:text-[var(--fg)] mb-1"
+                        >
+                          {group.title}
+                        </Link>
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                          {group.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => setMegaOpen(false)}
+                              className="text-[12px] sm:text-[13px] !py-0.5 text-[var(--fg)]/80 hover:text-[var(--fg)] truncate"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <h4>Accessories</h4>
-                  {menuData.category.accessories.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+
+                {/* 3. ACCESSORIES */}
+                <div className="mega__column">
+                  <div className="flex items-center justify-between mb-3 border-b border-[var(--line)] pb-1.5">
+                    <Link
+                      href={menuData.category.accessories.href}
+                      onClick={() => setMegaOpen(false)}
+                      className="text-xs font-black uppercase tracking-wider text-[var(--fg)] hover:opacity-75 !p-0"
+                    >
+                      {menuData.category.accessories.title}
                     </Link>
-                  ))}
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      Accessories
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    {menuData.category.accessories.groups.map((group) => (
+                      <div key={group.title}>
+                        <Link
+                          href={group.href}
+                          onClick={() => setMegaOpen(false)}
+                          className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block hover:text-[var(--fg)] mb-1"
+                        >
+                          {group.title}
+                        </Link>
+                        <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                          {group.items.map((item) => (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              onClick={() => setMegaOpen(false)}
+                              className="text-[12px] sm:text-[13px] !py-0.5 text-[var(--fg)]/80 hover:text-[var(--fg)] truncate"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <h4>Shop All</h4>
-                  <Link href="/collections/all-products" onClick={() => setMegaOpen(false)}>All Products</Link>
-                  <Link href="/collections/new-in" onClick={() => setMegaOpen(false)}>New In</Link>
+
+                {/* 4. GENDER & AGE */}
+                <div className="mega__column">
+                  <div className="flex items-center justify-between mb-3 border-b border-[var(--line)] pb-1.5">
+                    <span className="text-xs font-black uppercase tracking-wider text-[var(--fg)]">
+                      {menuData.category.genderAge.title}
+                    </span>
+                    <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-1.5 py-0.5 rounded uppercase tracking-wider">
+                      All Fits
+                    </span>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block mb-1">
+                        Gender
+                      </span>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                        {menuData.category.genderAge.gender.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setMegaOpen(false)}
+                            className="text-[12px] sm:text-[13px] !py-0.5 text-[var(--fg)]/80 hover:text-[var(--fg)]"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block mb-1">
+                        Age
+                      </span>
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                        {menuData.category.genderAge.age.map((item) => (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setMegaOpen(false)}
+                            className="text-[12px] sm:text-[13px] !py-0.5 text-[var(--fg)]/80 hover:text-[var(--fg)]"
+                          >
+                            {item.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t border-[var(--line)]">
+                      <span className="text-[11px] font-bold text-[var(--muted)] uppercase tracking-wider !p-0 block mb-1">
+                        Quick Explore
+                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <Link
+                          href="/collections/all-products"
+                          onClick={() => setMegaOpen(false)}
+                          className="text-[13px] !py-1 font-semibold text-[var(--fg)] hover:opacity-75"
+                        >
+                          All Products
+                        </Link>
+                        <Link
+                          href="/collections/new-in"
+                          onClick={() => setMegaOpen(false)}
+                          className="text-[13px] !py-1 font-semibold text-[var(--fg)] hover:opacity-75"
+                        >
+                          New In Drops
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </>
             )}
@@ -511,24 +837,24 @@ export default function Header() {
                 <div>
                   <h4>Popular Sports</h4>
                   {menuData.sports.popular.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>
                 <div>
-                  <h4>Performance Sports</h4>
+                  <h4>Performance &amp; Outdoor</h4>
                   {menuData.sports.performance.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>
                 <div>
-                  <h4>Field, Court &amp; Leisure</h4>
+                  <h4>Field, Court &amp; Daily</h4>
                   {menuData.sports.courtField.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>
@@ -545,24 +871,24 @@ export default function Header() {
                 <div>
                   <h4>Official Brand</h4>
                   {menuData.brand.official.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>
                 <div>
                   <h4>IPL Collaborations</h4>
                   {menuData.brand.ipl.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>
                 <div>
-                  <h4>Other Leagues</h4>
+                  <h4>League Collaborations</h4>
                   {menuData.brand.otherLeagues.map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
+                    <Link key={item.href} href={item.href} onClick={() => setMegaOpen(false)}>
+                      {item.name}
                     </Link>
                   ))}
                 </div>

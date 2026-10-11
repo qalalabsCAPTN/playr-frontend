@@ -474,6 +474,8 @@ export const collections: Record<string, { title: string; description: string }>
   accessories: { title: 'Accessories', description: 'Essential bags, headwear, drinkware, and sports lifestyle accessories.' },
   backpack: { title: 'Backpacks', description: 'Multipurpose laptop and sports backpacks.' },
   sling: { title: 'Sling Bags', description: 'Compact crossbody and sling bags for daily essentials.' },
+  gym: { title: 'Gym Bags & Duffels', description: 'High-capacity athletic gym bags and training duffels.' },
+  trolley: { title: 'Trolley Bags', description: 'Heavy-duty travel trolley bags and team wheelie bags.' },
   cushion: { title: 'Cushions & Accessories', description: 'Comfort accessories and stadium cushions.' },
   drinkware: { title: 'Drinkware & Bottles', description: 'Insulated stainless steel bottles, sippers, and hydration gear.' },
   sipper: { title: 'Sippers & Bottles', description: 'Ergonomic sports sipper water bottles.' },
@@ -481,6 +483,7 @@ export const collections: Record<string, { title: string; description: string }>
   mug: { title: 'Ceramic Mugs', description: 'Official team ceramic fan mugs.' },
   headwear: { title: 'Headwear & Caps', description: 'Breathable caps, visors, and beanies built for sport.' },
   caps: { title: 'Caps & Headwear', description: 'Breathable caps and hats built for sport and street.' },
+  cap: { title: 'Caps & Headwear', description: 'Breathable caps and hats built for sport and street.' },
   hat: { title: 'Hats & Bucket Hats', description: 'Wide-brim athletic hats and bucket hats.' },
   socks: { title: 'Socks & Performance', description: 'Cushioned athletic socks with arch support.' },
   'crew-socks': { title: 'Crew Socks', description: 'Mid-calf athletic crew socks.' },
@@ -548,6 +551,7 @@ export const collections: Record<string, { title: string; description: string }>
   girls: { title: "Girls' Activewear", description: "High-performance youth sportswear for girls." },
   kids: { title: 'Kids Collection', description: 'Performance sportswear built for young athletes.' },
   adult: { title: 'Adults Collection', description: 'Performance athletic apparel and equipment for adults.' },
+  ageless: { title: 'Ageless Collection', description: 'Universal athletic gear and accessories designed for all athletes.' },
 };
 
 export function formatCollectionTitle(slug: string): string {
@@ -748,8 +752,8 @@ export interface CategoryTile {
 }
 
 export const categoryTiles: CategoryTile[] = [
-  { handle: 'topwear', title: 'Topwear', image: getProduct('lucknow-super-giants-authentic-match-jersey-ipl-2026-adult-half-sleeve')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/cxzxc.jpg?v=1773746369' },
-  { handle: 'bottomwear', title: 'Bottomwear', image: getProduct('skin-pants-1')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/PRSKNLR23-154-3-1.jpg?v=1770793768' },
-  { handle: 'headwear', title: 'Headwear', image: getProduct('playr-mesh-cap-dark-grey')?.images[0] || '' },
-  { handle: 'swimming', title: 'Swim Gear', image: getProduct('goggles-performance-neon-orange')?.images[0] || '' },
+  { handle: 'apparel', title: 'Apparel', image: getProduct('lucknow-super-giants-authentic-match-jersey-ipl-2026-adult-half-sleeve')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/cxzxc.jpg?v=1773746369' },
+  { handle: 'equipment', title: 'Equipment', image: getProduct('csk-whistle-podu-cut-frame-kashmir-willow-tennis-bat-1')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard1_bbb32292-afbc-41ee-b2f0-01fd96c5aabd.jpg?v=1787655480' },
+  { handle: 'accessories', title: 'Accessories', image: getProduct('playr-mesh-cap-dark-grey')?.images[0] || '' },
+  { handle: 'topwear', title: 'Topwear', image: getProduct('csk-whistle-podu-round-neck-t-shirt-yellow-men')?.images[0] || 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/cxzxc.jpg?v=1773746369' },
 ];

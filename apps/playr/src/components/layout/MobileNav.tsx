@@ -48,33 +48,67 @@ export function MobileNav({ scrolled }: { scrolled: boolean }) {
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Category</h3>
-                  <div className="flex flex-col gap-3">
-                    <Link href="/collections/apparel" className="text-lg font-medium">Apparel</Link>
-                    <Link href="/collections/equipment" className="text-lg font-medium">Equipment</Link>
-                    <Link href="/collections/accessories" className="text-lg font-medium">Accessories</Link>
+                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-3 tracking-wider">Category</h3>
+                  <div className="flex flex-col gap-2.5">
+                    <Link href="/collections/apparel" onClick={() => setIsOpen(false)} className="text-base font-semibold text-zinc-900">Apparel</Link>
+                    <div className="pl-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 mb-1">
+                      <Link href="/collections/topwear" onClick={() => setIsOpen(false)}>Topwear</Link>
+                      <Link href="/collections/bottomwear" onClick={() => setIsOpen(false)}>Bottomwear</Link>
+                      <Link href="/collections/suit" onClick={() => setIsOpen(false)}>Suit</Link>
+                      <Link href="/collections/innerwear" onClick={() => setIsOpen(false)}>Innerwear</Link>
+                    </div>
+                    <Link href="/collections/equipment" onClick={() => setIsOpen(false)} className="text-base font-semibold text-zinc-900">Equipment</Link>
+                    <div className="pl-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 mb-1">
+                      <Link href="/collections/bat" onClick={() => setIsOpen(false)}>Bats</Link>
+                      <Link href="/collections/ball" onClick={() => setIsOpen(false)}>Balls</Link>
+                      <Link href="/collections/paddle-raquet" onClick={() => setIsOpen(false)}>Paddles</Link>
+                      <Link href="/collections/guard" onClick={() => setIsOpen(false)}>Guards &amp; Gear</Link>
+                    </div>
+                    <Link href="/collections/accessories" onClick={() => setIsOpen(false)} className="text-base font-semibold text-zinc-900">Accessories</Link>
+                    <div className="pl-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-600 mb-1">
+                      <Link href="/collections/bag" onClick={() => setIsOpen(false)}>Bags</Link>
+                      <Link href="/collections/caps" onClick={() => setIsOpen(false)}>Headwear</Link>
+                      <Link href="/collections/drinkware" onClick={() => setIsOpen(false)}>Drinkware</Link>
+                      <Link href="/collections/socks" onClick={() => setIsOpen(false)}>Socks</Link>
+                    </div>
+                    <div className="pt-2 border-t border-zinc-200/60 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-[#867b5d]">
+                      <Link href="/collections/men" onClick={() => setIsOpen(false)}>Men</Link>
+                      <Link href="/collections/women" onClick={() => setIsOpen(false)}>Women</Link>
+                      <Link href="/collections/unisex" onClick={() => setIsOpen(false)}>Unisex</Link>
+                      <Link href="/collections/kids" onClick={() => setIsOpen(false)}>Kids</Link>
+                    </div>
                   </div>
                 </div>
                 
                 <div>
-                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Sports</h3>
-                  <div className="flex flex-col gap-3">
-                    <Link href="/collections/cricket" className="text-lg font-medium">Cricket</Link>
-                    <Link href="/collections/running-training" className="text-lg font-medium">Running & Training</Link>
-                    <Link href="/collections/gym-fitness-yoga" className="text-lg font-medium">Gym Fitness Yoga</Link>
-                    <Link href="/collections/pickleball" className="text-lg font-medium">Pickleball</Link>
-                    <Link href="/collections/swimming" className="text-lg font-medium">Swimming</Link>
+                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-3 tracking-wider">Sports &amp; Functions</h3>
+                  <div className="grid grid-cols-2 gap-2 text-sm text-zinc-800">
+                    <Link href="/collections/cricket" onClick={() => setIsOpen(false)}>Cricket</Link>
+                    <Link href="/collections/running-training" onClick={() => setIsOpen(false)}>Running &amp; Training</Link>
+                    <Link href="/collections/gym-fitness-yoga" onClick={() => setIsOpen(false)}>Gym Fitness Yoga</Link>
+                    <Link href="/collections/cycling" onClick={() => setIsOpen(false)}>Cycling</Link>
+                    <Link href="/collections/pickleball" onClick={() => setIsOpen(false)}>Pickleball</Link>
+                    <Link href="/collections/swimming" onClick={() => setIsOpen(false)}>Swimming</Link>
+                    <Link href="/collections/outdoor-adventure" onClick={() => setIsOpen(false)}>Outdoor &amp; Adventure</Link>
+                    <Link href="/collections/lifestyle-after-sports" onClick={() => setIsOpen(false)}>Lifestyle After Sports</Link>
+                    <Link href="/collections/football" onClick={() => setIsOpen(false)}>Football</Link>
+                    <Link href="/collections/basketball" onClick={() => setIsOpen(false)}>Basketball</Link>
+                    <Link href="/collections/golf" onClick={() => setIsOpen(false)}>Golf</Link>
+                    <Link href="/collections/kabaddi" onClick={() => setIsOpen(false)}>Kabaddi</Link>
+                    <Link href="/collections/home-office" onClick={() => setIsOpen(false)}>Home &amp; Office</Link>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-4 tracking-wider">Official Brands</h3>
-                  <div className="flex flex-col gap-3">
-                    <Link href="/collections/chennai-super-kings" className="text-lg font-medium">Chennai Super Kings</Link>
-                    <Link href="/collections/lucknow-super-giants" className="text-lg font-medium">Lucknow Super Giants</Link>
-                    <Link href="/collections/sunrisers-hyderabad" className="text-lg font-medium">Sunrisers Hyderabad</Link>
-                    <Link href="/collections/up-yoddha" className="text-lg font-medium">UP Yoddhas</Link>
-                    <Link href="/collections/seattle-orcas" className="text-lg font-medium">Seattle Orcas</Link>
+                  <h3 className="font-bold text-sm text-[#867b5d] uppercase mb-3 tracking-wider">Official Brands</h3>
+                  <div className="flex flex-col gap-2 text-sm text-zinc-800">
+                    <Link href="/collections/playr" onClick={() => setIsOpen(false)}>playR</Link>
+                    <Link href="/collections/playr-street" onClick={() => setIsOpen(false)}>playR STREET</Link>
+                    <Link href="/collections/chennai-super-kings" onClick={() => setIsOpen(false)}>playR x Chennai Super Kings</Link>
+                    <Link href="/collections/lucknow-super-giants" onClick={() => setIsOpen(false)}>playR x Lucknow Super Giants</Link>
+                    <Link href="/collections/sunrisers-hyderabad" onClick={() => setIsOpen(false)}>playR x Sunrisers Hyderabad</Link>
+                    <Link href="/collections/seattle-orcas" onClick={() => setIsOpen(false)}>playR x Seattle Orcas</Link>
+                    <Link href="/collections/up-yoddha" onClick={() => setIsOpen(false)}>playR x UP Yoddha</Link>
                   </div>
                 </div>
               </div>

@@ -10,44 +10,101 @@ interface SubCategory {
 
 const CATEGORY_DATA: SubCategory[] = [
   {
-    title: 'Apparels',
-    items: ['Topwear', 'Bottomwear', 'Suit', 'Innerwear'],
+    title: 'Apparel',
+    items: [
+      'Topwear',
+      'T-Shirt Tee',
+      'T-Shirt Polo',
+      'Jersey',
+      'Hoodie',
+      'Jacket',
+      'Singlet',
+      'Bottomwear',
+      'Jogger',
+      'Shorts',
+      'Pants',
+      'Suit',
+      'Track Set',
+      'Innerwear',
+      'Skin Pants',
+      'Skin Shorts',
+      'Skin Singlet',
+      'Skin Tee',
+    ],
   },
   {
     title: 'Equipment',
     items: [
       'Bat',
+      'English Willow',
+      'Kashmir Willow',
+      'Popular Willow',
       'Ball',
-      'Bag',
-      'Band',
+      'Leather Ball',
+      'Tennis Ball',
+      'Paddle Raquet',
+      'Carbon Fiber',
+      'Glass Fiber',
       'Gloves',
       'Guard',
+      'Kitbag',
+      'Resistance Band',
       'Yoga Mat',
-      'Eyewear',
-      'Paddle Raquet',
-      'Set',
+      'Goggles',
+      'Combo Sets',
     ],
   },
   {
     title: 'Accessories',
-    items: ['Bag', 'Headwear', 'Drinkware', 'Socks', 'Cushion', 'Towel'],
+    items: [
+      'Bags',
+      'Sling',
+      'Backpack',
+      'Gym Bag',
+      'Trolley',
+      'Headwear',
+      'Cap',
+      'Hat',
+      'Drinkware',
+      'Mug',
+      'Sipper',
+      'Shaker',
+      'Socks',
+      'Crew Socks',
+      'Ankle Socks',
+      'Back Cushion',
+      'Bath Set Towel',
+    ],
+  },
+  {
+    title: 'Gender & Age',
+    items: [
+      'Men',
+      'Women',
+      'Unisex',
+      'Boys',
+      'Girls',
+      'Adult',
+      'Kids',
+      'Ageless',
+    ],
   },
 ];
 
 const SPORTS_DATA = [
-  'Cricket',
-  'Running & Training',
   'Gym Fitness Yoga',
+  'Running & Training',
+  'Cricket',
+  'Cycling',
   'Lifestyle After Sports',
+  'Kabaddi',
+  'Football',
   'Pickleball',
   'Swimming',
   'Outdoor & Adventure',
-  'Cycling',
-  'Football',
-  'Basketball',
   'Golf',
-  'Kabaddi',
   'Home & Office',
+  'Basketball',
 ];
 
 const BRAND_DATA = [
@@ -86,7 +143,7 @@ function ChevronUp() {
 
 export default function DropdownNav() {
   const [activeMenu, setActiveMenu] = useState<'CATEGORY' | 'SPORTS' | 'BRAND' | 'CLUB' | null>(null);
-  const [activeCategorySub, setActiveCategorySub] = useState<string>('Apparels');
+  const [activeCategorySub, setActiveCategorySub] = useState<string>('Apparel');
 
   const slugify = (str: string) =>
     str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
