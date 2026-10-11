@@ -114,6 +114,43 @@ export default function B2BPage() {
         </div>
       </section>
 
+      {/* AERODRY Technology Highlights Section */}
+      <section className="py-6 px-4 md:px-8 max-w-6xl mx-auto">
+        <div className="p-8 rounded-[var(--radius-lg)] bg-[var(--panel)] border border-[var(--line)] flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="max-w-xl">
+            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">
+              Proprietary Fabric Engineering
+            </span>
+            <h3 className="text-xl md:text-2xl font-black uppercase tracking-tight mt-1 mb-2">
+              AERODRY™ Performance Technology
+            </h3>
+            <p className="text-xs text-[var(--muted)] leading-relaxed">
+              Every playR corporate kit is woven with AERODRY moisture-wicking yarns, micro-ventilation grids, and 4-way mechanical stretch. Tested under high-intensity international match conditions to maintain cooling and rapid sweat evaporation.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+            <a
+              href="#inquiry"
+              className="px-6 py-3 rounded-md bg-[var(--fg)] text-[var(--panel)] font-bold text-xs uppercase tracking-widest text-center hover:opacity-90 transition-opacity"
+            >
+              Custom Teamwear
+            </a>
+            <button
+              type="button"
+              onClick={() => {
+                const dummy = document.createElement('a');
+                dummy.href = '/playR_Full_Website_Manual_Test_Cases.xlsx';
+                dummy.download = 'playR_Corporate_Teamwear_Catalogue_2026.xlsx';
+                dummy.click();
+              }}
+              className="px-6 py-3 rounded-md border border-[var(--line)] bg-[var(--chip)] text-[var(--fg)] font-bold text-xs uppercase tracking-widest text-center hover:bg-[var(--line)] transition-colors cursor-pointer"
+            >
+              Download Catalogue (PDF)
+            </button>
+          </div>
+        </div>
+      </section>
+
       {/* Inquiry Form */}
       <section id="inquiry" className="py-10 px-4 md:px-8 max-w-3xl mx-auto">
         <div className="p-6 md:p-10 rounded-[var(--radius-lg)] bg-[var(--panel)] border border-[var(--line)] shadow-xl">

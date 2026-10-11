@@ -14,11 +14,11 @@ const PARTNERSHIPS = [
     tag: 'IPL 2026',
   },
   {
-    title: 'Seattle Orcas',
+    title: 'Lucknow Super Giants',
     subtitle: 'Official Merchandise Partner',
-    image: `${CDN}/moving_carousel_ad_seattle_jpg.jpg`,
-    href: '/collections/seattle-orcas',
-    tag: 'MLC Champions',
+    image: `${CDN}/lsg_available_now_banner.jpg`,
+    href: '/collections/lsg',
+    tag: 'IPL 2026',
   },
   {
     title: 'Sunrisers Hyderabad',
@@ -26,6 +26,20 @@ const PARTNERSHIPS = [
     image: `${CDN}/moving_carousel_ad_srh_jpg.jpg`,
     href: '/collections/srh',
     tag: 'IPL 2026',
+  },
+  {
+    title: 'UP Yoddhas',
+    subtitle: 'Official Merchandise Partner',
+    image: `${CDN}/kikirt_banner.png`,
+    href: '/collections/up-yoddhas',
+    tag: 'Pro Kabaddi',
+  },
+  {
+    title: 'Seattle Orcas',
+    subtitle: 'Official Merchandise Partner',
+    image: `${CDN}/moving_carousel_ad_seattle_jpg.jpg`,
+    href: '/collections/seattle-orcas',
+    tag: 'MLC Champions',
   },
 ];
 

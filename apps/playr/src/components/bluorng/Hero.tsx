@@ -2,6 +2,7 @@
 
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { banners } from '@/lib/data';
 
 const CDN = 'https://cdn.shopify.com/s/files/1/0679/5939/0427/files';
 const SLIDES = [
@@ -16,7 +17,10 @@ const SLIDES = [
 ];
 
 export default function Hero() {
-  const [slides] = useState(SLIDES);
+  const dynamicSlides = banners && banners.length > 0
+    ? banners.map((b) => ({ src: b.image, alt: b.title, href: b.href }))
+    : SLIDES;
+  const [slides] = useState(dynamicSlides);
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const touchStartX = useRef<number | null>(null);

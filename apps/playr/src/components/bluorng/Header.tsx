@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from './CartContext';
 import LoginModal from '@/components/auth/LoginModal';
+import StoryViewer from './StoryViewer';
 import { products } from '@/lib/bluorng-data';
 
 const Icon = {
@@ -170,26 +171,30 @@ export default function Header() {
     document.body.classList.toggle('hdr-solid', solid);
   }, [solid]);
 
-  const openTab = (tab: MenuTab) => {
+  const [storyOpen, setStoryOpen] = useState(false);
+
+  const openTab = (tab: MenuTab, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setClubOpen(false);
     setActiveTab(tab);
     setMegaOpen(true);
   };
 
-  const toggleClub = () => {
+  const toggleClub = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setMegaOpen(false);
     setClubOpen((prev) => !prev);
   };
 
   return (
     <>
-      <header className={`header ${solid ? 'header--solid' : ''}`} onMouseLeave={() => { setMegaOpen(false); setClubOpen(false); }}>
+      <header className={`header ${scrolled ? 'header--scrolled' : ''} ${solid ? 'header--solid' : ''}`} onMouseLeave={() => { setMegaOpen(false); setClubOpen(false); }}>
         <div className="header__inner">
           <nav className="header__nav header__nav--desktop">
             <button 
               className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'category' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
-              onMouseEnter={() => openTab('category')} 
-              onClick={() => openTab('category')}
+              onMouseEnter={(e) => openTab('category', e)} 
+              onClick={(e) => openTab('category', e)}
             >
               <span>Category</span>
               <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'category' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -198,8 +203,8 @@ export default function Header() {
             </button>
             <button 
               className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'sports' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
-              onMouseEnter={() => openTab('sports')} 
-              onClick={() => openTab('sports')}
+              onMouseEnter={(e) => openTab('sports', e)} 
+              onClick={(e) => openTab('sports', e)}
             >
               <span>Sports</span>
               <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'sports' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -208,8 +213,8 @@ export default function Header() {
             </button>
             <button 
               className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${activeTab === 'brand' && megaOpen ? 'opacity-100 font-extrabold' : ''}`} 
-              onMouseEnter={() => openTab('brand')} 
-              onClick={() => openTab('brand')}
+              onMouseEnter={(e) => openTab('brand', e)} 
+              onClick={(e) => openTab('brand', e)}
             >
               <span>Brand</span>
               <svg className={`w-3 h-3 transition-transform duration-200 ${activeTab === 'brand' && megaOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +227,7 @@ export default function Header() {
               <button 
                 type="button"
                 className={`header__link uppercase font-bold tracking-wider flex items-center gap-1.5 ${clubOpen ? 'opacity-100 font-extrabold' : ''}`} 
-                onClick={toggleClub}
+                onClick={(e) => toggleClub(e)}
                 onMouseEnter={() => { setMegaOpen(false); setClubOpen(true); }}
               >
                 <span>Club</span>
@@ -288,11 +293,30 @@ export default function Header() {
               )}
             </div>
 
+            {/* Lookbook Nav Link */}
+            <button 
+              type="button"
+              className="header__link uppercase font-bold tracking-wider hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMegaOpen(false);
+                setClubOpen(false);
+                setStoryOpen(true);
+              }}
+              onMouseEnter={() => { setMegaOpen(false); setClubOpen(false); }}
+            >
+              Lookbook
+            </button>
+
             {/* B2B Link */}
             <Link 
               href="/b2b" 
               className="header__link uppercase font-bold tracking-wider hover:opacity-100 transition-opacity"
-              onClick={() => { setMegaOpen(false); setClubOpen(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMegaOpen(false);
+                setClubOpen(false);
+              }}
               onMouseEnter={() => { setMegaOpen(false); setClubOpen(false); }}
             >
               B2B
@@ -302,17 +326,20 @@ export default function Header() {
           <div className="flex items-center gap-2">
             <button 
               className={`header__pill-plus hidden md:inline-flex ${megaOpen ? 'active' : ''}`}
-              onClick={() => { setMegaOpen((v) => !v); setClubOpen(false); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setMegaOpen((v) => !v);
+                setClubOpen(false);
+              }}
               aria-label="Toggle menu"
             >
               +
             </button>
-            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '120px' }}>
+            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '140px' }}>
               <img 
                 src="/logo.png" 
                 alt="playR" 
-                className="h-7 w-auto object-contain flex-shrink-0"
-                style={{ aspectRatio: '402 / 165' }}
+                className="h-[38px] w-auto object-contain flex-shrink-0"
               />
             </Link>
           </div>
@@ -624,6 +651,7 @@ export default function Header() {
         <CornerCutouts className="header__corners" />
       </header>
 
+      {storyOpen && <StoryViewer onClose={() => setStoryOpen(false)} />}
       <LoginModal isOpen={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   );

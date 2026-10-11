@@ -44,3 +44,7 @@ yarn-error.log*
 
 # Local Database Store
 db_store.json
+
+# Scratch dumps
+scripts/*.html
+scripts/*.txt

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { banners } from '@/lib/bluorng-data';
+import { banners } from '@/lib/data';
 
 export default function BannerSlider() {
   const [idx, setIdx] = useState(0);

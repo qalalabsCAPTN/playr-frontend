@@ -150,10 +150,39 @@ export default function CartDrawer() {
               )}
             </div>
 
+            {/* NECTAR Digital Wallet Credit Toggle */}
+            <div className="border-t border-[var(--line)] py-2">
+              <label className="flex items-center justify-between cursor-pointer text-xs font-semibold text-[var(--fg)]">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>NECTAR Wallet Credit (₹250 available)</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={showCoupon && couponCode === 'NECTAR250'}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setCouponCode('NECTAR250');
+                      setShowCoupon(true);
+                      cart.showToast('NECTAR ₹250 wallet credit applied!');
+                    } else {
+                      setCouponCode('');
+                    }
+                  }}
+                  className="rounded border-[var(--line)] text-[var(--fg)] focus:ring-0 cursor-pointer"
+                />
+              </label>
+            </div>
+
             <div className="drawer__total">
               <span>Estimated total</span>
-              <span>{formatPrice(cart.total)}</span>
+              <span>{formatPrice(couponCode === 'NECTAR250' ? Math.max(0, cart.total - 250) : cart.total)}</span>
             </div>
+            {couponCode === 'NECTAR250' && (
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold -mt-2 mb-2">
+                Includes ₹250 NECTAR loyalty wallet deduction
+              </p>
+            )}
             <p className="drawer__note">Taxes included. Discounts and shipping calculated at checkout.</p>
             <button className="drawer__checkout" onClick={() => { cart.setOpen(false); router.push('/checkout'); }}>
               Check out
