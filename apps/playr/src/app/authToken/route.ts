@@ -18,6 +18,7 @@ async function issueToken(request: Request) {
   try {
     const body = await request.clone().json();
     username = String(body?.username ?? '');
+    password = String(body?.password ?? '');
   } catch {
     // Body is empty or not JSON, query and headers will be checked
   }

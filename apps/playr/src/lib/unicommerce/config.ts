@@ -37,6 +37,7 @@ export function getUnicommerceConfig(): UnicommerceConfig {
   const username = process.env.UNICOMMERCE_USERNAME || 'streetplayr';
   const password = process.env.UNICOMMERCE_PASSWORD || '';
   const facilityCode = process.env.UNICOMMERCE_FACILITY_CODE || 'playR_Delhi';
+  const channelCode = process.env.UNICOMMERCE_CHANNEL_CODE || 'PLAYR_CUSTOM';
   const webhookSecret = process.env.UNICOMMERCE_WEBHOOK_SECRET || '';
   const transportMode = (process.env.UNICOMMERCE_TRANSPORT_MODE === 'REST' ? 'REST' : 'SOAP') as 'REST' | 'SOAP';
 
@@ -46,6 +47,7 @@ export function getUnicommerceConfig(): UnicommerceConfig {
     username,
     password,
     facilityCode,
+    channelCode,
     webhookSecret,
     isDemoMode,
     transportMode,

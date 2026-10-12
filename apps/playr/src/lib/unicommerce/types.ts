@@ -8,6 +8,7 @@ export interface UnicommerceConfig {
   username: string;
   password: string;
   facilityCode: string;
+  channelCode: string;
   webhookSecret: string;
   isDemoMode: boolean;
   transportMode: 'REST' | 'SOAP';

@@ -6,7 +6,7 @@ import type { UniwareOrderCreateRequest } from './types';
 export class UnicommerceOrderService {
   async createOrder(
     order: UniwareOrderCreateRequest,
-    channelCode: string = 'CUSTOM'
+    channelCode: string = 'PLAYR_CUSTOM'
   ): Promise<{ success: boolean; uniwareCode?: string; error?: string; isDuplicate?: boolean }> {
     const config = getUnicommerceConfig();
 

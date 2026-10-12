@@ -59,6 +59,7 @@ export async function GET() {
     status: ucConfig.apiUrl && ucConfig.username ? 'connected' : 'configured',
     endpoint: ucConfig.apiUrl,
     facilityCode: ucConfig.facilityCode,
+    channelCode: ucConfig.channelCode,
     username: ucConfig.username,
     demoMode: ucConfig.isDemoMode,
   };

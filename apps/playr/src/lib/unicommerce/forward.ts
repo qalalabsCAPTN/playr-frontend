@@ -94,7 +94,7 @@ export async function forwardPaidOrderToUnicommerce(orderId: string): Promise<Un
       items,
       grandTotal: Number(order.grand_total ?? 0),
     },
-    process.env.UNICOMMERCE_CHANNEL_CODE || 'CUSTOM'
+    config.channelCode || 'PLAYR_CUSTOM'
   );
 
   if (ucResult.success && ucResult.uniwareCode) {
