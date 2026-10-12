@@ -123,55 +123,61 @@ export default function CheckoutPage() {
         paymentStatus: paymentMethod === 'cod' ? 'pending' : 'paid',
       };
 
-      // 1. If Online Payment, call Easebuzz payment initiation
-      if (paymentMethod === 'online') {
-        const easebuzzRes = await fetch('/api/checkout/easebuzz', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            amount: netTotal,
-            firstname: `${firstName} ${lastName}`,
-            email,
-            phone,
-            txnid: generatedOrderId,
-            productinfo: items.map((i) => i.product.title).slice(0, 3).join(', '),
-            surl: typeof window !== 'undefined' ? `${window.location.origin}/order-success/${generatedOrderId}` : '',
-            furl: typeof window !== 'undefined' ? `${window.location.origin}/checkout?failed=true` : '',
-          }),
-        });
-
-        if (easebuzzRes.ok) {
-          const easebuzzData = await easebuzzRes.json();
-          console.log('Easebuzz payment initiation successful:', easebuzzData);
-        }
-      }
-
-      // 2. Persist order to database/API
+      // 1. Persist order to database/API first
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderPayload),
       });
 
+      let savedOrderId = generatedOrderId;
       if (res.ok) {
         const data = await res.json();
-        setOrderId(data.order?.displayId || data.order?.id || generatedOrderId);
+        savedOrderId = data.order?.displayId || data.order?.id || generatedOrderId;
+        setOrderId(savedOrderId);
       } else {
         setOrderId(generatedOrderId);
       }
 
-      // 3. Award SP-RR / NECTAR loyalty points
+      // 2. Award loyalty points / local storage record
       try {
         const earnedPoints = Math.round(netTotal * 0.1);
         const currentPoints = parseInt(localStorage.getItem('playr_loyalty_points') || '0', 10);
         localStorage.setItem('playr_loyalty_points', (currentPoints + earnedPoints).toString());
-        localStorage.setItem('playr_last_order', JSON.stringify({ orderId: generatedOrderId, date: new Date().toISOString(), total: netTotal }));
+        localStorage.setItem('playr_last_order', JSON.stringify({ orderId: savedOrderId, date: new Date().toISOString(), total: netTotal }));
       } catch (err) {
         console.debug('Failed to record loyalty points', err);
       }
 
+      // 3. If Online Payment, call Easebuzz payment initiation and redirect
+      if (paymentMethod === 'online') {
+        const easebuzzRes = await fetch('/api/checkout/easebuzz', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            amount: netTotal,
+            firstname: `${firstName} ${lastName}`.trim(),
+            email,
+            phone,
+            txnid: savedOrderId,
+            productinfo: items.map((i) => i.product.title).slice(0, 3).join(', '),
+            surl: typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/easebuzz` : '',
+            furl: typeof window !== 'undefined' ? `${window.location.origin}/api/webhooks/easebuzz` : '',
+          }),
+        });
+
+        if (easebuzzRes.ok) {
+          const easebuzzData = await easebuzzRes.json();
+          if (easebuzzData?.paymentUrl) {
+            clearCart();
+            window.location.href = easebuzzData.paymentUrl;
+            return;
+          }
+        }
+      }
+
       clearCart();
-      router.push(`/order-success/${generatedOrderId}`);
+      router.push(`/order-success/${savedOrderId}`);
     } catch (err: any) {
       console.error('Checkout processing error:', err);
       setOrderId(generatedOrderId);
