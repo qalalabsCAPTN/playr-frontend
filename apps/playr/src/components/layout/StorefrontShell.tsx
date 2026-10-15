@@ -22,7 +22,7 @@ export function StorefrontShell({ children }: { children: React.ReactNode }) {
       <SmoothScroll />
       <Header />
       <div className="page-frame" />
-      <main className="flex-1 w-full max-w-full min-w-0 overflow-x-hidden">{children}</main>
+      <main className={`flex-1 w-full max-w-full min-w-0 overflow-x-hidden`}>{children}</main>
       <CartDrawer />
       <MobileNavDock />
       <Footer />

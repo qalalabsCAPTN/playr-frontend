@@ -10,6 +10,7 @@ const PARTNERSHIPS = [
     title: 'Chennai Super Kings',
     subtitle: 'Official Merchandise Partner',
     image: `${CDN}/moving_carousel_ad_csk__jpg.jpg`,
+    ratio: '1 / 1',
     href: '/collections/csk',
     tag: 'IPL 2026',
   },
@@ -17,6 +18,7 @@ const PARTNERSHIPS = [
     title: 'Lucknow Super Giants',
     subtitle: 'Official Merchandise Partner',
     image: `${CDN}/lsg_available_now_banner.jpg`,
+    ratio: '1920 / 720',
     href: '/collections/lsg',
     tag: 'IPL 2026',
   },
@@ -24,6 +26,7 @@ const PARTNERSHIPS = [
     title: 'Sunrisers Hyderabad',
     subtitle: 'Official Merchandise Partner',
     image: `${CDN}/moving_carousel_ad_srh_jpg.jpg`,
+    ratio: '1 / 1',
     href: '/collections/srh',
     tag: 'IPL 2026',
   },
@@ -31,6 +34,7 @@ const PARTNERSHIPS = [
     title: 'UP Yoddhas',
     subtitle: 'Official Merchandise Partner',
     image: `${CDN}/kikirt_banner.png`,
+    ratio: '1920 / 720',
     href: '/collections/up-yoddhas',
     tag: 'Pro Kabaddi',
   },
@@ -38,6 +42,7 @@ const PARTNERSHIPS = [
     title: 'Seattle Orcas',
     subtitle: 'Official Merchandise Partner',
     image: `${CDN}/moving_carousel_ad_seattle_jpg.jpg`,
+    ratio: '1 / 1',
     href: '/collections/seattle-orcas',
     tag: 'MLC Champions',
   },
@@ -111,7 +116,10 @@ export default function PartnershipBanners() {
       </div>
 
       {/* Featured Moving Sub Banner Showcase */}
-      <div className="relative rounded-[var(--radius-lg)] overflow-hidden bg-[var(--panel)] border border-[var(--line)] aspect-[16/9] sm:aspect-[21/9] md:aspect-[3/1] min-h-[160px] md:min-h-[200px]">
+      <div
+        className="relative rounded-[var(--radius-lg)] overflow-hidden bg-[var(--panel)] border border-[var(--line)] w-full transition-[aspect-ratio] duration-500"
+        style={{ aspectRatio: PARTNERSHIPS[idx].ratio, maxHeight: 'min(80vh, 640px)' }}
+      >
         {PARTNERSHIPS.map((p, i) => (
           <Link
             key={p.title}
@@ -123,8 +131,15 @@ export default function PartnershipBanners() {
           >
             <img
               src={p.image}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-60"
+              loading="lazy"
+            />
+            <img
+              src={p.image}
               alt={p.title}
-              className="w-full h-full object-cover"
+              className="relative w-full h-full object-contain"
               loading={i === 0 ? 'eager' : 'lazy'}
             />
           </Link>

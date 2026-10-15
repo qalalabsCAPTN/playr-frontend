@@ -454,39 +454,10 @@ export default function Header() {
                 </div>
               )}
             </div>
-
-            {/* Lookbook Nav Link */}
-            <button 
-              type="button"
-              className="header__link uppercase font-bold tracking-wider hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMegaOpen(false);
-                setClubOpen(false);
-                setStoryOpen(true);
-              }}
-              onMouseEnter={() => { setMegaOpen(false); setClubOpen(false); }}
-            >
-              Lookbook
-            </button>
-
-            {/* B2B Link */}
-            <Link 
-              href="/b2b" 
-              className="header__link uppercase font-bold tracking-wider hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMegaOpen(false);
-                setClubOpen(false);
-              }}
-              onMouseEnter={() => { setMegaOpen(false); setClubOpen(false); }}
-            >
-              B2B
-            </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
-            <button 
+          <div className="header__center">
+            <button
               className={`header__pill-plus hidden md:inline-flex ${megaOpen ? 'active' : ''}`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -497,16 +468,29 @@ export default function Header() {
             >
               +
             </button>
-            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '140px' }}>
+            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '100px' }}>
               <img 
                 src="/logo.png" 
                 alt="playR" 
-                className="h-[38px] w-auto object-contain flex-shrink-0"
+                className="h-[22px] w-auto object-contain flex-shrink-0"
               />
             </Link>
           </div>
 
           <div className="header__right">
+            <button
+              type="button"
+              className="iconbtn iconbtn--story iconbtn--desktop-only"
+              aria-label="Open lookbook stories"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMegaOpen(false);
+                setClubOpen(false);
+                setStoryOpen(true);
+              }}
+            >
+              <img src="/lookbook/artboard-1.jpg" alt="" />
+            </button>
             {/* Desktop-only secondary icons */}
             <Link href="/collections/seattle-orcas" className="iconbtn iconbtn--desktop-only" aria-label="Stores">
               {Icon.pin}

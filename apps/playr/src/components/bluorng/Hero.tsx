@@ -64,7 +64,7 @@ export default function Hero() {
           aria-label={s.alt}
         >
           <img
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             src={s.src}
             alt={s.alt}
             loading={i === 0 ? 'eager' : 'lazy'}

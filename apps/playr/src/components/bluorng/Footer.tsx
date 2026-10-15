@@ -41,6 +41,8 @@ export default function Footer() {
             <h4>We are playR</h4>
             <Link href="/about">Our story</Link>
             <Link href="/collections/seattle-orcas">Walk-in Stores</Link>
+            <Link href="/b2b">B2B &amp; Teamwear</Link>
+            <Link href="/b2b#inquiry">Bulk &amp; custom orders</Link>
             <Link href="/b2b">Collaborations</Link>
             <Link href="/contact">Careers</Link>
             <Link href="/media">Media</Link>
