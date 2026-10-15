@@ -1,4 +1,5 @@
-import { createClient as createSupabaseClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createStubClient } from './stub';
 
 export function createClient(): SupabaseClient<any, any, any> {
@@ -9,5 +10,5 @@ export function createClient(): SupabaseClient<any, any, any> {
     return createStubClient('browser');
   }
 
-  return createSupabaseClient(url, key);
+  return createBrowserClient(url, key);
 }

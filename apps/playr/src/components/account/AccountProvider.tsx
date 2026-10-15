@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { useSession } from "next-auth/react"
+import { createClient } from "@/lib/supabase/client"
 import {
   UserProfile,
   Order,
@@ -30,6 +31,7 @@ const AccountContext = createContext<AccountContextType | undefined>(undefined)
 
 export function AccountProvider({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession()
+  const [supabaseUser, setSupabaseUser] = useState<any>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
   const [wallet, setWallet] = useState<WalletState | null>(null)
@@ -38,11 +40,33 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session?.user) {
+        setSupabaseUser(data.session.user)
+      }
+    })
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, sess) => {
+      setSupabaseUser(sess?.user ?? null)
+    })
+
+    return () => {
+      authListener?.subscription?.unsubscribe()
+    }
+  }, [])
+
   const refreshData = async () => {
-    if (status === "loading") return;
-    
-    // If not authenticated, clear states
-    if (!session?.user) {
+    const activeUser = session?.user || (supabaseUser ? {
+      id: supabaseUser.id,
+      email: supabaseUser.email,
+      name: supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email,
+    } : null)
+
+    // If not authenticated via either provider, clear states
+    if (!activeUser) {
+      if (status === "loading") return
       setProfile(null)
       setOrders([])
       setWallet(null)
@@ -55,7 +79,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true)
     setError(null)
     try {
-      const userId = (session.user as any).id || "real_usr_8f92a";
+      const userId = (activeUser as any).id || "real_usr_8f92a";
       const [prof, ords, wal, rew, xp] = await Promise.all([
         identityAdapter.getProfile(userId),
         identityAdapter.getOrders(userId),
@@ -63,10 +87,26 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         MockLoyaltyService.getRewardsPoints(userId),
         loyaltyAdapter.getUserXP(userId),
       ])
-      setProfile(prof)
-      setOrders(ords)
-      setWallet(wal)
-      setRewards(rew)
+
+      const resolvedFirstName = (activeUser as any).name?.trim()?.split(' ')[0] || 'User';
+      const resolvedLastName = (activeUser as any).name?.trim()?.split(' ')?.slice(1)?.join(' ') || '';
+
+      setProfile(prof || {
+        id: userId,
+        email: activeUser.email || '',
+        firstName: resolvedFirstName,
+        lastName: resolvedLastName,
+        phone: (activeUser as any).phone || '',
+        tier: 'bronze',
+        walletBalance: 0,
+        rewardsPoints: 0,
+        xp: 0,
+        addresses: [],
+        memberSince: new Date().getFullYear(),
+      })
+      setOrders(ords || [])
+      setWallet(wal || { balance: 0, currency: 'INR', transactions: [] })
+      setRewards(rew || { points: 0, tier: 'bronze', history: [] })
       setXpState(xp)
     } catch (err) {
       setError("Failed to load account data")
@@ -112,7 +152,7 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session, status])
+  }, [session, status, supabaseUser])
 
   return (
     <AccountContext.Provider value={{

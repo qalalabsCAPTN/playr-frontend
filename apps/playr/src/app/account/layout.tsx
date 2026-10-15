@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { signOut } from "next-auth/react"
+import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client"
 
 const links = [
   { href: "/account", label: "Dashboard", icon: "dashboard", exact: true },
@@ -25,6 +26,12 @@ function AccountSidebar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
+    try {
+      const supabase = createBrowserSupabaseClient();
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Supabase signOut error", e);
+    }
     await signOut({ callbackUrl: "/" });
   };
 

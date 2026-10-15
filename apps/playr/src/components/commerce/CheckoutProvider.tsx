@@ -5,6 +5,7 @@ import { ShippingAddress, PaymentMethod, ShippingMethod, eventPublisher } from "
 import { useRouter } from "next/navigation"
 import { useCommerce } from "./CommerceProvider"
 import { useSession } from "next-auth/react"
+import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client"
 import { createRazorpayOrderAction, verifyPaymentSignatureAction } from "@/app/actions/payment"
 
 /* eslint-disable no-unused-vars */
@@ -47,6 +48,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { cartItems, cartSubtotal } = useCommerce()
   const { data: session } = useSession()
+  const [supabaseUser, setSupabaseUser] = useState<any>(null)
   
   const [email, setEmail] = useState("")
   const [savedAddresses, setSavedAddresses] = useState<ShippingAddress[]>([])
@@ -72,9 +74,31 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null)
 
   React.useEffect(() => {
-    if (session?.user) {
-      const userId = (session.user as any).id;
-      setEmail(session.user.email || "");
+    const supabase = createBrowserSupabaseClient()
+    supabase.auth.getSession().then(({ data }) => {
+      if (data?.session?.user) {
+        setSupabaseUser(data.session.user)
+      }
+    })
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, sess) => {
+      setSupabaseUser(sess?.user ?? null)
+    })
+
+    return () => {
+      listener?.subscription?.unsubscribe()
+    }
+  }, [])
+
+  React.useEffect(() => {
+    const activeUser = session?.user || (supabaseUser ? {
+      id: supabaseUser.id,
+      email: supabaseUser.email,
+    } : null)
+
+    if (activeUser) {
+      const userId = (activeUser as any).id;
+      setEmail(activeUser.email || "");
       fetch(`/api/identity/users/${userId}`)
         .then(res => res.json())
         .then(user => {
@@ -90,7 +114,7 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
         })
         .catch(err => console.error("Error loading checkout profile", err));
     }
-  }, [session]);
+  }, [session, supabaseUser]);
 
   const applyPromoCode = async (code: string) => {
     if (!code.trim()) return false;
@@ -128,14 +152,16 @@ export function CheckoutProvider({ children }: { children: React.ReactNode }) {
     setIsProcessing(true)
     setError(null)
     
+    const activeUserId = (session?.user as any)?.id || supabaseUser?.id;
+
     // Auth Validation for production
-    if (!session?.user) {
+    if (!activeUserId) {
       setError("You must be logged in to checkout. Please sign in.")
       setIsProcessing(false)
       return
     }
 
-    const userId = (session.user as any).id;
+    const userId = activeUserId;
 
     // Basic validation
     if (!email.trim() || !email.includes("@")) {
