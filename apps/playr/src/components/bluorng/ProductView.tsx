@@ -394,14 +394,22 @@ export default function ProductView({ product }: ProductViewProps) {
     if (!el) return;
     const update = () => {
       const header = 58 + 16;
-      const top = Math.min(header, window.innerHeight - el.offsetHeight - 16);
+      const vh = document.documentElement.clientHeight || window.innerHeight;
+      const top = Math.min(header, vh - el.offsetHeight - 16);
       el.style.setProperty('--side-top', `${Math.round(top)}px`);
     };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     window.addEventListener('resize', update);
-    return () => { ro.disconnect(); window.removeEventListener('resize', update); };
+    window.addEventListener('load', update);
+    window.addEventListener('scroll', update, { passive: true });
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+      window.removeEventListener('load', update);
+      window.removeEventListener('scroll', update);
+    };
   }, []);
 
   const images = product.images || [];
