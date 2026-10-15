@@ -314,6 +314,9 @@ export default function ProductView({ product }: ProductViewProps) {
   const [tab, setTab] = useState<'details' | 'care' | 'shipping'>('details');
   const [guideOpen, setGuideOpen] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
+  const [slide, setSlide] = useState(0);
+  const galleryRef = useRef<HTMLDivElement>(null);
+  const sideRef = useRef<HTMLElement>(null);
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const saved = cart.isInWishlist(product.handle);
 
@@ -386,12 +389,34 @@ export default function ProductView({ product }: ProductViewProps) {
     router.push('/checkout');
   };
 
+  useEffect(() => {
+    const el = sideRef.current;
+    if (!el) return;
+    const update = () => {
+      const header = 58 + 16;
+      const top = Math.min(header, window.innerHeight - el.offsetHeight - 16);
+      el.style.setProperty('--side-top', `${Math.round(top)}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener('resize', update);
+    return () => { ro.disconnect(); window.removeEventListener('resize', update); };
+  }, []);
+
   const images = product.images || [];
+  const slideCount = images.length + (isCustomizing ? 1 : 0);
+  const onGalleryScroll = () => {
+    const el = galleryRef.current;
+    if (!el || !el.clientWidth) return;
+    setSlide(Math.round(el.scrollLeft / el.clientWidth));
+  };
 
   return (
     <div className="pdp-page" style={{ background: pageTint(product.title) }}>
       <div className="pdp">
-        <div className="pdp__gallery">
+        <div className="pdp__gallery-wrap">
+        <div className="pdp__gallery" ref={galleryRef} onScroll={onGalleryScroll}>
           <div className="pdp__gallery-left">
             {isCustomizing ? (
               <canvas
@@ -422,8 +447,16 @@ export default function ProductView({ product }: ProductViewProps) {
             ))}
           </div>
         </div>
+        {slideCount > 1 && (
+          <div className="pdp__dots" aria-hidden>
+            {Array.from({ length: slideCount }).map((_, i) => (
+              <span key={i} className={i === slide ? 'active' : ''} />
+            ))}
+          </div>
+        )}
+        </div>
 
-        <aside className="pdp__side">
+        <aside className="pdp__side" ref={sideRef}>
           <div className="pdp__panel">
             <div className="pdp__toprow">
               <div>

@@ -426,7 +426,7 @@ html.lenis, html.lenis body {
   html, body {
     width: 100%;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   body {
     background-color: var(--page-bg);
@@ -1641,3 +1641,52 @@ body.theme-dark .theme-switch__thumb svg { stroke: #fafafa; }
   max-height: min(80vh, 640px);
 }
 .jerseybanner img { object-fit: contain !important; object-position: center !important; }
+
+/* ============ PDP GALLERY: desktop two-column edge-to-edge, phone swipe slider ============ */
+.pdp__gallery { gap: 8px; }
+.pdp__gallery-right { gap: 8px; }
+.pdp__gallery-left img,
+.pdp__gallery-left canvas,
+.pdp__gallery-right img {
+  aspect-ratio: 1 / 1;
+  border-radius: 12px;
+  object-fit: cover;
+}
+.pdp__dots { display: none; }
+/* Left image stays pinned while the right column of images scrolls past it; the details panel scrolls until its bottom is visible, then pins */
+.pdp__side { top: var(--side-top, calc(var(--header-h) + 16px)); }
+
+@media (max-width: 900px) {
+  .pdp__gallery {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    gap: 0;
+    -webkit-overflow-scrolling: touch;
+    margin: 0 -12px;
+  }
+  .pdp__gallery::-webkit-scrollbar { display: none; }
+  .pdp__gallery-left,
+  .pdp__gallery-right { display: contents; }
+  .pdp__gallery-left img,
+  .pdp__gallery-left canvas,
+  .pdp__gallery-right img {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+  .pdp__dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .pdp__dots span {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--line);
+    transition: background 0.2s, transform 0.2s;
+  }
+  .pdp__dots span.active { background: var(--fg); transform: scale(1.3); }
+}
