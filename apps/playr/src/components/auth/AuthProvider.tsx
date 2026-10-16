@@ -63,7 +63,13 @@ export default function AuthProvider({
             const profile = await getProfileAction();
             sync(profile ?? null);
           } else {
-            sync(null);
+            const currentUser = useAuthStore.getState().user;
+            if (currentUser?.id === 'usr_athlete_preview') {
+              // Preserve preview session for local visual testing & demo exploration
+              sync(currentUser);
+            } else {
+              sync(null);
+            }
           }
 
           // Listen to live auth state changes

@@ -309,6 +309,37 @@ export default function LoginModal({
                 Create an account
               </Link>
             </p>
+
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  import('@/store/authStore').then(({ useAuthStore }) => {
+                    useAuthStore.getState().sync({
+                      id: "usr_athlete_preview",
+                      username: "alexmercer",
+                      name: "Alex Mercer",
+                      phone: "+91 98765 43210",
+                      email: "athlete@playr.in",
+                      avatar: null,
+                      referralCode: "PLAYR-PRO",
+                      walletId: "wal_1001",
+                      joinedFrom: "preview",
+                      authProvider: "phone",
+                      isOnboarded: true,
+                      memberSince: "2026-01-15T00:00:00.000Z",
+                      sprrBalance: 2450,
+                      role: "member",
+                      tier: "STREET"
+                    });
+                    onClose();
+                  });
+                }}
+                className="text-[11px] font-bold uppercase tracking-wider text-primary hover:underline"
+              >
+                Explore Demo Locker →
+              </button>
+            </div>
           </motion.div>
         </motion.div>
       )}

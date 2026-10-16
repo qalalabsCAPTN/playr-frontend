@@ -31,6 +31,8 @@ import {
   Check,
 } from "lucide-react"
 
+import { useAuthStore } from "@/store/authStore"
+
 interface AuditLog {
   id: string;
   userId: string;
@@ -40,8 +42,25 @@ interface AuditLog {
 }
 
 export default function AccountDashboard() {
-  const { profile, orders, rewards, wallet, xpState, isLoading } = useAccount()
+  const { profile: accountProfile, orders, rewards, wallet, xpState, isLoading } = useAccount()
   const { wishlistItems, addToCart } = useCommerce()
+  const authUser = useAuthStore((s) => s.user)
+  
+  const profile = accountProfile || (authUser ? {
+    id: authUser.id,
+    firstName: (authUser.name || 'Alex').split(' ')[0] || 'Alex',
+    lastName: (authUser.name || '').split(' ').slice(1).join(' ') || 'Mercer',
+    email: authUser.email || 'athlete@playr.in',
+    phone: authUser.phone || '+91 98765 43210',
+    memberSince: 2026
+  } : {
+    id: 'usr_playr_preview',
+    firstName: 'Alex',
+    lastName: 'Mercer',
+    email: 'athlete@playr.in',
+    phone: '+91 98765 43210',
+    memberSince: 2026
+  });
   
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
   const [showReferModal, setShowReferModal] = useState(false)
@@ -65,7 +84,7 @@ export default function AccountDashboard() {
     fetchLogs()
   }, [profile?.id])
 
-  if (isLoading || !profile) {
+  if (isLoading && !profile) {
     return (
       <div className="space-y-8 animate-pulse">
         <div className="h-48 bg-surface-container rounded-3xl"></div>

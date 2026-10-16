@@ -89,6 +89,30 @@ export function AccountProvider({ children }: { children: React.ReactNode }) {
         transactions: [],
       })
 
+      const xp = authUser.sprrBalance || 0;
+      setXpState({
+        userId: authUser.id,
+        totalXP: xp,
+        currentTier: {
+          id: (authUser.tier || 'street').toLowerCase(),
+          name: authUser.tier || 'STREET',
+          minXP: 0,
+          maxXP: 5000,
+          benefits: ['Early Drop Access', 'Member Pricing', 'Secret Lockers'],
+          badgeIcon: 'award'
+        },
+        nextTier: {
+          id: 'player',
+          name: 'PLAYER',
+          minXP: 5000,
+          maxXP: 10000,
+          benefits: ['Free Express Shipping', 'Exclusive Kits', 'Custom Monogramming'],
+          badgeIcon: 'crown'
+        },
+        xpToNextTier: Math.max(0, 5000 - xp),
+        progressPercent: Math.min(100, Math.round((xp / 5000) * 100))
+      })
+
       // Fetch user's orders from API or Supabase if available
       try {
         const res = await fetch(`/api/identity/users/${authUser.id}/orders`)
