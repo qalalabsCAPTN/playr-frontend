@@ -111,7 +111,7 @@ export default function CartDrawer() {
                       }
                     }}
                     placeholder="Add special instructions or delivery note..."
-                    className="w-full p-2 text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none focus:border-[var(--fg)] resize-none"
+                    className="w-full p-2 text-base md:text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none focus:border-[var(--fg)] resize-none"
                   />
                 </div>
               )}
@@ -134,7 +134,7 @@ export default function CartDrawer() {
                     value={couponCode}
                     onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
                     placeholder="PROMO CODE"
-                    className="flex-1 px-2.5 py-1.5 text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] font-semibold uppercase focus:outline-none focus:border-[var(--fg)]"
+                    className="flex-1 px-2.5 py-1.5 text-base md:text-xs bg-[var(--chip)] border border-[var(--line)] rounded-[var(--radius-sm)] text-[var(--fg)] placeholder-[var(--muted)] font-semibold uppercase focus:outline-none focus:border-[var(--fg)]"
                   />
                   <button
                     type="button"
@@ -184,9 +184,23 @@ export default function CartDrawer() {
               </p>
             )}
             <p className="drawer__note">Taxes included. Discounts and shipping calculated at checkout.</p>
-            <button className="drawer__checkout" onClick={() => { cart.setOpen(false); router.push('/checkout'); }}>
-              Check out
-            </button>
+            <div className="space-y-2 mt-2">
+              <button 
+                type="button"
+                className="w-full bg-[#16181d] dark:bg-[#f3f3f3] text-white dark:text-[#16181d] py-3.5 px-6 rounded-full font-bold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.99] transition-all shadow-md" 
+                onClick={() => { cart.setOpen(false); router.push('/checkout'); }}
+              >
+                <span>Buy Now</span>
+                <span className="text-amber-400 dark:text-amber-600 font-black">→</span>
+              </button>
+              <button 
+                type="button"
+                className="w-full bg-transparent border border-[var(--line)] text-[var(--fg)] py-2.5 px-6 rounded-full font-semibold text-xs tracking-wider uppercase hover:bg-[var(--chip)] transition-colors"
+                onClick={() => { cart.setOpen(false); router.push('/checkout'); }}
+              >
+                Proceed to Checkout
+              </button>
+            </div>
           </div>
         )}
       </aside>

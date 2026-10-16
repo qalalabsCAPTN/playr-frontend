@@ -108,7 +108,7 @@ export default function ClubOffersPage() {
       {/* Floating WhatsApp Support Badge at Bottom Right */}
       <div className="fixed bottom-5 right-5 z-40">
         <a 
-          href="https://wa.me/919999999999" 
+          href="https://wa.me/" 
           target="_blank" 
           rel="noopener noreferrer"
           className="flex items-center gap-2 bg-[#00e676] hover:bg-[#00c853] text-[#1c1a16] font-bold px-4 py-2 rounded-full shadow-2xl text-xs transition-transform duration-200 hover:scale-105"

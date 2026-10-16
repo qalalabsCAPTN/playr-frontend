@@ -352,9 +352,9 @@ export default function AccountSupportPage() {
           <section className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm space-y-4">
             <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Quick Hotlines</h4>
             <div className="space-y-2.5">
-              <a href="https://wa.me/919876543210" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-surface border border-outline-variant/15 rounded-2xl hover:bg-on-surface/5 transition-all text-xs font-bold text-on-surface">
+              <a href="https://wa.me/" target="_blank" rel="noreferrer" className="flex items-center gap-3 p-3 bg-surface border border-outline-variant/15 rounded-2xl hover:bg-on-surface/5 transition-all text-xs font-bold text-on-surface">
                 <MessageSquare className="w-4 h-4 text-green-500 shrink-0" />
-                WhatsApp: +91 98765 43210
+                WhatsApp: Support Desk
               </a>
               <a href="tel:+919876543210" className="flex items-center gap-3 p-3 bg-surface border border-outline-variant/15 rounded-2xl hover:bg-on-surface/5 transition-all text-xs font-bold text-on-surface">
                 <Phone className="w-4 h-4 text-primary shrink-0" />

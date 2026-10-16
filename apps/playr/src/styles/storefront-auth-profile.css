@@ -38,6 +38,7 @@
   inset: 0;
   z-index: 120;
   background: rgba(17, 17, 17, 0.6);
+  -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;

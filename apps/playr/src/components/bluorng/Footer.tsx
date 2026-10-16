@@ -17,7 +17,7 @@ export default function Footer() {
           <div>
             <h4>Connect with us</h4>
             <a href="tel:+918448441388">Call</a>
-            <a href="https://wa.me/918448441388">Text (WhatsApp)</a>
+            <a href="https://wa.me/">Text (WhatsApp)</a>
             <a href="https://www.instagram.com/playr.in" target="_blank" rel="noreferrer">
               Instagram
             </a>

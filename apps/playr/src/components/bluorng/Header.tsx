@@ -311,9 +311,11 @@ export default function Header() {
     if (saved === 'dark') {
       setTheme('dark');
       document.body.classList.add('theme-dark');
+      document.documentElement.classList.add('theme-dark', 'dark');
     } else {
       setTheme('light');
       document.body.classList.remove('theme-dark');
+      document.documentElement.classList.remove('theme-dark', 'dark');
     }
   }, []);
 
@@ -322,10 +324,12 @@ export default function Header() {
       setTheme('dark');
       localStorage.setItem('playr-theme', 'dark');
       document.body.classList.add('theme-dark');
+      document.documentElement.classList.add('theme-dark', 'dark');
     } else {
       setTheme('light');
       localStorage.setItem('playr-theme', 'light');
       document.body.classList.remove('theme-dark');
+      document.documentElement.classList.remove('theme-dark', 'dark');
     }
   };
 
@@ -350,7 +354,14 @@ export default function Header() {
 
   return (
     <>
-      <header className={`header ${scrolled ? 'header--scrolled' : ''} ${solid ? 'header--solid' : ''}`} onMouseLeave={() => { setMegaOpen(false); setClubOpen(false); }}>
+      <header 
+        className={`header ${scrolled ? 'header--scrolled' : ''} ${solid ? 'header--solid' : ''}`} 
+        onMouseLeave={() => { 
+          if (typeof window !== 'undefined' && window.innerWidth < 768) return;
+          setMegaOpen(false); 
+          setClubOpen(false); 
+        }}
+      >
         <div className="header__inner">
           <nav className="header__nav header__nav--desktop">
             <button 
@@ -538,10 +549,15 @@ export default function Header() {
             <div className="header__search-input-wrap">
               <input
                 type="text"
+                id="header-search-input"
+                name="q"
+                autoComplete="off"
+                aria-label="Search products"
                 placeholder="Search here....."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 autoFocus
+                className="text-base md:text-sm"
               />
               <button 
                 className="header__search-close" 

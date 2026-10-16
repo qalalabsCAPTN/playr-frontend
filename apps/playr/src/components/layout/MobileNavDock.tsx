@@ -124,10 +124,14 @@ export function MobileNavDock() {
               <span className="text-[var(--muted)]">{Icon.search}</span>
               <input
                 type="text"
+                id="mobile-search-input"
+                name="q"
+                autoComplete="off"
+                aria-label="Search catalog"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search products, caps, jerseys..."
-                className="w-full bg-transparent text-sm font-medium text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none"
+                className="w-full bg-transparent text-base md:text-sm font-medium text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none"
                 autoFocus
               />
               <button
