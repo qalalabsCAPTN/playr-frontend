@@ -1,9 +1,10 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from "react"
-import { CartItem, WishlistItem, MockCartService, NECTARAnalytics } from "@playr/nectar-core"
+import { CartItem, WishlistItem, NECTARAnalytics } from "@playr/nectar-core"
 import { CartDrawer } from "@playr/ui"
 import { useRouter } from "next/navigation"
+import { useCartStore } from "@/store/cartStore"
 
 /* eslint-disable no-unused-vars */
 interface CommerceContextType {
@@ -30,16 +31,20 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
   const router = useRouter()
 
+  const storeItems = useCartStore((s) => s.items)
+  const storeAddItem = useCartStore((s) => s.addItem)
+  const storeRemoveItem = useCartStore((s) => s.removeItem)
+  const storeUpdateQty = useCartStore((s) => s.updateQuantity)
+
   // Load from local storage
   useEffect(() => {
     setMounted(true)
     const loadStoredCart = () => {
       const storedCart = localStorage.getItem("playr_cart")
-      const storedCartItems = localStorage.getItem("playr_cart_items")
       const storedWishlist = localStorage.getItem("playr_wishlist")
-      
+
       if (storedCart) {
-        try { 
+        try {
           const parsed = JSON.parse(storedCart)
           if (Array.isArray(parsed) && parsed.length > 0) {
             setCartItems(parsed)
@@ -47,26 +52,21 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
           }
         } catch(e) { console.error(e) }
       }
-      
-      if (storedCartItems) {
-        try {
-          const parsed = JSON.parse(storedCartItems)
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            const converted: CartItem[] = parsed.map((item: any) => ({
-              id: item.key || String(Math.random()),
-              productId: item.product?.handle || item.key || "prod",
-              variantId: item.key || "var",
-              title: item.product?.title || "Product",
-              imageSrc: item.product?.images?.[0] || "",
-              colorName: item.product?.colors?.[0] || "Default",
-              price: item.product?.price || 0,
-              quantity: item.qty || 1,
-              size: item.size || "One Size"
-            }))
-            setCartItems(converted)
-            return
-          }
-        } catch(e) { console.error(e) }
+
+      if (storeItems && storeItems.length > 0) {
+        const converted: CartItem[] = storeItems.map((i) => ({
+          id: i.id,
+          productId: i.productId,
+          variantId: i.id,
+          title: i.name,
+          imageSrc: i.image,
+          colorName: i.color,
+          price: i.price,
+          quantity: i.quantity,
+          size: i.size,
+        }))
+        setCartItems(converted)
+        return
       }
 
       setCartItems([])
@@ -81,9 +81,9 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
     loadStoredCart()
     window.addEventListener('storage', loadStoredCart)
     return () => window.removeEventListener('storage', loadStoredCart)
-  }, [])
+  }, [storeItems])
 
-  // Save to local storage
+  // Sync to local storage
   useEffect(() => {
     if (!mounted) return
     localStorage.setItem("playr_cart", JSON.stringify(cartItems))
@@ -98,6 +98,18 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
       }
       return [...prev, item]
     })
+
+    storeAddItem({
+      id: item.id,
+      productId: item.productId,
+      name: item.title,
+      price: item.price,
+      quantity: item.quantity,
+      color: item.colorName || 'Default',
+      size: item.size || 'M',
+      image: item.imageSrc || '',
+    })
+
     setIsCartDrawerOpen(true)
     NECTARAnalytics.trackAddToCart(
       { id: item.productId, title: item.title, price: item.price, category: 'Apparel' } as any,
@@ -107,11 +119,13 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromCart = (id: string) => {
     setCartItems(prev => prev.filter(i => i.id !== id))
+    storeRemoveItem(id)
   }
 
   const updateCartQuantity = (id: string, qty: number) => {
     if (qty < 1) return
     setCartItems(prev => prev.map(i => i.id === id ? { ...i, quantity: qty } : i))
+    storeUpdateQty(id, qty)
   }
 
   const addToWishlist = (item: WishlistItem) => {
@@ -144,16 +158,11 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
     }))
     
     newCartItems.forEach(item => addToCart(item))
-    setWishlistItems([]) // Clear wishlist after adding
+    setWishlistItems([])
     setIsCartDrawerOpen(true)
   }
 
-  const cartSubtotal = MockCartService.calculateSubtotal(cartItems)
-
-  const handleCheckout = () => {
-    setIsCartDrawerOpen(false)
-    router.push('/cart')
-  }
+  const cartSubtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 
   return (
     <CommerceContext.Provider value={{
@@ -170,17 +179,18 @@ export function CommerceProvider({ children }: { children: React.ReactNode }) {
       addAllWishlistToCart
     }}>
       {children}
-      {mounted && (
-        <CartDrawer 
-          isOpen={isCartDrawerOpen}
-          onClose={() => setIsCartDrawerOpen(false)}
-          items={cartItems}
-          subtotal={cartSubtotal}
-          onUpdateQuantity={updateCartQuantity}
-          onRemoveItem={removeFromCart}
-          onCheckout={handleCheckout}
-        />
-      )}
+      <CartDrawer 
+        isOpen={isCartDrawerOpen}
+        onClose={() => setIsCartDrawerOpen(false)}
+        items={cartItems}
+        subtotal={cartSubtotal}
+        onUpdateQuantity={updateCartQuantity}
+        onRemoveItem={removeFromCart}
+        onCheckout={() => {
+          setIsCartDrawerOpen(false)
+          router.push("/cart")
+        }}
+      />
     </CommerceContext.Provider>
   )
 }

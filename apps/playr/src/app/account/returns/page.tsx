@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { useAccount } from "@/components/account/AccountProvider"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
+import { RotateCcw, CheckCircle2, Check, Plus, X, PackageOpen, ArrowRight } from "lucide-react"
 
 interface ReturnRequest {
   id: string;
@@ -25,12 +26,12 @@ export default function AccountReturnsPage() {
     {
       id: "RET-90118",
       orderId: "PR-99231",
-      productTitle: "Pro Training Tee",
+      productTitle: "Pro Training Performance Tee",
       reason: "Size is too tight, exchange requested",
       type: "exchange",
       status: "Courier Pickup Scheduled",
       timestamp: "2026-06-25T14:30:00Z",
-      imageSrc: "https://lh3.googleusercontent.com/aida-public/AB6AXuBQgn4RT5qaIGU-406eP9WRJHcCBy-t_nPVirj9buuKofJtj0y8fzNQJpDAdv9M-LqlOCGWqYWRwylnFuEGqje0FDTIJmuEOUx_UXIFbkeFzXRmiRfP9IQ9gtrxf-DLbNNqyPIlcA3iPI2H0jnEDvl1ZHj0NCw29MJ0XrCVULpb_ZMzAx6s69UdWHsXUWqV74kIFpwqpoZ-eTUP9SqtWHVOi8EW4-rZbcioiXJWUfLq7pAukB8hoJvvrPUUjUfcIX9QUa_fh6GmqE0"
+      imageSrc: "https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard6.png?v=1782909214"
     }
   ])
 
@@ -38,7 +39,7 @@ export default function AccountReturnsPage() {
   const [isRaisingRequest, setIsRaisingRequest] = useState(false)
   const [selectedOrderItem, setSelectedOrderItem] = useState("")
   const [claimType, setClaimType] = useState<'return' | 'exchange'>('return')
-  const [reason, setReason] = useState("Size exchange")
+  const [reason, setReason] = useState("Sizing issues")
   const [details, setDetails] = useState("")
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -48,61 +49,71 @@ export default function AccountReturnsPage() {
     setTimeout(() => setToastMessage(null), 3000)
   }
 
-  // Find eligible items for returns (from delivered orders)
+  // Find eligible items for returns (from delivered orders, or all items)
   const deliveredOrders = orders.filter(o => o.status === 'delivered')
-  const returnableItems: Array<{ id: string; title: string; imageSrc: string; orderDisplayId: string; orderId: string }> = []
+  const returnableItems: Array<{ id: string; title: string; imageSrc: string; orderDisplayId: string; orderId: string }> = [];
   
-  deliveredOrders.forEach(o => {
-    o.items.forEach(item => {
+  const targetOrders = deliveredOrders.length > 0 ? deliveredOrders : orders;
+  targetOrders.forEach((o: any) => {
+    o.items?.forEach((item: any) => {
       returnableItems.push({
         id: `${o.id}-${item.id}`,
         title: `${item.title} (Size: ${item.size}, Color: ${item.colorName})`,
         imageSrc: item.imageSrc,
         orderDisplayId: o.displayId,
         orderId: o.id
-      })
+      });
+    });
+  });
+
+  // Add fallback item if no orders exist yet
+  if (returnableItems.length === 0) {
+    returnableItems.push({
+      id: "demo-item-1",
+      title: "playR Mesh Cap — Red (Standard Size)",
+      imageSrc: "https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard6.png?v=1782909214",
+      orderDisplayId: "PR-882931",
+      orderId: "demo-order"
     })
-  })
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       setUploadedImage(URL.createObjectURL(file))
-      triggerToast("Proof image uploaded successfully!")
+      triggerToast("Proof image attached!")
     }
   }
 
   const handleSubmitRequest = (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedOrderItem) {
-      triggerToast("Please select an item to return.")
+      triggerToast("Please select an item for return.")
       return
     }
 
     setIsSubmitting(true)
     setTimeout(() => {
-      const selectedObj = returnableItems.find(r => r.id === selectedOrderItem)
-      if (selectedObj) {
-        const newRequest: ReturnRequest = {
-          id: `RET-${Math.floor(10000 + Math.random() * 90000)}`,
-          orderId: selectedObj.orderDisplayId,
-          productTitle: selectedObj.title,
-          reason: `${reason} - ${details}`,
-          type: claimType,
-          status: 'Claim Submitted',
-          timestamp: new Date().toISOString(),
-          imageSrc: selectedObj.imageSrc
-        }
-
-        setReturns(prev => [newRequest, ...prev])
-        triggerToast("Return request submitted successfully!")
-        setIsRaisingRequest(false)
-        setSelectedOrderItem("")
-        setDetails("")
-        setUploadedImage(null)
+      const selectedObj = returnableItems.find(r => r.id === selectedOrderItem) || returnableItems[0]
+      const newRequest: ReturnRequest = {
+        id: `RET-${Math.floor(10000 + Math.random() * 90000)}`,
+        orderId: selectedObj.orderDisplayId,
+        productTitle: selectedObj.title,
+        reason: `${reason}${details ? ' - ' + details : ''}`,
+        type: claimType,
+        status: 'Claim Submitted',
+        timestamp: new Date().toISOString(),
+        imageSrc: selectedObj.imageSrc
       }
+
+      setReturns(prev => [newRequest, ...prev])
+      triggerToast("Return request submitted successfully!")
+      setIsRaisingRequest(false)
+      setSelectedOrderItem("")
+      setDetails("")
+      setUploadedImage(null)
       setIsSubmitting(false)
-    }, 1500)
+    }, 1000)
   }
 
   if (isLoading) {
@@ -120,7 +131,7 @@ export default function AccountReturnsPage() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-primary-fixed-dim">assignment_return</span>
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             {toastMessage}
           </motion.div>
         )}
@@ -128,15 +139,13 @@ export default function AccountReturnsPage() {
 
       <div className="flex justify-between items-end border-b border-outline-variant/30 pb-4">
         <h1 className="font-black text-3xl uppercase tracking-tighter text-on-surface font-headline">Returns & Exchanges</h1>
-        {returnableItems.length > 0 && (
-          <button 
-            onClick={() => setIsRaisingRequest(!isRaisingRequest)}
-            className="bg-primary text-on-primary px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center gap-2"
-          >
-            <span className="material-symbols-outlined text-sm">{isRaisingRequest ? 'close' : 'add'}</span>
-            {isRaisingRequest ? 'Cancel' : 'Request Return'}
-          </button>
-        )}
+        <button 
+          onClick={() => setIsRaisingRequest(!isRaisingRequest)}
+          className="bg-primary text-on-primary px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center gap-2 shadow-sm"
+        >
+          {isRaisingRequest ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {isRaisingRequest ? 'Cancel' : 'Request Return'}
+        </button>
       </div>
 
       {/* Request Return Form */}
@@ -151,7 +160,7 @@ export default function AccountReturnsPage() {
                 <select
                   value={selectedOrderItem}
                   onChange={(e) => setSelectedOrderItem(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                   required
                 >
                   <option value="">Choose item...</option>
@@ -198,7 +207,7 @@ export default function AccountReturnsPage() {
                 <select
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="Sizing issues">Sizing issues (too large/too tight)</option>
                   <option value="Defective/Damaged product">Defective/Damaged product</option>
@@ -207,12 +216,11 @@ export default function AccountReturnsPage() {
                 </select>
               </div>
 
-              {/* File Upload Mock */}
               <div className="space-y-1.5">
-                <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Upload Sizing/Damage Proof</label>
+                <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Upload Verification Proof</label>
                 <div className="flex gap-3 items-center">
                   <label className="bg-surface-container border border-outline-variant/30 hover:border-primary/40 rounded-xl px-5 py-3 text-xs font-bold text-on-surface cursor-pointer transition-all uppercase tracking-wider">
-                    Choose Proof File
+                    Choose Photo
                     <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                   </label>
                   {uploadedImage && (
@@ -231,7 +239,7 @@ export default function AccountReturnsPage() {
                 onChange={(e) => setDetails(e.target.value)}
                 placeholder="Details of defects or specific sizing requirements..."
                 rows={3}
-                className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -239,7 +247,7 @@ export default function AccountReturnsPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-primary text-on-primary px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity"
+                className="bg-primary text-on-primary px-8 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity shadow-sm"
               >
                 {isSubmitting ? "Submitting..." : "Submit Claim"}
               </button>
@@ -269,7 +277,7 @@ export default function AccountReturnsPage() {
                   {/* Header info */}
                   <div className="flex justify-between items-start border-b border-outline-variant/15 pb-4">
                     <div className="flex gap-4 items-center">
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-surface-container shrink-0 border border-outline-variant/10">
+                      <div className="relative w-14 h-14 rounded-2xl overflow-hidden bg-surface-container shrink-0 border border-outline-variant/15">
                         <Image fill alt={ret.productTitle} className="object-cover" src={ret.imageSrc} />
                       </div>
                       <div>
@@ -279,7 +287,7 @@ export default function AccountReturnsPage() {
                         </span>
                       </div>
                     </div>
-                    <span className="text-[9px] font-black bg-primary-container text-on-primary-container px-3 py-1 rounded-full uppercase tracking-wider">
+                    <span className="text-[9px] font-black bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full uppercase tracking-wider">
                       {ret.type === 'exchange' ? "EXCHANGE" : "REFUND"}
                     </span>
                   </div>
@@ -295,11 +303,11 @@ export default function AccountReturnsPage() {
                         
                         return (
                           <div key={m} className="flex md:flex-col items-center gap-3 md:gap-1.5 md:w-1/4">
-                            <div className={`w-6.5 h-6.5 rounded-full flex items-center justify-center border-4 border-surface-container-lowest shrink-0 ${
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center border-4 border-surface shadow-sm shrink-0 ${
                               isCompleted ? 'bg-primary text-on-primary' : 'bg-surface-container text-on-surface-variant/40'
                             }`}>
                               {isCompleted ? (
-                                <span className="material-symbols-outlined text-[10px]">check</span>
+                                <Check className="w-3.5 h-3.5" />
                               ) : (
                                 <div className="w-1.5 h-1.5 bg-on-surface-variant/40 rounded-full" />
                               )}
@@ -323,9 +331,12 @@ export default function AccountReturnsPage() {
             })}
           </div>
         ) : (
-          <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 p-16 text-center">
-            <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-2">assignment_return</span>
-            <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">No active returns or exchange claims found.</p>
+          <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 p-16 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center mb-4 text-on-surface-variant/40">
+              <RotateCcw className="w-8 h-8" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface">No active returns or exchange claims found</p>
+            <p className="text-[11px] text-on-surface-variant mt-1">If you receive an item you want to exchange or return, raise a claim here within 30 days.</p>
           </div>
         )}
       </section>

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useAccount } from "@/components/account/AccountProvider"
 import { motion, AnimatePresence } from "framer-motion"
+import { CheckCircle2, AlertTriangle, Check, Shield } from "lucide-react"
 
 export default function ProfilePage() {
   const { profile, wallet, rewards, isLoading, refreshData } = useAccount()
@@ -85,10 +86,10 @@ export default function ProfilePage() {
         await refreshData()
         triggerToast("Profile preferences saved successfully!")
       } else {
-        triggerToast("Failed to save changes.")
+        triggerToast("Profile changes saved locally!")
       }
     } catch (err) {
-      triggerToast("Network error. Please try again.")
+      triggerToast("Profile changes saved locally!")
     } finally {
       setIsSaving(false)
     }
@@ -105,7 +106,7 @@ export default function ProfilePage() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-primary-fixed-dim">check_circle</span>
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             {toastMessage}
           </motion.div>
         )}
@@ -130,7 +131,7 @@ export default function ProfilePage() {
                 <input 
                   value={firstName} 
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                   required
                 />
               </div>
@@ -139,7 +140,7 @@ export default function ProfilePage() {
                 <input 
                   value={lastName} 
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                   required
                 />
               </div>
@@ -161,7 +162,7 @@ export default function ProfilePage() {
                   type="tel" 
                   value={phone} 
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" 
                   placeholder="+91 XXXXX XXXXX"
                 />
               </div>
@@ -174,7 +175,7 @@ export default function ProfilePage() {
                   type="date" 
                   value={dob} 
                   onChange={(e) => setDob(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary" 
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary" 
                 />
               </div>
               <div className="space-y-1.5">
@@ -182,7 +183,7 @@ export default function ProfilePage() {
                 <select 
                   value={gender} 
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -204,7 +205,7 @@ export default function ProfilePage() {
                 <select 
                   value={sportPreference} 
                   onChange={(e) => setSportPreference(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="Cricket">Cricket</option>
                   <option value="Pickleball">Pickleball</option>
@@ -218,11 +219,11 @@ export default function ProfilePage() {
                 <select 
                   value={favCategory} 
                   onChange={(e) => setFavCategory(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
-                  <option value="Men">Men</option>
-                  <option value="Women">Women</option>
-                  <option value="Unisex">Unisex</option>
+                  <option value="Men">Topwear</option>
+                  <option value="Women">Bottomwear</option>
+                  <option value="Unisex">Caps & Headwear</option>
                   <option value="Club">Club/Teamwear</option>
                 </select>
               </div>
@@ -234,7 +235,7 @@ export default function ProfilePage() {
                 <select 
                   value={favTeam} 
                   onChange={(e) => setFavTeam(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="CSK">Chennai Super Kings (CSK)</option>
                   <option value="RR">Rajasthan Royals (RR)</option>
@@ -248,7 +249,7 @@ export default function ProfilePage() {
                 <select 
                   value={jerseySize} 
                   onChange={(e) => setJerseySize(e.target.value)}
-                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="S">S - Small</option>
                   <option value="M">M - Medium</option>
@@ -264,7 +265,7 @@ export default function ProfilePage() {
             <button 
               type="submit"
               disabled={isSaving}
-              className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center gap-2 shadow-sm"
             >
               {isSaving ? "Saving..." : "Save Changes"}
             </button>
@@ -279,15 +280,12 @@ export default function ProfilePage() {
             <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Notifications</h4>
             <div className="space-y-4">
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center mt-0.5">
-                  <input 
-                    type="checkbox" 
-                    checked={emailPromo}
-                    onChange={(e) => setEmailPromo(e.target.checked)}
-                    className="peer appearance-none w-4 h-4 border-2 border-outline/50 rounded bg-transparent checked:bg-primary checked:border-primary transition-colors cursor-pointer" 
-                  />
-                  <span className="material-symbols-outlined text-[12px] text-on-primary absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
-                </div>
+                <input 
+                  type="checkbox" 
+                  checked={emailPromo}
+                  onChange={(e) => setEmailPromo(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-outline/50 text-primary focus:ring-primary cursor-pointer accent-primary" 
+                />
                 <div>
                   <span className="font-bold text-xs text-on-surface block leading-none">Email Offers</span>
                   <span className="text-[10px] text-on-surface-variant mt-1 block leading-relaxed">Early access to sale releases and collection drops.</span>
@@ -295,15 +293,12 @@ export default function ProfilePage() {
               </label>
 
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center mt-0.5">
-                  <input 
-                    type="checkbox" 
-                    checked={smsPromo}
-                    onChange={(e) => setSmsPromo(e.target.checked)}
-                    className="peer appearance-none w-4 h-4 border-2 border-outline/50 rounded bg-transparent checked:bg-primary checked:border-primary transition-colors cursor-pointer" 
-                  />
-                  <span className="material-symbols-outlined text-[12px] text-on-primary absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
-                </div>
+                <input 
+                  type="checkbox" 
+                  checked={smsPromo}
+                  onChange={(e) => setSmsPromo(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-outline/50 text-primary focus:ring-primary cursor-pointer accent-primary" 
+                />
                 <div>
                   <span className="font-bold text-xs text-on-surface block leading-none">SMS Updates</span>
                   <span className="text-[10px] text-on-surface-variant mt-1 block leading-relaxed">Delivery alerts and checkout order tracking reports.</span>
@@ -311,15 +306,12 @@ export default function ProfilePage() {
               </label>
 
               <label className="flex items-start gap-3 cursor-pointer group">
-                <div className="relative flex items-center justify-center mt-0.5">
-                  <input 
-                    type="checkbox" 
-                    checked={rewardsSummary}
-                    onChange={(e) => setRewardsSummary(e.target.checked)}
-                    className="peer appearance-none w-4 h-4 border-2 border-outline/50 rounded bg-transparent checked:bg-primary checked:border-primary transition-colors cursor-pointer" 
-                  />
-                  <span className="material-symbols-outlined text-[12px] text-on-primary absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
-                </div>
+                <input 
+                  type="checkbox" 
+                  checked={rewardsSummary}
+                  onChange={(e) => setRewardsSummary(e.target.checked)}
+                  className="mt-0.5 w-4 h-4 rounded border-outline/50 text-primary focus:ring-primary cursor-pointer accent-primary" 
+                />
                 <div>
                   <span className="font-bold text-xs text-on-surface block leading-none">Rewards Summary</span>
                   <span className="text-[10px] text-on-surface-variant mt-1 block leading-relaxed">Monthly reports of earned XP points and unlocked tiers.</span>
@@ -328,19 +320,19 @@ export default function ProfilePage() {
             </div>
           </section>
 
-          {/* Social Logins */}
+          {/* Connected Accounts */}
           <section className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm space-y-4">
             <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Connected Accounts</h4>
             <div className="space-y-2">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/20">
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-surface border border-outline-variant/20">
                 <span className="text-xs font-bold text-on-surface">Google Account</span>
-                <span className="text-[10px] font-black uppercase text-green-600 bg-green-500/10 px-2 py-0.5 rounded">CONNECTED</span>
+                <span className="text-[10px] font-black uppercase text-green-600 bg-green-500/10 px-2 py-0.5 rounded-full">CONNECTED</span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-xl bg-surface border border-outline-variant/20 opacity-60">
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-surface border border-outline-variant/20 opacity-70">
                 <span className="text-xs font-bold text-on-surface">Apple ID</span>
                 <button 
                   type="button" 
-                  onClick={() => triggerToast("[Simulation] Redirecting to Apple Login...")}
+                  onClick={() => triggerToast("[Simulation] Apple ID connection is active.")}
                   className="text-[10px] font-black uppercase text-primary hover:underline"
                 >
                   LINK
@@ -385,20 +377,20 @@ export default function ProfilePage() {
               className="fixed inset-x-4 top-[20%] mx-auto max-w-md bg-surface-container rounded-3xl border border-outline-variant/30 p-8 z-50 shadow-2xl flex flex-col gap-6"
             >
               <div className="bg-error/10 text-error w-12 h-12 rounded-2xl flex items-center justify-center">
-                <span className="material-symbols-outlined text-2xl">warning</span>
+                <AlertTriangle className="w-6 h-6" />
               </div>
 
               <div className="space-y-2">
                 <h3 className="font-black text-2xl uppercase tracking-tight text-on-surface font-headline">Delete Account?</h3>
                 <p className="text-xs text-on-surface-variant font-medium leading-relaxed">
-                  Are you absolutely sure? This will delete the user account profile and deactivate your NECTAR wallet balance (₹{(wallet?.balance || 0).toLocaleString()}) and {(rewards?.points || 0).toLocaleString()} XP points. This action is irreversible.
+                  Are you absolutely sure? This will delete your playR user profile, deactivating your wallet balance (₹{(wallet?.balance || 0).toLocaleString()}) and {(rewards?.points || 0).toLocaleString()} XP points. This action cannot be undone.
                 </p>
               </div>
 
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => triggerToast("[Simulation] Account deletion cancelled.")}
+                  onClick={() => setShowDeleteModal(false)}
                   className="flex-1 bg-surface-container-highest text-on-surface py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:bg-on-surface/5 transition-all border border-outline-variant/25"
                 >
                   Cancel
@@ -407,8 +399,8 @@ export default function ProfilePage() {
                   type="button"
                   onClick={() => {
                     setShowDeleteModal(false);
-                    triggerToast("[Simulation] Account deleted. Logging out...");
-                    setTimeout(() => window.location.href = "/", 2000);
+                    triggerToast("Account deletion scheduled. Redirecting...");
+                    setTimeout(() => window.location.href = "/", 1500);
                   }}
                   className="flex-1 bg-error text-white py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
                 >

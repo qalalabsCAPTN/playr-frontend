@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { useCart } from '@/components/bluorng/CartContext';
+import { useAuthStore } from '@/store/authStore';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, total, clearCart } = useCart();
+  const user = useAuthStore((s) => s.user);
   const [mounted, setMounted] = useState(false);
   const [phase, setPhase] = useState<'form' | 'processing' | 'success'>('form');
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +36,7 @@ export default function CheckoutPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponDiscount, setCouponDiscount] = useState<number>(0);
   const [useNectarWallet, setUseNectarWallet] = useState(false);
-  const nectarWalletCredit = 250;
+  const nectarWalletCredit = user?.sprrBalance !== undefined && user.sprrBalance > 0 ? user.sprrBalance : 250;
 
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
@@ -42,6 +44,18 @@ export default function CheckoutPage() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      if (user.email && !email) setEmail(user.email);
+      if (user.phone && !phone) setPhone(user.phone);
+      if (user.name) {
+        const parts = user.name.trim().split(' ');
+        if (!firstName) setFirstName(parts[0] || '');
+        if (!lastName && parts.length > 1) setLastName(parts.slice(1).join(' ') || '');
+      }
+    }
+  }, [user]);
 
   const shippingCost = deliverySpeed === 'express' ? 150 : 0;
   const nectarDeduction = useNectarWallet ? Math.min(nectarWalletCredit, Math.max(0, total - couponDiscount)) : 0;

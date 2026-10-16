@@ -4,6 +4,7 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useAccount } from "@/components/account/AccountProvider"
+import { PackageOpen, Package } from "lucide-react"
 
 export default function OrdersPage() {
   const { orders, isLoading } = useAccount()
@@ -74,7 +75,9 @@ export default function OrdersPage() {
           ))
         ) : (
           <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 p-16 text-center flex flex-col items-center">
-            <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4">inventory_2</span>
+            <div className="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center mb-4 text-on-surface-variant/40">
+              <PackageOpen className="w-8 h-8" />
+            </div>
             <h4 className="font-black text-2xl uppercase tracking-tighter text-on-surface mb-2">No orders yet</h4>
             <p className="text-on-surface-variant font-medium mb-8">When you place an order, it will appear here.</p>
             <Link href="/collections" className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">

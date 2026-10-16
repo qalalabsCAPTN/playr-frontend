@@ -5,6 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useCommerce } from "@/components/commerce/CommerceProvider"
 import { motion, AnimatePresence } from "framer-motion"
+import { Heart, Share2, X, Check, ShoppingBag } from "lucide-react"
 
 export default function AccountWishlistPage() {
   const { wishlistItems, removeFromWishlist, addToCart } = useCommerce()
@@ -52,8 +53,10 @@ export default function AccountWishlistPage() {
   }
 
   const handleShareWishlist = () => {
-    navigator.clipboard.writeText(window.location.href)
-    triggerToast("Wishlist link copied to clipboard!")
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href)
+      triggerToast("Wishlist link copied to clipboard!")
+    }
   }
 
   return (
@@ -65,22 +68,25 @@ export default function AccountWishlistPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
+            className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-[#1c1a16] text-[#FAF8F5] px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-black/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-primary-fixed-dim">favorite</span>
+            <Heart className="w-4 h-4 text-emerald-400 fill-emerald-400" />
             {toastMessage}
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="flex flex-col sm:flex-row justify-between items-baseline sm:items-end border-b border-outline-variant/30 pb-4 gap-4">
-        <h1 className="font-black text-3xl uppercase tracking-tighter text-on-surface font-headline">My Wishlist</h1>
+        <div>
+          <h1 className="font-black text-3xl uppercase tracking-tighter text-on-surface font-headline">My Wishlist</h1>
+          <p className="text-xs text-on-surface-variant font-medium mt-1">Curated selection of saved playR performance pieces</p>
+        </div>
         {wishlistItems.length > 0 && (
           <button 
             onClick={handleShareWishlist}
             className="text-xs font-bold uppercase tracking-widest text-primary hover:text-on-surface transition-colors flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm">share</span> Share Wishlist
+            <Share2 className="w-3.5 h-3.5" /> Share Wishlist
           </button>
         )}
       </div>
@@ -98,15 +104,16 @@ export default function AccountWishlistPage() {
                     removeFromWishlist(item.productId)
                     triggerToast(`Removed ${item.title} from wishlist.`)
                   }}
+                  aria-label="Remove item"
                   className="absolute top-4 right-4 w-9 h-9 bg-surface/80 backdrop-blur-md rounded-full flex items-center justify-center text-on-surface-variant hover:text-error hover:bg-error/10 transition-colors shadow-sm"
                 >
-                  <span className="material-symbols-outlined text-sm">close</span>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="p-5 flex-grow flex flex-col justify-between gap-4">
                 <div>
-                  <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">{item.category}</span>
+                  <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">{item.category || "Topwear"}</span>
                   <h4 className="font-black text-md text-on-surface uppercase tracking-tight mt-1 line-clamp-1 font-headline">{item.title}</h4>
                   <span className="font-black text-sm text-on-surface mt-2 block">₹{item.price.toLocaleString()}</span>
                 </div>
@@ -121,7 +128,7 @@ export default function AccountWishlistPage() {
                         onChange={() => toggleRestockAlert(item.productId)}
                         className="peer appearance-none w-4 h-4 border-2 border-outline/50 rounded bg-transparent checked:bg-primary checked:border-primary transition-colors cursor-pointer" 
                       />
-                      <span className="material-symbols-outlined text-[10px] text-on-primary absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
+                      <Check className="w-3 h-3 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
                     </div>
                     <span className="font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">Notify on Restock</span>
                   </label>
@@ -134,7 +141,7 @@ export default function AccountWishlistPage() {
                         onChange={() => togglePriceAlert(item.productId)}
                         className="peer appearance-none w-4 h-4 border-2 border-outline/50 rounded bg-transparent checked:bg-primary checked:border-primary transition-colors cursor-pointer" 
                       />
-                      <span className="material-symbols-outlined text-[10px] text-on-primary absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" style={{ fontVariationSettings: "'wght' 700" }}>check</span>
+                      <Check className="w-3 h-3 text-white absolute pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
                     </div>
                     <span className="font-bold text-[10px] uppercase tracking-wider text-on-surface-variant">Price Drop Alerts</span>
                   </label>
@@ -145,7 +152,7 @@ export default function AccountWishlistPage() {
                     onClick={() => handleMoveToCart(item)}
                     className="w-full bg-primary text-on-primary py-3 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm"
                   >
-                    <span className="material-symbols-outlined text-sm">shopping_bag</span>
+                    <ShoppingBag className="w-4 h-4" />
                     Move to Bag
                   </button>
                 </div>
@@ -155,10 +162,10 @@ export default function AccountWishlistPage() {
         </div>
       ) : (
         <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 p-16 text-center flex flex-col items-center">
-          <span className="material-symbols-outlined text-6xl text-on-surface-variant/30 mb-4">favorite</span>
+          <Heart className="w-16 h-16 text-on-surface-variant/30 mb-4 stroke-[1.5]" />
           <h3 className="font-black text-2xl uppercase tracking-tighter text-on-surface font-headline mb-2">Your wishlist is empty</h3>
           <p className="text-on-surface-variant text-xs font-semibold mb-8 max-w-sm leading-relaxed">Save your favorite gear here and they will be waiting for you whenever you are ready to play.</p>
-          <Link href="/collections" className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+          <Link href="/collections/all-products" className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
             Start Browsing
           </Link>
         </div>

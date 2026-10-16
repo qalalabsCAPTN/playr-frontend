@@ -25,6 +25,16 @@ COPY --from=deps /app/packages/nectar-core/node_modules ./packages/nectar-core/n
 COPY --from=deps /app/packages/ui/node_modules ./packages/ui/node_modules
 COPY . .
 
+# Build arguments for Next.js compile-time static inlining
+ARG NEXT_PUBLIC_SUPABASE_URL=https://sayxtpglwjiinnrftifq.supabase.co
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNheXh0cGdsd2ppaW5ucmZ0aWZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyODQxMzksImV4cCI6MjA5Mzg2MDEzOX0.NiT5r6z4HABTfP7LXYihnkic8xSLqldEoJ6KK4HLDVU
+ARG NEXT_PUBLIC_SITE_URL=https://playr.in
+ARG NEXT_PUBLIC_BRAND_ID=playr
+
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_BRAND_ID=$NEXT_PUBLIC_BRAND_ID
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 

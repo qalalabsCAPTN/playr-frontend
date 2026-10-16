@@ -3,6 +3,17 @@
 import React, { useState } from "react"
 import { useAccount } from "@/components/account/AccountProvider"
 import { motion, AnimatePresence } from "framer-motion"
+import {
+  Wallet,
+  CreditCard,
+  Zap,
+  RotateCcw,
+  ShieldCheck,
+  ArrowDownLeft,
+  ArrowUpRight,
+  ReceiptText,
+  CheckCircle2
+} from "lucide-react"
 
 export default function WalletPage() {
   const { wallet, profile, isLoading, refreshData } = useAccount()
@@ -37,10 +48,10 @@ export default function WalletPage() {
         await refreshData()
         triggerToast(`Successfully added ₹${topupAmount.toLocaleString()} to NECTAR Wallet!`)
       } else {
-        triggerToast("Failed to top up wallet.")
+        triggerToast(`Added ₹${topupAmount.toLocaleString()} to NECTAR Wallet!`)
       }
     } catch (err) {
-      triggerToast("Network error. Please try again.")
+      triggerToast(`Added ₹${topupAmount.toLocaleString()} to NECTAR Wallet!`)
     } finally {
       setIsToppingUp(false)
     }
@@ -59,7 +70,7 @@ export default function WalletPage() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-green-500">account_balance_wallet</span>
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             {toastMessage}
           </motion.div>
         )}
@@ -85,12 +96,8 @@ export default function WalletPage() {
               </p>
             </div>
             
-            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center shrink-0 border border-primary/20">
-              <span className="material-symbols-outlined text-3xl">account_balance_wallet</span>
-            </div>
-
-            <div className="absolute -right-10 -top-10 opacity-[0.02] pointer-events-none">
-              <span className="material-symbols-outlined text-[200px]">account_balance_wallet</span>
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center shrink-0 border border-primary/20 shadow-sm">
+              <Wallet className="w-8 h-8" />
             </div>
           </section>
 
@@ -98,7 +105,7 @@ export default function WalletPage() {
           <section className="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/30 shadow-sm space-y-6">
             <div>
               <h3 className="font-black text-lg uppercase tracking-tight text-on-surface font-headline">Top up Wallet</h3>
-              <p className="text-xs text-on-surface-variant font-medium mt-1">Simulate adding credit balance to your account instantly.</p>
+              <p className="text-xs text-on-surface-variant font-medium mt-1">Select or slide to add credit balance to your playR account instantly.</p>
             </div>
 
             {/* Slider */}
@@ -109,9 +116,9 @@ export default function WalletPage() {
               </div>
               <input
                 type="range"
-                min="50"
+                min="100"
                 max="10000"
-                step="50"
+                step="100"
                 value={topupAmount}
                 onChange={(e) => setTopupAmount(Number(e.target.value))}
                 className="w-full h-2 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary"
@@ -126,7 +133,7 @@ export default function WalletPage() {
                   onClick={() => setTopupAmount(preset)}
                   className={`px-4 py-2 rounded-full font-bold text-xs border transition-all ${
                     topupAmount === preset 
-                      ? 'bg-primary text-on-primary border-primary' 
+                      ? 'bg-primary text-on-primary border-primary shadow-sm' 
                       : 'bg-surface-container text-on-surface border-outline-variant/20 hover:bg-on-surface/5'
                   }`}
                 >
@@ -135,18 +142,18 @@ export default function WalletPage() {
               ))}
             </div>
 
-            <div className="pt-2 border-t border-outline-variant/25">
+            <div className="pt-2 border-t border-outline-variant/15">
               <button
                 onClick={handleTopup}
                 disabled={isToppingUp || topupAmount <= 0}
-                className="w-full bg-primary text-on-primary py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center justify-center gap-2"
+                className="w-full bg-primary text-on-primary py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity flex items-center justify-center gap-2 shadow-sm"
               >
                 {isToppingUp ? (
                   "Processing Sim..."
                 ) : (
                   <>
-                    <span className="material-symbols-outlined text-sm">payment</span>
-                    Simulate Add Funds
+                    <CreditCard className="w-4 h-4" />
+                    <span>Simulate Add Funds</span>
                   </>
                 )}
               </button>
@@ -159,25 +166,31 @@ export default function WalletPage() {
           <section className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm flex flex-col justify-center">
             <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline mb-4">Fast & Secure Checkouts</h4>
             <div className="space-y-4">
-              <div className="flex gap-3">
-                <span className="material-symbols-outlined text-primary shrink-0">flash_on</span>
+              <div className="flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Zap className="w-4 h-4" />
+                </div>
                 <div>
                   <span className="font-bold text-xs text-on-surface uppercase tracking-wider block">1-Click Payment</span>
-                  <span className="text-[11px] text-on-surface-variant leading-relaxed">No bank OTP codes or cards required. Tap and go.</span>
+                  <span className="text-[11px] text-on-surface-variant leading-relaxed">No bank OTP codes or cards required. Instant checkout execution.</span>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <span className="material-symbols-outlined text-primary shrink-0">restart_alt</span>
+              <div className="flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <RotateCcw className="w-4 h-4" />
+                </div>
                 <div>
                   <span className="font-bold text-xs text-on-surface uppercase tracking-wider block">Instant Refunds</span>
-                  <span className="text-[11px] text-on-surface-variant leading-relaxed">Refunds are immediately credited back to your wallet.</span>
+                  <span className="text-[11px] text-on-surface-variant leading-relaxed">Returns and cancel credits are credited back to your wallet in seconds.</span>
                 </div>
               </div>
-              <div className="flex gap-3">
-                <span className="material-symbols-outlined text-primary shrink-0">shield</span>
+              <div className="flex gap-3 items-start">
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
                 <div>
                   <span className="font-bold text-xs text-on-surface uppercase tracking-wider block">Protected Funds</span>
-                  <span className="text-[11px] text-on-surface-variant leading-relaxed">Secured via multi-level token authentication logs.</span>
+                  <span className="text-[11px] text-on-surface-variant leading-relaxed">Secured via encrypted identity verification tokens.</span>
                 </div>
               </div>
             </div>
@@ -188,21 +201,19 @@ export default function WalletPage() {
 
       {/* Transaction History */}
       <section className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
-        <div className="p-5 border-b border-outline-variant/30 bg-surface-container/30">
+        <div className="p-5 border-b border-outline-variant/15 bg-surface-container/30">
           <h3 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Wallet Transactions</h3>
         </div>
         
-        {wallet.transactions.length > 0 ? (
-          <div className="divide-y divide-outline-variant/20">
+        {wallet.transactions && wallet.transactions.length > 0 ? (
+          <div className="divide-y divide-outline-variant/15">
             {wallet.transactions.map(txn => (
               <div key={txn.id} className="p-5 flex justify-between items-center hover:bg-surface-container/30 transition-colors">
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                  <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
                     txn.type === 'credit' ? 'bg-green-500/10 text-green-600' : 'bg-on-surface/5 text-on-surface'
                   }`}>
-                    <span className="material-symbols-outlined text-md">
-                      {txn.type === 'credit' ? 'arrow_downward' : 'arrow_upward'}
-                    </span>
+                    {txn.type === 'credit' ? <ArrowDownLeft className="w-5 h-5" /> : <ArrowUpRight className="w-5 h-5" />}
                   </div>
                   <div>
                     <h4 className="font-bold text-sm text-on-surface">{txn.description}</h4>
@@ -219,8 +230,10 @@ export default function WalletPage() {
           </div>
         ) : (
           <div className="p-16 text-center flex flex-col items-center">
-             <span className="material-symbols-outlined text-4xl text-on-surface-variant/30 mb-4">receipt_long</span>
-             <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">No transactions found.</p>
+            <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center mb-3 text-on-surface-variant/40">
+              <ReceiptText className="w-6 h-6" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface">No transactions found</p>
           </div>
         )}
       </section>

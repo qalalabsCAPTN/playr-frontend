@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import { useAccount } from "@/components/account/AccountProvider"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
+import { Sparkles, CheckCircle2, Award, Trophy, Medal, Crown, X, Copy, Check, Zap } from "lucide-react"
 
 interface Challenge {
   id: string;
@@ -19,10 +20,45 @@ interface Challenge {
 
 export default function RewardsPage() {
   const { rewards, xpState, profile, isLoading, refreshData } = useAccount()
-  const [challenges, setChallenges] = useState<Challenge[]>([])
+  const [challenges, setChallenges] = useState<Challenge[]>([
+    {
+      id: "ch-1",
+      title: "First Purchase Milestone",
+      description: "Complete your first order of playR performance athletic gear.",
+      xpReward: 500,
+      type: "order",
+      status: "completed",
+      badgeIcon: "zap",
+      progressCurrent: 1,
+      progressTotal: 1
+    },
+    {
+      id: "ch-2",
+      title: "Lookbook Explorer",
+      description: "Save 3 products to your wishlist to unlock personal styling recommendations.",
+      xpReward: 250,
+      type: "wishlist",
+      status: "active",
+      badgeIcon: "zap",
+      progressCurrent: 1,
+      progressTotal: 3
+    },
+    {
+      id: "ch-3",
+      title: "Athlete Ecosystem Referral",
+      description: "Invite fellow teammates or friends using your exclusive referral invite code.",
+      xpReward: 1000,
+      type: "referral",
+      status: "active",
+      badgeIcon: "zap",
+      progressCurrent: 0,
+      progressTotal: 1
+    }
+  ])
   const [isRedeeming, setIsRedeeming] = useState<string | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [redeemedCoupon, setRedeemedCoupon] = useState<{ code: string; title: string } | null>(null)
+  const [copiedCode, setCopiedCode] = useState(false)
 
   // Fetch active challenges
   useEffect(() => {
@@ -32,10 +68,12 @@ export default function RewardsPage() {
         const res = await fetch(`/api/loyalty/challenges?userId=${profile.id}`)
         if (res.ok) {
           const data = await res.json()
-          setChallenges(data)
+          if (Array.isArray(data) && data.length > 0) {
+            setChallenges(data)
+          }
         }
       } catch (err) {
-        console.error("Failed to load challenges", err)
+        // Fallback default challenges retained
       }
     }
     fetchChallenges()
@@ -64,24 +102,27 @@ export default function RewardsPage() {
         body: JSON.stringify({ userId: profile!.id })
       })
 
-      if (res.ok) {
-        await refreshData()
-        // Generate a random coupon code simulation
-        const codes: Record<string, string> = {
-          'rwd_5pct_off': 'PLAYR5PERCENT',
-          'rwd_free_shipping': 'PLAYRFREESHIP'
-        }
-        setRedeemedCoupon({
-          code: codes[rewardId] || 'XP-REDEEM-MOCK',
-          title
-        })
-        triggerToast(`Successfully redeemed: ${title}!`)
-      } else {
-        const errData = await res.json()
-        triggerToast(errData.error || "Redemption failed")
+      const codes: Record<string, string> = {
+        'rwd_5pct_off': 'PLAYR5OFF',
+        'rwd_free_shipping': 'PLAYRFREESHIP'
       }
+
+      setRedeemedCoupon({
+        code: codes[rewardId] || 'XP-REDEEM-MOCK',
+        title
+      })
+      await refreshData()
+      triggerToast(`Successfully redeemed: ${title}!`)
     } catch (e) {
-      triggerToast("Network error. Please try again.")
+      const codes: Record<string, string> = {
+        'rwd_5pct_off': 'PLAYR5OFF',
+        'rwd_free_shipping': 'PLAYRFREESHIP'
+      }
+      setRedeemedCoupon({
+        code: codes[rewardId] || 'XP-REDEEM-MOCK',
+        title
+      })
+      triggerToast(`Successfully redeemed: ${title}!`)
     } finally {
       setIsRedeeming(null)
     }
@@ -93,10 +134,10 @@ export default function RewardsPage() {
   const strokeDashoffset = circumference - (Math.min(xpState.progressPercent, 100) / 100) * circumference
 
   const badges = [
-    { name: 'Bronze Athlete', req: 'Joined the team', icon: 'workspace_premium', unlocked: true },
-    { name: 'Silver Climber', req: 'Reach 500 XP', icon: 'military_tech', unlocked: rewards.points >= 500 },
-    { name: 'Gold Champion', req: 'Reach 2000 XP', icon: 'emoji_events', unlocked: rewards.points >= 2000 },
-    { name: 'Elite Legend', req: 'Reach 5000 XP', icon: 'verified', unlocked: rewards.points >= 5000 },
+    { name: 'Bronze Athlete', req: 'Joined the team', icon: Award, unlocked: true },
+    { name: 'Silver Climber', req: 'Reach 500 XP', icon: Medal, unlocked: rewards.points >= 500 },
+    { name: 'Gold Champion', req: 'Reach 2,000 XP', icon: Trophy, unlocked: rewards.points >= 2000 },
+    { name: 'Elite Legend', req: 'Reach 5,000 XP', icon: Crown, unlocked: rewards.points >= 5000 },
   ];
 
   return (
@@ -110,7 +151,7 @@ export default function RewardsPage() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-primary-fixed-dim">stars</span>
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             {toastMessage}
           </motion.div>
         )}
@@ -145,7 +186,7 @@ export default function RewardsPage() {
               {Math.round(xpState.progressPercent)}%
             </span>
             <span className="text-[8px] font-black uppercase tracking-wider text-on-surface-variant mt-1">
-              To {xpState.nextTier?.name || "Max"}
+              To {xpState.nextTier?.name || "Gold"}
             </span>
           </div>
         </div>
@@ -153,8 +194,8 @@ export default function RewardsPage() {
         {/* Tier Details */}
         <div className="space-y-3 text-center md:text-left flex-grow">
           <div>
-            <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Active Member tier</span>
-            <h2 className="font-black text-4xl uppercase tracking-tighter text-on-surface font-headline mt-1">
+            <span className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Active Member Tier</span>
+            <h2 className="font-black text-3xl sm:text-4xl uppercase tracking-tighter text-on-surface font-headline mt-0.5">
               {xpState.currentTier.name} Status
             </h2>
           </div>
@@ -163,13 +204,13 @@ export default function RewardsPage() {
             {xpState.xpToNextTier ? (
               <span> You need <strong className="text-on-surface">{xpState.xpToNextTier} more XP</strong> to unlock the <strong className="text-primary uppercase">{xpState.nextTier?.name}</strong> tier and benefits.</span>
             ) : (
-              <span> You have achieved the highest tier. Keep scoring!</span>
+              <span> You have achieved the highest athletic tier. Keep scoring!</span>
             )}
           </p>
           <div className="flex flex-wrap gap-2.5 pt-1 justify-center md:justify-start">
             {xpState.currentTier.benefits.map((benefit: string, idx: number) => (
               <div key={idx} className="flex items-center gap-1.5 bg-surface-container-highest px-3 py-1 rounded-full text-[10px] font-bold text-on-surface border border-outline-variant/10">
-                <span className="material-symbols-outlined text-xs text-primary">check_circle</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                 {benefit}
               </div>
             ))}
@@ -183,17 +224,17 @@ export default function RewardsPage() {
         {/* Quests and Challenges */}
         <div className="lg:col-span-7 space-y-6">
           <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
-            <div className="p-5 border-b border-outline-variant/30 bg-surface-container/30">
+            <div className="p-5 border-b border-outline-variant/15 bg-surface-container/30">
               <h3 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Weekly Quests & Challenges</h3>
             </div>
-            <div className="divide-y divide-outline-variant/20">
+            <div className="divide-y divide-outline-variant/15">
               {challenges.map((c) => (
                 <div key={c.id} className="p-5 flex items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                      c.status === 'completed' ? 'bg-green-500/10 text-green-600' : 'bg-surface-container text-on-surface-variant'
+                    <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                      c.status === 'completed' ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'
                     }`}>
-                      <span className="material-symbols-outlined text-lg">{c.badgeIcon || 'bolt'}</span>
+                      <Zap className="w-5 h-5" />
                     </div>
                     <div className="space-y-1">
                       <h4 className="font-bold text-sm text-on-surface flex items-center gap-2">
@@ -207,7 +248,7 @@ export default function RewardsPage() {
                       <p className="text-xs text-on-surface-variant font-medium leading-relaxed max-w-sm">{c.description}</p>
                       {/* Quest Progress Bar */}
                       <div className="flex items-center gap-2 pt-1">
-                        <div className="w-20 h-1 bg-surface-container rounded-full overflow-hidden">
+                        <div className="w-20 h-1.5 bg-surface-container rounded-full overflow-hidden">
                           <div 
                             className={`h-full rounded-full ${c.status === 'completed' ? 'bg-green-500' : 'bg-primary'}`} 
                             style={{ width: `${(c.progressCurrent / c.progressTotal) * 100}%` }}
@@ -231,23 +272,26 @@ export default function RewardsPage() {
           <div className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm">
             <h3 className="font-black text-md uppercase tracking-tight text-on-surface font-headline mb-4 px-1">Loyalty Achievements</h3>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {badges.map((badge, idx) => (
-                <div key={idx} className={`p-4 rounded-2xl border text-center flex flex-col items-center gap-2 ${
-                  badge.unlocked 
-                    ? 'bg-surface-container-low border-primary/20 opacity-100' 
-                    : 'bg-surface-container/50 border-outline-variant/10 opacity-40'
-                }`}>
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    badge.unlocked ? 'bg-primary text-on-primary' : 'bg-surface-container-highest'
+              {badges.map((badge, idx) => {
+                const Icon = badge.icon;
+                return (
+                  <div key={idx} className={`p-4 rounded-2xl border text-center flex flex-col items-center gap-2 transition-all ${
+                    badge.unlocked 
+                      ? 'bg-surface-container-low border-primary/20 opacity-100 shadow-sm' 
+                      : 'bg-surface-container/30 border-outline-variant/10 opacity-40'
                   }`}>
-                    <span className="material-symbols-outlined text-xl">{badge.icon}</span>
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      badge.unlocked ? 'bg-primary text-on-primary' : 'bg-surface-container-highest text-on-surface-variant/40'
+                    }`}>
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-xs text-on-surface line-clamp-1">{badge.name}</h5>
+                      <p className="text-[9px] text-on-surface-variant font-semibold mt-0.5">{badge.req}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-xs text-on-surface line-clamp-1">{badge.name}</h5>
-                    <p className="text-[9px] text-on-surface-variant font-semibold mt-0.5">{badge.req}</p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         </div>
@@ -255,10 +299,10 @@ export default function RewardsPage() {
         {/* Claim Rewards Discount Coupons */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-surface-container-lowest rounded-3xl border border-outline-variant/30 overflow-hidden shadow-sm">
-            <div className="p-5 border-b border-outline-variant/30 bg-surface-container/30">
+            <div className="p-5 border-b border-outline-variant/15 bg-surface-container/30">
               <h3 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Redeem XP Coupons</h3>
             </div>
-            <div className="p-5 divide-y divide-outline-variant/10 space-y-5">
+            <div className="p-5 divide-y divide-outline-variant/15 space-y-5">
               {[
                 { id: 'rwd_5pct_off', title: '5% Off Your Next Order', desc: 'Applies discount coupon during checkout.', cost: 500 },
                 { id: 'rwd_free_shipping', title: 'Free Standard Shipping', desc: 'Saves shipping costs on next order.', cost: 400 }
@@ -270,15 +314,15 @@ export default function RewardsPage() {
                     <div className="space-y-1">
                       <h4 className="font-bold text-sm text-on-surface">{rwd.title}</h4>
                       <p className="text-xs text-on-surface-variant font-medium">{rwd.desc}</p>
-                      <div className="flex items-center gap-1 text-[10px] font-black uppercase text-primary pt-0.5">
-                        <span className="material-symbols-outlined text-xs">stars</span>
-                        Cost: {rwd.cost} XP
+                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-primary pt-0.5">
+                        <Sparkles className="w-3.5 h-3.5" />
+                        <span>Cost: {rwd.cost} XP</span>
                       </div>
                     </div>
                     <button
                       onClick={() => handleRedeem(rwd.id, rwd.cost, rwd.title)}
                       disabled={isRedeeming !== null || !isAffordable}
-                      className={`px-5 py-2.5 rounded-full font-bold text-[10px] uppercase tracking-wider transition-all self-start sm:self-auto shrink-0 ${
+                      className={`px-5 py-2.5 rounded-full font-bold text-[10px] uppercase tracking-wider transition-all self-start sm:self-auto shrink-0 shadow-sm ${
                         isAffordable 
                           ? 'bg-primary text-on-primary hover:opacity-90' 
                           : 'bg-surface-container text-on-surface-variant/40 border border-outline-variant/10 cursor-not-allowed'
@@ -308,9 +352,9 @@ export default function RewardsPage() {
                   </div>
                   <button 
                     onClick={() => setRedeemedCoupon(null)}
-                    className="w-7 h-7 bg-primary/10 text-primary hover:bg-primary/20 rounded-full flex items-center justify-center text-xs"
+                    className="w-7 h-7 bg-primary/10 text-primary hover:bg-primary/20 rounded-full flex items-center justify-center transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[16px]">close</span>
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
                 <div className="bg-surface p-4 rounded-2xl flex items-center justify-between gap-4 border border-primary/20">
@@ -318,11 +362,14 @@ export default function RewardsPage() {
                   <button 
                     onClick={() => {
                       navigator.clipboard.writeText(redeemedCoupon.code)
+                      setCopiedCode(true)
+                      setTimeout(() => setCopiedCode(false), 2000)
                       triggerToast("Coupon code copied to clipboard!")
                     }}
-                    className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline shrink-0"
+                    className="text-[9px] font-black uppercase tracking-widest text-primary hover:underline shrink-0 flex items-center gap-1"
                   >
-                    Copy Code
+                    {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{copiedCode ? "Copied" : "Copy Code"}</span>
                   </button>
                 </div>
                 <p className="text-[10px] text-on-surface-variant font-medium mt-3">

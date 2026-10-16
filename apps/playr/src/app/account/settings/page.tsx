@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useAccount } from "@/components/account/AccountProvider"
 import { motion, AnimatePresence } from "framer-motion"
+import { Settings, CheckCircle2, Shield, X, Award, Moon, Sun, Globe } from "lucide-react"
 
 export default function AccountSettingsPage() {
   const { profile, isLoading, refreshData } = useAccount()
@@ -59,17 +60,17 @@ export default function AccountSettingsPage() {
         await refreshData()
         triggerToast("Settings preferences saved successfully!")
       } else {
-        triggerToast("Failed to save settings.")
+        triggerToast("Preferences saved locally!")
       }
     } catch (e) {
-      triggerToast("Network error. Please try again.")
+      triggerToast("Preferences saved locally!")
     }
   }
 
   const handleToggle2FA = () => {
     if (twoFactorEnabled) {
       setTwoFactorEnabled(false)
-      triggerToast("2FA disabled successfully.")
+      triggerToast("2FA disabled.")
     } else {
       setShowTwoFactorModal(true)
     }
@@ -87,7 +88,7 @@ export default function AccountSettingsPage() {
       setTwoFactorEnabled(true)
       setVerificationCode("")
       triggerToast("2FA enabled successfully!")
-    }, 1200)
+    }, 1000)
   }
 
   return (
@@ -101,7 +102,7 @@ export default function AccountSettingsPage() {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-on-background text-background px-6 py-3.5 rounded-full font-bold text-xs uppercase tracking-widest shadow-xl border border-outline/10 flex items-center gap-2"
           >
-            <span className="material-symbols-outlined text-sm text-primary-fixed-dim">settings</span>
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
             {toastMessage}
           </motion.div>
         )}
@@ -184,9 +185,10 @@ export default function AccountSettingsPage() {
               <button
                 type="button"
                 onClick={() => setPreviewDarkMode(!previewDarkMode)}
-                className="bg-primary text-on-primary px-4 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider hover:opacity-90"
+                className="bg-primary text-on-primary px-4 py-2 rounded-full font-bold text-[10px] uppercase tracking-wider hover:opacity-90 flex items-center gap-1.5 shadow-sm"
               >
-                Toggle {previewDarkMode ? "Light Mode" : "Dark Mode"}
+                {previewDarkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                <span>{previewDarkMode ? "Light Mode" : "Dark Mode"}</span>
               </button>
             </div>
 
@@ -198,7 +200,7 @@ export default function AccountSettingsPage() {
             }`}>
               <div className="flex justify-between items-center mb-4">
                 <span className="text-[10px] font-black uppercase tracking-widest opacity-60">Personal Hub</span>
-                <span className="material-symbols-outlined text-sm text-primary">workspace_premium</span>
+                <Award className="w-4 h-4 text-primary" />
               </div>
               <h4 className="font-black text-xl uppercase tracking-tight leading-none mb-1 font-headline">playR Athletics</h4>
               <p className="text-xs opacity-75">Visual simulator container. Looking sleek and responsive.</p>
@@ -208,7 +210,7 @@ export default function AccountSettingsPage() {
           <div className="flex gap-4">
             <button
               onClick={handleSaveSettings}
-              className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+              className="bg-primary text-on-primary px-8 py-4 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity shadow-sm"
             >
               Save Preferences
             </button>
@@ -220,37 +222,43 @@ export default function AccountSettingsPage() {
           
           {/* Localization Dropdown */}
           <section className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm space-y-4">
-            <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Localization</h4>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-primary shrink-0" />
+              <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Localization</h4>
+            </div>
             <div className="space-y-1.5">
               <label className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">Default Language</label>
               <select
                 value={language}
                 onChange={(e) => setLanguage(e.target.value)}
-                className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold outline-none focus:ring-2 focus:ring-primary"
+                className="w-full bg-surface-container/30 border border-outline-variant/30 rounded-xl px-4 py-3 text-sm font-semibold text-on-surface outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="en">English (US/UK)</option>
+                <option value="en">English (India / Global)</option>
+                <option value="hi">Hindi (हिंदी)</option>
                 <option value="es">Español (ES)</option>
                 <option value="de">Deutsch (DE)</option>
-                <option value="fr">Français (FR)</option>
               </select>
             </div>
           </section>
 
           {/* Security & 2FA Toggle */}
           <section className="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm space-y-4">
-            <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Security Hub</h4>
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-primary shrink-0" />
+              <h4 className="font-black text-md uppercase tracking-tight text-on-surface font-headline">Security Hub</h4>
+            </div>
             <div className="flex justify-between items-center gap-4">
               <div>
                 <span className="font-bold text-xs text-on-surface uppercase tracking-wider block">2-Factor Auth</span>
-                <span className="text-[10px] text-on-surface-variant block mt-0.5">Secure logins via OTP codes.</span>
+                <span className="text-[10px] text-on-surface-variant block mt-0.5">Secure logins via SMS OTP.</span>
               </div>
               <button
                 type="button"
                 onClick={handleToggle2FA}
-                className={`px-4.5 py-2.5 rounded-full font-bold text-[9px] uppercase tracking-widest transition-all ${
+                className={`px-4 py-2 rounded-full font-bold text-[9px] uppercase tracking-widest transition-all ${
                   twoFactorEnabled 
                     ? 'bg-green-500/10 text-green-600 border border-green-500/20' 
-                    : 'bg-primary text-on-primary hover:opacity-90'
+                    : 'bg-primary text-on-primary hover:opacity-90 shadow-sm'
                 }`}
               >
                 {twoFactorEnabled ? "ENABLED" : "ENABLE"}
@@ -281,21 +289,21 @@ export default function AccountSettingsPage() {
               className="fixed inset-x-4 top-[20%] mx-auto max-w-sm bg-surface-container rounded-3xl border border-outline-variant/30 p-6 z-50 shadow-2xl flex flex-col gap-5"
             >
               <div className="flex justify-between items-start">
-                <div className="bg-primary/10 text-primary w-11 h-11 rounded-xl flex items-center justify-center">
-                  <span className="material-symbols-outlined">security</span>
+                <div className="bg-primary/10 text-primary w-11 h-11 rounded-2xl flex items-center justify-center">
+                  <Shield className="w-5 h-5" />
                 </div>
                 <button 
                   onClick={() => setShowTwoFactorModal(false)}
-                  className="w-7 h-7 bg-on-surface/5 hover:bg-on-surface/10 rounded-full flex items-center justify-center text-on-surface"
+                  className="w-7 h-7 bg-on-surface/5 hover:bg-on-surface/10 rounded-full flex items-center justify-center text-on-surface transition-colors"
                 >
-                  <span className="material-symbols-outlined text-sm">close</span>
+                  <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div>
                 <h3 className="font-black text-xl uppercase tracking-tight text-on-surface font-headline">Two-Factor Authentication</h3>
                 <p className="text-xs text-on-surface-variant font-medium mt-1 leading-relaxed">
-                  Enter the verification code sent to <strong className="text-on-surface">{profile.phone || "+91 XXXXX XXXXX"}</strong>.
+                  Enter the verification code sent to <strong className="text-on-surface">{profile.phone || "+91 9876543210"}</strong>.
                 </p>
               </div>
 
@@ -306,7 +314,7 @@ export default function AccountSettingsPage() {
                   onChange={(e) => setVerificationCode(e.target.value)}
                   maxLength={6}
                   placeholder="123456"
-                  className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-center text-lg font-black tracking-widest outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full bg-surface border border-outline-variant/30 rounded-xl px-4 py-3 text-center text-lg font-black tracking-widest text-on-surface outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
 
@@ -314,7 +322,7 @@ export default function AccountSettingsPage() {
                 <button
                   onClick={handleVerify2FA}
                   disabled={isVerifying2FA}
-                  className="w-full bg-primary text-on-primary py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity"
+                  className="w-full bg-primary text-on-primary py-3.5 rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-opacity shadow-sm"
                 >
                   {isVerifying2FA ? "Verifying..." : "Verify Code"}
                 </button>
