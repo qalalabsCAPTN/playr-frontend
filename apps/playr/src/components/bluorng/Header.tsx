@@ -409,58 +409,69 @@ export default function Header() {
                 </svg>
               </button>
 
-              {/* Popover Dropdown under CLUB */}
+              {/* Popover Dropdown under CLUB: Offers > Lets PlayR > Power players */}
               {clubOpen && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-sm py-2 z-50"
+                  className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-xl py-2 z-50 backdrop-blur-md"
                   onMouseLeave={() => setClubOpen(false)}
                 >
+                  {/* 1. Offers */}
                   <Link 
-                    href="/earn-points" 
-                    className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    href="/offers" 
+                    className="block px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-between"
                     onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                   >
-                    Player Club
+                    <span>Offers</span>
+                    <span className="text-[10px] bg-red-500/10 text-red-600 font-extrabold px-1.5 py-0.5 rounded">HOT</span>
                   </Link>
-                  
-                  {/* LET'S PLAY Item with Right Submenu */}
+
+                  {/* 2. Lets PlayR Item with Submenu */}
                   <div className="group/sub relative">
                     <div 
                       className="flex items-center justify-between w-full px-5 py-2.5 text-xs font-bold tracking-wider uppercase hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer transition-colors"
                     >
-                      <span>LET&apos;S PLAY</span>
+                      <span>Lets PlayR</span>
                       <svg className="w-3 h-3 transition-transform group-hover/sub:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
 
-                    {/* Submenu flyout next to LET'S PLAY */}
+                    {/* Submenu flyout next to Lets PlayR */}
                     <div 
-                      className="hidden group-hover/sub:block absolute left-full top-0 ml-0.5 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-sm py-2 z-50"
+                      className="hidden group-hover/sub:block absolute left-full top-0 ml-0.5 w-52 bg-white dark:bg-[#1c1a16] text-[#1c1a16] dark:text-[#f4f4f4] shadow-xl border border-black/10 dark:border-white/10 rounded-xl py-2 z-50"
                     >
                       <Link 
                         href="/earn-points" 
-                        className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        className="block px-5 py-2 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        onClick={() => { setClubOpen(false); setMegaOpen(false); }}
+                      >
+                        Player Club Overview
+                      </Link>
+                      <Link 
+                        href="/earn-points" 
+                        className="block px-5 py-2 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                         onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                       >
                         Win Giveaways
                       </Link>
                       <Link 
                         href="/earn-points" 
-                        className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                        className="block px-5 py-2 text-xs font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
                         onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                       >
-                        Earn points
+                        Earn Points
                       </Link>
                     </div>
                   </div>
 
+                  {/* 3. Power players */}
                   <Link 
-                    href="/offer" 
-                    className="block px-5 py-2.5 text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    href="/leaderboard" 
+                    className="block px-5 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center justify-between"
                     onClick={() => { setClubOpen(false); setMegaOpen(false); }}
                   >
-                    Offer
+                    <span>Power players</span>
+                    <span className="text-[10px] bg-amber-500/10 text-amber-600 font-extrabold px-1.5 py-0.5 rounded">XP</span>
                   </Link>
                 </div>
               )}
@@ -468,22 +479,12 @@ export default function Header() {
           </nav>
 
           <div className="header__center">
-            <button
-              className={`header__pill-plus hidden md:inline-flex ${megaOpen ? 'active' : ''}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setMegaOpen((v) => !v);
-                setClubOpen(false);
-              }}
-              aria-label="Toggle menu"
-            >
-              +
-            </button>
-            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '100px' }}>
+            {/* The + on Desktop removed per client request */}
+            <Link href="/" className="header__logo flex-shrink-0" style={{ maxWidth: '180px' }}>
               <img 
                 src="/logo.png" 
                 alt="playR" 
-                className="h-[22px] w-auto object-contain flex-shrink-0"
+                className="h-[34px] sm:h-[38px] md:h-[42px] w-auto object-contain flex-shrink-0 transition-transform duration-200 hover:scale-105"
               />
             </Link>
           </div>
@@ -502,12 +503,9 @@ export default function Header() {
             >
               <img src="/lookbook/artboard-1.jpg" alt="" />
             </button>
-            {/* Desktop-only secondary icons */}
-            <Link href="/collections/seattle-orcas" className="iconbtn iconbtn--desktop-only" aria-label="Stores">
-              {Icon.pin}
-            </Link>
+            {/* Location Button removed per client request */}
             <button 
-              className={`iconbtn iconbtn--desktop-only ${searchOpen ? 'active' : ''}`} 
+              className={`iconbtn ${searchOpen ? 'active' : ''}`} 
               onClick={() => {
                 setSearchOpen((v) => !v);
                 setMegaOpen(false);
@@ -538,58 +536,136 @@ export default function Header() {
               {Icon.bag}
               {cart.count > 0 && <span className="iconbtn__count">{cart.count}</span>}
             </button>
-            <button className="iconbtn iconbtn--menu" onClick={() => { setMegaOpen((v) => !v); setClubOpen(false); }} aria-label="Menu">
+            {/* Hamburger menu strictly hidden on desktop (md:hidden) */}
+            <button className="iconbtn iconbtn--menu md:hidden" onClick={() => { setMegaOpen((v) => !v); setClubOpen(false); }} aria-label="Menu">
               {Icon.menu}
             </button>
           </div>
         </div>
 
+        {/* Side Screen Search Drawer (Replaces Full-Screen Search Bar) */}
         {searchOpen && (
-          <div className="header__search-bar">
-            <div className="header__search-input-wrap">
-              <input
-                type="text"
-                id="header-search-input"
-                name="q"
-                autoComplete="off"
-                aria-label="Search products"
-                placeholder="Search here....."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                autoFocus
-                className="text-base md:text-sm"
-              />
-              <button 
-                className="header__search-close" 
-                onClick={() => setSearchOpen(false)}
-                aria-label="Close search"
-              >
-                ×
-              </button>
-            </div>
-            {searchQuery && (
-              <div className="header__search-results">
-                {filteredProducts.length > 0 ? (
-                  filteredProducts.map((p) => (
-                    <Link
-                      key={p.handle}
-                      href={`/products/${p.handle}`}
-                      className="header__search-item"
-                      onClick={() => setSearchOpen(false)}
+          <div className="fixed inset-0 z-[200]">
+            {/* Backdrop Scrim */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+              onClick={() => setSearchOpen(false)}
+            />
+
+            {/* Slide-over Right Side Panel */}
+            <div
+              className="fixed inset-y-0 right-0 w-full max-w-md bg-[var(--panel)] shadow-2xl border-l border-[var(--line)] flex flex-col z-[201] animate-in slide-in-from-right duration-300"
+            >
+              {/* Drawer Header */}
+              <div className="p-6 border-b border-[var(--line)] flex items-center justify-between">
+                <div>
+                  <h3 className="font-extrabold uppercase tracking-wider text-base text-[var(--fg)]">
+                    Search Store
+                  </h3>
+                  <p className="text-[11px] text-[var(--muted)] mt-0.5">
+                    Search official jerseys, equipment, &amp; collections
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--chip)] text-[var(--fg)] text-lg font-bold hover:bg-[var(--line)] transition-colors cursor-pointer"
+                  aria-label="Close search"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Search Input Field */}
+              <div className="p-6 border-b border-[var(--line)] bg-[var(--chip)]">
+                <div className="relative flex items-center">
+                  <span className="absolute left-4 text-[var(--muted)] pointer-events-none">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <circle cx="11" cy="11" r="7" strokeWidth="2" />
+                      <path d="m20 20-3.5-3.5" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    id="header-side-search-input"
+                    name="q"
+                    autoComplete="off"
+                    autoFocus
+                    placeholder="Search jerseys, bats, caps, teams..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-11 pr-10 py-3 text-xs font-semibold rounded-xl bg-[var(--panel)] border border-[var(--line)] text-[var(--fg)] placeholder-[var(--muted)] focus:outline-none focus:border-[var(--fg)]"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="absolute right-3 text-xs font-bold text-[var(--muted)] hover:text-[var(--fg)]"
                     >
-                      <img src={p.images[0]} alt={p.title} />
-                      <div>
-                        <span className="title">{p.title}</span>
-                        <span className="price">₹{p.price}</span>
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="header__search-empty">No products found for &quot;{searchQuery}&quot;</div>
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* Popular Search Suggestions */}
+                {!searchQuery && (
+                  <div className="mt-4">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--muted)] block mb-2">
+                      Popular Searches
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {['CSK Jersey', 'Mumbai Indians', 'Bat', 'Cap', 'Rajasthan Royals'].map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setSearchQuery(s)}
+                          className="px-3 py-1 rounded-full text-xs bg-[var(--panel)] border border-[var(--line)] text-[var(--fg)] hover:border-[var(--fg)] transition-colors cursor-pointer"
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-            )}
-            <CornerCutouts className="search__corners" />
+
+              {/* Results List */}
+              <div className="flex-1 overflow-y-auto p-6 space-y-3">
+                {searchQuery ? (
+                  filteredProducts.length > 0 ? (
+                    filteredProducts.map((p) => (
+                      <Link
+                        key={p.handle}
+                        href={`/products/${p.handle}`}
+                        className="flex items-center gap-4 p-3 rounded-xl hover:bg-[var(--chip)] border border-transparent hover:border-[var(--line)] transition-all group"
+                        onClick={() => setSearchOpen(false)}
+                      >
+                        <div className="w-16 h-16 rounded-lg bg-[var(--chip)] overflow-hidden shrink-0 border border-[var(--line)]">
+                          <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold text-[var(--fg)] uppercase tracking-tight truncate group-hover:text-primary">
+                            {p.title}
+                          </h4>
+                          <p className="text-[11px] text-[var(--muted)] mt-0.5">{p.type || 'Equipment'}</p>
+                          <span className="text-xs font-black text-red-600 dark:text-red-500 font-mono mt-1 block">
+                            ₹{p.price.toLocaleString('en-IN')}
+                          </span>
+                        </div>
+                      </Link>
+                    ))
+                  ) : (
+                    <div className="py-12 text-center text-xs text-[var(--muted)]">
+                      No products found matching &quot;{searchQuery}&quot;
+                    </div>
+                  )
+                ) : (
+                  <div className="py-8 text-center text-[11px] text-[var(--muted)]">
+                    Type a query above to see instant search results.
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
@@ -903,23 +979,27 @@ export default function Header() {
             {activeTab === 'club' && (
               <>
                 <div>
-                  <h4>Player Club</h4>
-                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Player Club Overview</Link>
-                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Win Giveaways</Link>
-                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Earn Points</Link>
-                  <Link href="/offer" onClick={() => setMegaOpen(false)}>Offers &amp; Promotions</Link>
+                  <h4>Offers</h4>
+                  <Link href="/offers" onClick={() => setMegaOpen(false)}>Exclusive Offers &amp; Discounts</Link>
+                  <Link href="/offers" onClick={() => setMegaOpen(false)}>Jersey Customization Bundles</Link>
+                  <Link href="/offers" onClick={() => setMegaOpen(false)}>Member Free Shipping Codes</Link>
                 </div>
                 <div>
-                  <h4>Official IPL Clubs</h4>
-                  {menuData.club.ipl.slice(0, 4).map((item) => (
-                    <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
-                      {item}
-                    </Link>
-                  ))}
+                  <h4>Lets PlayR</h4>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Player Club Hub</Link>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Win Giveaways &amp; Kits</Link>
+                  <Link href="/earn-points" onClick={() => setMegaOpen(false)}>Earn XP Points</Link>
+                  <Link href="/challenges" onClick={() => setMegaOpen(false)}>Daily Sports Challenges</Link>
                 </div>
                 <div>
-                  <h4>More Franchises</h4>
-                  {menuData.club.ipl.slice(4).map((item) => (
+                  <h4>Power players</h4>
+                  <Link href="/leaderboard" onClick={() => setMegaOpen(false)}>Global Athlete Leaderboard</Link>
+                  <Link href="/leaderboard" onClick={() => setMegaOpen(false)}>Elite Hall of Fame</Link>
+                  <Link href="/community" onClick={() => setMegaOpen(false)}>Community Challenges</Link>
+                </div>
+                <div>
+                  <h4>Official Franchise Clubs</h4>
+                  {menuData.club.ipl.slice(0, 5).map((item) => (
                     <Link key={item} href={`/collections/${slugify(item)}`} onClick={() => setMegaOpen(false)}>
                       {item}
                     </Link>
@@ -929,12 +1009,6 @@ export default function Header() {
                       {item}
                     </Link>
                   ))}
-                </div>
-                <div>
-                  <h4>Corporate &amp; Enterprise</h4>
-                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Corporate Teamwear</Link>
-                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Bulk Equipment</Link>
-                  <Link href="/b2b" onClick={() => setMegaOpen(false)}>Request Quote</Link>
                 </div>
               </>
             )}

@@ -336,7 +336,7 @@ export default function AccountReturnsPage() {
               <RotateCcw className="w-8 h-8" />
             </div>
             <p className="text-xs font-bold uppercase tracking-wider text-on-surface">No active returns or exchange claims found</p>
-            <p className="text-[11px] text-on-surface-variant mt-1">If you receive an item you want to exchange or return, raise a claim here within 30 days.</p>
+            <p className="text-[11px] text-on-surface-variant mt-1">If you receive an item you want to exchange or return, raise a claim here within 7 days of delivery.</p>
           </div>
         )}
       </section>

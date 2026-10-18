@@ -77,8 +77,8 @@ export default function AccountSupportPage() {
   const [activeFaq, setActiveFaq] = useState<number | null>(null)
 
   const faqs = [
-    { q: "How long does shipping take?", a: "Standard shipping takes 3-5 business days. Express shipping takes 1-2 business days. Official kitted jersey orders with personalization may take an extra 48 hours to process." },
-    { q: "What is the return policy?", a: "We offer a 30-day hassle-free return and exchange policy on all unworn items with tags. Personalized jerseys are non-returnable unless defective." },
+    { q: "How long does shipping take?", a: "Standard shipping takes 3-5 business days across India. Official kitted jersey orders with personalization may take an extra 48 hours to process." },
+    { q: "What is the return policy?", a: "We offer a 7-day hassle-free return and exchange policy on all unworn items with tags. Personalized jerseys are non-returnable unless defective." },
     { q: "How do I redeem my NECTAR rewards?", a: "Go to your Account Rewards Hub, choose an unlocked coupon code, and click 'Redeem'. You can copy this code and paste it in the Cart or Checkout screen to apply discounts." },
     { q: "Can I cancel my order after it has shipped?", a: "Once an order is shipped, it cannot be cancelled. You can raise a return request in the Returns page once it is delivered." },
     { q: "How does wallet cashback work?", a: "Elite tier members earn up to 15% XP cashback on purchases. This is instantly credited to your NECTAR wallet and can be used on your next checkout." }

@@ -32,11 +32,34 @@ function OtpContent() {
       if (!res.ok) {
         setError(data.error || "Verification failed.")
       } else {
-        setSuccess("Code verified successfully! Proceeding to account reset...")
+        setSuccess("Code verified successfully! Welcome to playR.")
+        if (data.user) {
+          try {
+            const { useAuthStore } = await import('@/store/authStore');
+            useAuthStore.getState().sync({
+              id: data.user.id,
+              username: data.user.name?.toLowerCase().replace(/\s+/g, '') || '',
+              name: data.user.name || 'playR Member',
+              phone: '',
+              email: data.user.email,
+              avatar: null,
+              referralCode: 'PLAYR-PRO',
+              walletId: `wal_${data.user.id.slice(-4)}`,
+              joinedFrom: 'otp',
+              authProvider: 'email',
+              isOnboarded: true,
+              memberSince: new Date().toISOString(),
+              sprrBalance: data.user.sprrBalance || 100,
+              role: data.user.role || 'member',
+              tier: data.user.tier || 'STREET',
+            });
+          } catch (e) {
+            console.error('Failed to sync auth state', e);
+          }
+        }
         setTimeout(() => {
-          // Direct to login
-          router.push('/login')
-        }, 1500)
+          router.push('/account')
+        }, 1200)
       }
     } catch (err) {
       setError("An unexpected error occurred.")
@@ -45,13 +68,37 @@ function OtpContent() {
     }
   }
 
+  const handleResend = async () => {
+    if (!email) {
+      setError("Missing email address to resend OTP.");
+      return;
+    }
+    setError('');
+    setSuccess('Sending a new OTP code to your inbox...');
+    try {
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, purpose: 'login' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSuccess("A new 6-digit verification code has been sent via email.");
+      } else {
+        setError(data.error || "Failed to resend code.");
+      }
+    } catch (err) {
+      setError("Failed to resend verification code.");
+    }
+  };
+
   return (
     <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 p-8 rounded-2xl shadow-xl">
       <h1 className="text-3xl font-black text-white text-center tracking-tighter mb-2">Verify OTP</h1>
       <p className="text-zinc-400 text-center text-sm mb-4">We sent a verification code to <span className="text-white font-medium">{email}</span></p>
       
       <div className="bg-primary-container/10 border border-primary/20 text-on-primary-container p-3 rounded-lg text-xs text-center mb-6">
-        💡 Demo Mode: Use OTP verification code <strong className="text-primary text-sm">123456</strong>
+        📧 Check your inbox — 6-digit verification code has been dispatched via SMTP.
       </div>
 
       {error && (
@@ -90,7 +137,7 @@ function OtpContent() {
       </form>
 
       <div className="mt-8 text-center text-sm text-zinc-500">
-        Didn&apos;t receive code? <button onClick={() => alert("Mock OTP resent code: 123456")} className="text-white hover:underline">Resend</button>
+        Didn&apos;t receive code? <button onClick={handleResend} className="text-white hover:underline font-bold">Resend OTP</button>
       </div>
     </div>
   )

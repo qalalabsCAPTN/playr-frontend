@@ -28,8 +28,8 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState('India');
 
-  // Delivery Speed
-  const [deliverySpeed, setDeliverySpeed] = useState<'standard' | 'express'>('standard');
+  // Delivery Speed (Standard only)
+  const [deliverySpeed] = useState<'standard'>('standard');
 
   // Coupon & NECTAR Wallet
   const [couponCode, setCouponCode] = useState('');
@@ -38,7 +38,7 @@ export default function CheckoutPage() {
   const [useNectarWallet, setUseNectarWallet] = useState(false);
   const nectarWalletCredit = user?.sprrBalance !== undefined && user.sprrBalance > 0 ? user.sprrBalance : 250;
 
-  // Payment Method
+  // Payment Method (Online Gateway only - COD hidden)
   const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
 
   useEffect(() => {
@@ -57,7 +57,8 @@ export default function CheckoutPage() {
     }
   }, [user]);
 
-  const shippingCost = deliverySpeed === 'express' ? 150 : 0;
+  // Standard Delivery Under 999 should be 199, Free at or above 999
+  const shippingCost = total > 0 && total < 999 ? 199 : 0;
   const nectarDeduction = useNectarWallet ? Math.min(nectarWalletCredit, Math.max(0, total - couponDiscount)) : 0;
   const netTotal = Math.max(0, total - couponDiscount - nectarDeduction + shippingCost);
 
@@ -507,61 +508,48 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Delivery Speed Selector */}
+              {/* Delivery Speed Selector (Standard Only - Express Removed) */}
               <div className="bg-[var(--panel)] border border-[var(--line)] rounded-[var(--radius)] p-6">
-                <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--muted)] mb-4 border-b border-[var(--line)] pb-2">
-                  03 // Delivery Speed
-                </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <label
-                    className={`p-4 rounded-[var(--radius-sm)] border cursor-pointer flex flex-col justify-between transition-colors ${
-                      deliverySpeed === 'standard'
-                        ? 'border-[var(--fg)] bg-[var(--chip)]'
-                        : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--muted)]'
-                    }`}
-                  >
+                <div className="flex items-center justify-between mb-4 border-b border-[var(--line)] pb-2">
+                  <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--muted)]">
+                    03 // Shipping Method
+                  </h2>
+                  <span className="font-mono text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">
+                    {total >= 999 ? 'Free Delivery Applied' : 'Standard Delivery'}
+                  </span>
+                </div>
+                <div>
+                  <div className="p-4 rounded-[var(--radius-sm)] border border-[var(--fg)] bg-[var(--chip)] flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="deliverySpeed"
-                          checked={deliverySpeed === 'standard'}
-                          onChange={() => setDeliverySpeed('standard')}
+                          checked={true}
+                          readOnly
                           className="accent-[var(--fg)]"
                         />
-                        <span className="text-xs font-bold uppercase tracking-wider">Standard</span>
+                        <span className="text-xs font-bold uppercase tracking-wider">Standard Delivery</span>
                       </div>
-                      <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">Free</span>
+                      <span className={`text-xs font-bold ${shippingCost === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--fg)]'}`}>
+                        {shippingCost === 0 ? 'Free' : '₹199'}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-[var(--muted)]">3–5 Business Days · India Post / Bluedart</span>
-                  </label>
-
-                  <label
-                    className={`p-4 rounded-[var(--radius-sm)] border cursor-pointer flex flex-col justify-between transition-colors ${
-                      deliverySpeed === 'express'
-                        ? 'border-[var(--fg)] bg-[var(--chip)]'
-                        : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--muted)]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="deliverySpeed"
-                          checked={deliverySpeed === 'express'}
-                          onChange={() => setDeliverySpeed('express')}
-                          className="accent-[var(--fg)]"
-                        />
-                        <span className="text-xs font-bold uppercase tracking-wider">Express Air</span>
-                      </div>
-                      <span className="text-xs font-bold text-[var(--fg)]">₹150</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] text-[var(--muted)]">
+                      <span>3–5 Business Days · India Post / Bluedart</span>
+                      <span>
+                        {total < 999 ? (
+                          <span className="text-amber-600 dark:text-amber-400 font-medium">Add {formatPrice(999 - total)} more for FREE delivery</span>
+                        ) : (
+                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">Orders ₹999+ qualify for FREE delivery</span>
+                        )}
+                      </span>
                     </div>
-                    <span className="text-[11px] text-[var(--muted)]">1–2 Business Days · Priority Air Dispatch</span>
-                  </label>
+                  </div>
                 </div>
               </div>
 
-              {/* Payment Method Selector */}
+              {/* Payment Method Selector (COD Hidden - Online Only) */}
               <div className="bg-[var(--panel)] border border-[var(--line)] rounded-[var(--radius)] p-6">
                 <h2 className="font-mono text-xs uppercase tracking-widest text-[var(--muted)] mb-4 border-b border-[var(--line)] pb-2 flex items-center justify-between">
                   <span>04 // Payment Gateway</span>
@@ -569,60 +557,27 @@ export default function CheckoutPage() {
                 </h2>
                 <div className="space-y-3">
                   <label
-                    className={`flex items-center justify-between p-4 rounded-[var(--radius-sm)] border cursor-pointer transition-colors ${
-                      paymentMethod === 'online'
-                        ? 'border-[var(--fg)] bg-[var(--chip)]'
-                        : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--muted)]'
-                    }`}
+                    className="flex items-center justify-between p-4 rounded-[var(--radius-sm)] border border-[var(--fg)] bg-[var(--chip)] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center gap-3">
                       <input
                         type="radio"
                         name="payment"
-                        checked={paymentMethod === 'online'}
-                        onChange={() => setPaymentMethod('online')}
+                        checked={true}
+                        readOnly
                         className="accent-[var(--fg)]"
                       />
                       <div>
                         <span className="text-xs font-bold uppercase tracking-wider block">
-                          Easebuzz Gateway (UPI, Cards, NetBanking)
+                          Easebuzz Gateway (UPI, Cards, NetBanking, Wallets)
                         </span>
                         <span className="text-[10px] text-[var(--muted)]">
-                          Secured via Easebuzz 256-bit SHA-512 encryption
+                          Secured via 256-bit SHA-512 bank-grade encryption
                         </span>
                       </div>
                     </div>
                     <span className="font-mono text-[9px] uppercase tracking-widest text-emerald-600 dark:text-emerald-400 font-bold">
-                      Recommended
-                    </span>
-                  </label>
-
-                  <label
-                    className={`flex items-center justify-between p-4 rounded-[var(--radius-sm)] border cursor-pointer transition-colors ${
-                      paymentMethod === 'cod'
-                        ? 'border-[var(--fg)] bg-[var(--chip)]'
-                        : 'border-[var(--line)] bg-[var(--panel)] hover:border-[var(--muted)]'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="payment"
-                        checked={paymentMethod === 'cod'}
-                        onChange={() => setPaymentMethod('cod')}
-                        className="accent-[var(--fg)]"
-                      />
-                      <div>
-                        <span className="text-xs font-bold uppercase tracking-wider block">
-                          Cash on Delivery (COD)
-                        </span>
-                        <span className="text-[10px] text-[var(--muted)]">
-                          Pay cash upon delivery at your doorstep
-                        </span>
-                      </div>
-                    </div>
-                    <span className="font-mono text-[9px] uppercase tracking-widest text-[var(--muted)]">
-                      Doorstep
+                      100% Secure
                     </span>
                   </label>
                 </div>

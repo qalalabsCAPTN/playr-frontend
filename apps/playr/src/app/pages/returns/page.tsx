@@ -5,7 +5,7 @@ const steps = [
   {
     step: "01",
     title: "Initiate Return",
-    desc: "Go to Account → Orders within 15 days of delivery. Select the item and click Return / Exchange.",
+    desc: "Go to Account → Orders within 7 days of delivery. Select the item and click Return / Exchange.",
     icon: "package_2",
   },
   {
@@ -31,7 +31,7 @@ const steps = [
 const notEligible = [
   "Items washed, worn, or altered",
   "Products without original tags/packaging",
-  "Items returned after 15 days from delivery",
+  "Items returned after 7 days from delivery",
   "Customized/personalized products (name prints, numbers)",
   "Gift cards and digital products",
   "Items marked as Final Sale",
@@ -56,7 +56,7 @@ export default function ReturnsPage() {
         {/* Key Facts */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {[
-            { icon: "event_available", title: "15-Day Window", desc: "Return or exchange within 15 days of delivery." },
+            { icon: "event_available", title: "7-Day Window", desc: "Return or exchange within 7 days of delivery." },
             { icon: "storefront", title: "Free Pickup", desc: "Doorstep pickup at no extra cost anywhere in India." },
             { icon: "replay", title: "Free Size Exchange", desc: "Size swaps are always free, subject to stock." },
           ].map((fact) => (

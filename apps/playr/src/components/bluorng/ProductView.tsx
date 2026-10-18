@@ -6,6 +6,8 @@ import { useCart } from './CartContext';
 import ProductSection from './ProductSection';
 import RecentlyVisited, { pushRecentlyVisited } from './RecentlyVisited';
 import { products, formatPrice, BluorngProduct } from '@/lib/bluorng-data';
+import LoginModal from '@/components/auth/LoginModal';
+import { useAuthStore } from '@/store/authStore';
 
 // HTML5 Canvas Jersey Customization Engine (1:1 Ratio)
 const drawJersey = (
@@ -250,6 +252,64 @@ const adjustColorBrightness = (hex: string, percent: number) => {
   return `#${rHex}${gHex}${bHex}`;
 };
 
+export function isPartnershipJersey(product: BluorngProduct): boolean {
+  if (product.customizable === true) return true;
+  if (product.customizable === false) return false;
+
+  const title = (product.title || '').toLowerCase();
+  const type = (product.type || '').toLowerCase();
+  const collections = (product.collections || []).map((c) => c.toLowerCase()).join(' ');
+  const combined = `${title} ${type} ${collections}`;
+
+  // Must be a jersey
+  const isJersey = combined.includes('jersey') || type === 'jersey';
+  if (!isJersey) return false;
+
+  // Must be a partnership / club / league jersey
+  const isTeam =
+    combined.includes('csk') ||
+    combined.includes('chennai') ||
+    combined.includes('mi') ||
+    combined.includes('mumbai') ||
+    combined.includes('rr') ||
+    combined.includes('rajasthan') ||
+    combined.includes('srh') ||
+    combined.includes('sunrisers') ||
+    combined.includes('lsg') ||
+    combined.includes('lucknow') ||
+    combined.includes('pbks') ||
+    combined.includes('punjab') ||
+    combined.includes('kkr') ||
+    combined.includes('kolkata') ||
+    combined.includes('seattle') ||
+    combined.includes('yoddha') ||
+    combined.includes('partnership') ||
+    combined.includes('club') ||
+    combined.includes('ipl');
+
+  return isTeam;
+}
+
+export function getJerseyOverlayStyles(product: BluorngProduct) {
+  const t = (product.title + ' ' + (product.type || '')).toLowerCase();
+  if (t.includes('csk') || t.includes('chennai') || t.includes('whistle podu') || t.includes('yellow')) {
+    return { font: '#005ea6', accent: '#ffffff', stroke: '#ffc72c' }; // CSK Blue & Gold
+  }
+  if (t.includes('rr') || t.includes('rajasthan royals') || t.includes('pink')) {
+    return { font: '#ffffff', accent: '#001d48', stroke: '#cba135' }; // RR Navy/Gold
+  }
+  if (t.includes('mi') || t.includes('mumbai indians') || t.includes('blue')) {
+    return { font: '#f5a623', accent: '#004f9f', stroke: '#ffffff' }; // MI Gold & Blue
+  }
+  if (t.includes('srh') || t.includes('sunrisers') || t.includes('orange')) {
+    return { font: '#ffffff', accent: '#111111', stroke: '#ff5a1f' }; // SRH Orange
+  }
+  if (t.includes('lsg') || t.includes('lucknow')) {
+    return { font: '#ffffff', accent: '#0057b8', stroke: '#00a3e0' }; // LSG Cyan/Navy
+  }
+  return { font: '#ffffff', accent: '#111111', stroke: '#f59e0b' };
+}
+
 const SIZE_SETS: Record<string, string[]> = {
   Caps: ['S/M', 'M/L', 'One Size'],
   Headwear: ['One Size'],
@@ -320,23 +380,66 @@ export default function ProductView({ product }: ProductViewProps) {
   const [selectedColor, setSelectedColor] = useState(product.colors?.[0] || '');
   const saved = cart.isInWishlist(product.handle);
 
-  // Customization State
-  const isCustomizableProduct = product.customizable || (product.type && ['Jersey', 'T-Shirt', 'Polo', 'Sportswear'].includes(product.type));
+  // Customization & Auth State
+  const authUser = useAuthStore((s) => s.user);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const isCustomizableProduct = isPartnershipJersey(product);
   const [isCustomizing, setIsCustomizing] = useState(false);
   const [playerName, setPlayerName] = useState('');
   const [playerNumber, setPlayerNumber] = useState('');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
+  const overlayStyles = getJerseyOverlayStyles(product);
+
+  const handleToggleCustomization = () => {
+    if (!authUser) {
+      setLoginModalOpen(true);
+      cart.showToast('Please sign in to personalise your jersey.');
+      return;
+    }
+    setIsCustomizing((v) => !v);
+  };
+
+  const handleSaveToProfile = () => {
+    if (!authUser) {
+      setLoginModalOpen(true);
+      return;
+    }
+    if (!playerName.trim() && !playerNumber.trim()) {
+      cart.showToast('Please enter a Name or Number to save.');
+      return;
+    }
+    const customPayload = getCustomizationPayload();
+    const savedItem = {
+      id: `pers_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      userId: authUser.id,
+      productHandle: product.handle,
+      productTitle: product.title,
+      productImage: product.images[0] || '',
+      price: product.price,
+      playerName: playerName.trim(),
+      playerNumber: playerNumber.trim(),
+      size,
+      customImage: customPayload?.image || product.images[0] || '',
+      savedAt: new Date().toISOString(),
+    };
+    try {
+      const key = `playr_saved_customizations_${authUser.id}`;
+      const existing = JSON.parse(localStorage.getItem(key) || '[]');
+      existing.unshift(savedItem);
+      localStorage.setItem(key, JSON.stringify(existing));
+      const generic = JSON.parse(localStorage.getItem('playr_saved_customizations') || '[]');
+      generic.unshift(savedItem);
+      localStorage.setItem('playr_saved_customizations', JSON.stringify(generic));
+      cart.showToast('Personalised jersey saved to your profile!');
+    } catch (e) {
+      console.error('Failed to save customization', e);
+    }
+  };
+
   useEffect(() => {
     pushRecentlyVisited(product.handle);
   }, [product.handle]);
-
-  // Sync canvas redraw on name/number/color change
-  useEffect(() => {
-    if (!isCustomizing || !canvasRef.current) return;
-    const themeColor = colorSwatch(selectedColor || product.colors?.[0] || 'black');
-    drawJersey(canvasRef.current, playerName, playerNumber, themeColor, product.title);
-  }, [isCustomizing, playerName, playerNumber, selectedColor, product]);
 
   const related = products.filter((p) => p.type === product.type && p.handle !== product.handle).slice(0, 8);
   const onSale = Boolean(product.compareAt && product.compareAt > product.price);
@@ -349,9 +452,34 @@ export default function ProductView({ product }: ProductViewProps) {
   const getCustomizationPayload = () => {
     if (!isCustomizing || (!playerName && !playerNumber)) return undefined;
     let customImage: string | undefined;
-    if (canvasRef.current) {
+    if (canvasRef.current && product.images[0]) {
       try {
-        customImage = canvasRef.current.toDataURL('image/png');
+        const cvs = canvasRef.current;
+        const ctx = cvs.getContext('2d');
+        if (ctx) {
+          ctx.clearRect(0, 0, cvs.width, cvs.height);
+          const cx = cvs.width / 2;
+          const cy = cvs.height * 0.44;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          if (playerName) {
+            ctx.font = '900 38px Impact, Oswald, sans-serif';
+            ctx.fillStyle = overlayStyles.font;
+            ctx.strokeStyle = overlayStyles.accent;
+            ctx.lineWidth = 4;
+            ctx.strokeText(playerName.toUpperCase(), cx, cy - 36);
+            ctx.fillText(playerName.toUpperCase(), cx, cy - 36);
+          }
+          if (playerNumber) {
+            ctx.font = '900 110px Impact, Oswald, sans-serif';
+            ctx.fillStyle = overlayStyles.font;
+            ctx.strokeStyle = overlayStyles.accent;
+            ctx.lineWidth = 8;
+            ctx.strokeText(playerNumber, cx, cy + 42);
+            ctx.fillText(playerNumber, cx, cy + 42);
+          }
+          customImage = cvs.toDataURL('image/png');
+        }
       } catch (e) {
         // Fallback silently if canvas export fails
       }
@@ -359,7 +487,7 @@ export default function ProductView({ product }: ProductViewProps) {
     return {
       name: playerName.trim() || undefined,
       number: playerNumber.trim() || undefined,
-      image: customImage,
+      image: customImage || product.images[0],
     };
   };
 
@@ -426,14 +554,50 @@ export default function ProductView({ product }: ProductViewProps) {
         <div className="pdp__gallery-wrap">
         <div className="pdp__gallery" ref={galleryRef} onScroll={onGalleryScroll}>
           <div className="pdp__gallery-left">
-            {isCustomizing ? (
-              <canvas
-                ref={canvasRef}
-                width={700}
-                height={700}
-                className="w-full aspect-square rounded-[20px] object-cover bg-[#16181d] shadow-lg cursor-default"
-                aria-label="Live customized jersey preview"
-              />
+            {isCustomizing && images[0] ? (
+              <div className="relative w-full aspect-square rounded-[20px] overflow-hidden bg-[#16181d] shadow-lg flex items-center justify-center">
+                <img
+                  src={images[0]}
+                  alt={`${product.title} — personalized preview`}
+                  className="w-full h-full object-cover"
+                />
+                {/* Team & Personalization Badge */}
+                <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-[10px] font-mono uppercase tracking-wider text-white">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  Personalised Preview
+                </div>
+                {/* Live Name & Number Overlay */}
+                <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-6">
+                  <div className="flex flex-col items-center justify-center -mt-6 drop-shadow-[0_4px_16px_rgba(0,0,0,0.85)]">
+                    <span
+                      className="font-black uppercase tracking-[0.2em] text-center select-none"
+                      style={{
+                        fontFamily: 'var(--font-heading, "Impact", "Oswald", "Arial Black", sans-serif)',
+                        fontSize: 'clamp(20px, 3.6vw, 36px)',
+                        color: overlayStyles.font,
+                        WebkitTextStroke: `2px ${overlayStyles.accent}`,
+                        textShadow: `0 3px 12px rgba(0,0,0,0.9)`,
+                      }}
+                    >
+                      {playerName || 'YOUR NAME'}
+                    </span>
+                    <span
+                      className="font-black leading-none select-none mt-1"
+                      style={{
+                        fontFamily: 'var(--font-heading, "Impact", "Oswald", "Arial Black", sans-serif)',
+                        fontSize: 'clamp(64px, 13vw, 120px)',
+                        color: overlayStyles.font,
+                        WebkitTextStroke: `3.5px ${overlayStyles.accent}`,
+                        textShadow: `0 4px 16px rgba(0,0,0,0.95)`,
+                      }}
+                    >
+                      {playerNumber || '07'}
+                    </span>
+                  </div>
+                </div>
+                {/* Hidden canvas for saving composite raster */}
+                <canvas ref={canvasRef} width={700} height={700} className="hidden" />
+              </div>
             ) : images[0] ? (
               <img 
                 src={images[0]} 
@@ -546,26 +710,39 @@ export default function ProductView({ product }: ProductViewProps) {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold uppercase tracking-wider text-[var(--fg)]">
-                      Customize Your Jersey
+                      Jersey Personaliser
                     </span>
                     <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400">
-                      Live 1:1 Preview
+                      Partnership Exclusive
                     </span>
                   </div>
                   <button
                     type="button"
-                    onClick={() => setIsCustomizing((v) => !v)}
-                    className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${
+                    onClick={handleToggleCustomization}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-full transition-colors ${
                       isCustomizing 
                         ? 'bg-[var(--fg)] text-[var(--panel)]' 
                         : 'border border-[var(--line)] text-[var(--fg)] hover:bg-[var(--panel)]'
                     }`}
                   >
-                    {isCustomizing ? 'Disable' : 'Customize'}
+                    {!authUser ? 'Sign In to Personalise' : isCustomizing ? 'Disable' : 'Personalise'}
                   </button>
                 </div>
 
-                {isCustomizing && (
+                {!authUser ? (
+                  <div className="p-3 rounded-lg bg-[var(--panel)] border border-[var(--line)] flex items-center justify-between">
+                    <p className="text-[11px] text-[var(--muted)]">
+                      Log in to customize your squad name &amp; number on this partnership jersey.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => setLoginModalOpen(true)}
+                      className="px-2.5 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                    >
+                      Login →
+                    </button>
+                  </div>
+                ) : isCustomizing ? (
                   <div className="space-y-3 pt-2 border-t border-[var(--line)]">
                     <div>
                       <label className="block text-[11px] font-bold uppercase tracking-wider text-[var(--muted)] mb-1">
@@ -596,11 +773,21 @@ export default function ProductView({ product }: ProductViewProps) {
                         className="w-full px-3 py-2 text-xs font-semibold rounded-lg bg-[var(--panel)] border border-[var(--line)] text-[var(--fg)] focus:outline-none focus:border-[var(--fg)]"
                       />
                     </div>
-                    <p className="text-[11px] text-[var(--muted)] italic">
-                      ✓ Real-time render updates directly in the 1:1 square jersey studio preview above.
-                    </p>
+                    <div className="flex items-center justify-between pt-1">
+                      <p className="text-[11px] text-[var(--muted)] italic">
+                        ✓ Real-time render updates directly on the jersey preview.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleSaveToProfile}
+                        className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--line)] bg-[var(--panel)] text-[var(--fg)] hover:bg-[var(--fg)] hover:text-[var(--panel)] transition-colors flex items-center gap-1.5"
+                      >
+                        <BookmarkIcon filled={false} />
+                        Save to Profile
+                      </button>
+                    </div>
                   </div>
-                )}
+                ) : null}
               </div>
             )}
 
@@ -677,10 +864,10 @@ export default function ProductView({ product }: ProductViewProps) {
               )}
               {tab === 'shipping' && (
                 <ul>
-                  <li>Shipped within 24 hours</li>
-                  <li>Free delivery pan-India</li>
-                  <li>Cash on delivery available</li>
-                  <li>Dispatch next day</li>
+                  <li>Shipped within 24–48 hours</li>
+                  <li>Standard Delivery: ₹199 (Free on orders ₹999+)</li>
+                  <li>7-Day Hassle-Free Returns &amp; Exchanges</li>
+                  <li>100% Secure Prepaid Payment (UPI, Cards, NetBanking)</li>
                 </ul>
               )}
             </div>
@@ -737,6 +924,7 @@ export default function ProductView({ product }: ProductViewProps) {
 
       {related.length > 0 && <ProductSection title="You may like" products={related} gallery={true} />}
       <RecentlyVisited excludeHandle={product.handle} />
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </div>
   );
 }

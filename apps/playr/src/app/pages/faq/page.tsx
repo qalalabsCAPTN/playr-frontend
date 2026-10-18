@@ -30,7 +30,7 @@ const faqs = [
     items: [
       {
         q: "What is the return window?",
-        a: "We offer a 15-day return window from the date of delivery. Items must be unwashed, unworn, and in original packaging with tags intact."
+        a: "We offer a 7-day return window from the date of delivery. Items must be unwashed, unworn, and in original packaging with tags intact."
       },
       {
         q: "How do I initiate a return?",

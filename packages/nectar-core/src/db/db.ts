@@ -1065,7 +1065,7 @@ const INITIAL_DB_STATE = {
 let memoryDbState: typeof INITIAL_DB_STATE | null = null;
 
 // Initialize database
-function loadDbData(): typeof INITIAL_DB_STATE {
+export function loadDbData(): typeof INITIAL_DB_STATE {
   if (memoryDbState) {
     return memoryDbState;
   }
@@ -1103,7 +1103,7 @@ function loadDbData(): typeof INITIAL_DB_STATE {
   }
 }
 
-function saveDbData(data: typeof INITIAL_DB_STATE) {
+export function saveDbData(data: typeof INITIAL_DB_STATE) {
   memoryDbState = data;
   if (process.env.VERCEL) {
     // Return early in read-only Vercel environment
@@ -1378,11 +1378,7 @@ async function getSupabaseProducts() {
 
 export async function getDbProducts() {
   const db = loadDbData();
-  const supabaseProducts = await getSupabaseProducts();
-  if (supabaseProducts.length === 0) return db.products;
-  const supabaseSlugs = new Set(supabaseProducts.map((p: any) => p.slug));
-  const localOnly = db.products.filter((p: any) => !supabaseSlugs.has(p.slug));
-  return [...supabaseProducts, ...localOnly];
+  return db.products;
 }
 
 export async function getDbProductBySlug(slug: string) {

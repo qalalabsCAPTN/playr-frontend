@@ -1,15 +1,17 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { useAccount } from "@/components/account/AccountProvider"
 import { motion, AnimatePresence } from "framer-motion"
-import { CheckCircle2, AlertTriangle, Check, Shield } from "lucide-react"
+import { CheckCircle2, AlertTriangle, Check, Shield, Shirt, Trash2 } from "lucide-react"
 
 export default function ProfilePage() {
   const { profile, wallet, rewards, isLoading, refreshData } = useAccount()
   const [isSaving, setIsSaving] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [savedCustomizations, setSavedCustomizations] = useState<any[]>([])
 
   // Form states
   const [firstName, setFirstName] = useState("")
@@ -48,6 +50,32 @@ export default function ProfilePage() {
       setRewardsSummary((profile as any).rewardsSummary !== undefined ? (profile as any).rewardsSummary : true)
     }
   }, [profile])
+
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const userKey = profile?.id ? `playr_saved_customizations_${profile.id}` : ''
+      const rawUser = userKey ? localStorage.getItem(userKey) : null
+      const rawGeneric = localStorage.getItem('playr_saved_customizations')
+      const items = rawUser ? JSON.parse(rawUser) : rawGeneric ? JSON.parse(rawGeneric) : []
+      setSavedCustomizations(items)
+    } catch (e) {
+      console.error('Failed to load saved customizations', e)
+    }
+  }, [profile?.id])
+
+  const handleDeleteCustomization = (id: string) => {
+    try {
+      const userKey = profile?.id ? `playr_saved_customizations_${profile.id}` : ''
+      const updated = savedCustomizations.filter((item) => item.id !== id)
+      setSavedCustomizations(updated)
+      if (userKey) localStorage.setItem(userKey, JSON.stringify(updated))
+      localStorage.setItem('playr_saved_customizations', JSON.stringify(updated))
+      triggerToast('Personalised jersey removed from profile.')
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   if (isLoading || !profile) {
     return <div className="animate-pulse h-96 bg-surface-container rounded-3xl"></div>
@@ -356,6 +384,99 @@ export default function ProfilePage() {
         </aside>
 
       </form>
+
+      {/* Saved Customizations Section */}
+      <section className="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/30 space-y-6">
+        <div className="flex items-center justify-between border-b border-outline-variant/20 pb-4">
+          <div>
+            <span className="text-[10px] font-black uppercase tracking-widest text-primary block mb-1">Partnership Exclusives</span>
+            <h3 className="font-black text-xl uppercase tracking-tight text-on-surface font-headline flex items-center gap-2">
+              <Shirt className="w-5 h-5 text-primary" />
+              <span>My Personalised Jerseys</span>
+            </h3>
+          </div>
+          <span className="text-xs font-mono font-bold text-on-surface-variant bg-surface-container px-3 py-1 rounded-full border border-outline-variant/20">
+            {savedCustomizations.length} Saved
+          </span>
+        </div>
+
+        {savedCustomizations.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {savedCustomizations.map((item) => (
+              <div
+                key={item.id}
+                className="bg-surface-container rounded-2xl border border-outline-variant/25 p-4 flex flex-col justify-between gap-4 group hover:border-primary/40 transition-all shadow-sm"
+              >
+                <div className="flex gap-4">
+                  <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-black shrink-0 border border-outline-variant/15 flex items-center justify-center">
+                    {item.productImage && (
+                      <img src={item.productImage} alt={item.productTitle} className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-1">
+                      <span className="text-[9px] font-black uppercase text-amber-400 tracking-wider truncate max-w-full">
+                        {item.playerName || 'SQUAD'}
+                      </span>
+                      <span className="text-base font-black text-white leading-none">
+                        {item.playerNumber || '00'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-xs uppercase text-on-surface truncate">{item.productTitle}</h4>
+                    <p className="text-[11px] font-medium text-on-surface-variant mt-0.5">Size: <strong className="text-on-surface">{item.size || 'M'}</strong></p>
+                    <div className="flex items-center gap-2 mt-2">
+                      <span className="text-[10px] uppercase font-mono font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
+                        {item.playerName}
+                      </span>
+                      <span className="text-[10px] uppercase font-mono font-bold bg-surface-container-highest text-on-surface px-2 py-0.5 rounded">
+                        #{item.playerNumber}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2 border-t border-outline-variant/15">
+                  <span className="font-mono font-bold text-xs text-on-surface">
+                    ₹{item.price?.toLocaleString('en-IN')}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteCustomization(item.id)}
+                      className="p-1.5 text-on-surface-variant/60 hover:text-error hover:bg-error/10 rounded-lg transition-colors cursor-pointer"
+                      title="Remove"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                    <Link
+                      href={`/products/${item.productHandle}`}
+                      className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-bold text-[10px] uppercase tracking-wider hover:opacity-90 transition-opacity"
+                    >
+                      Order Jersey
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 rounded-2xl border border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-2">
+            <div className="w-12 h-12 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface-variant/40">
+              <Shirt className="w-6 h-6" />
+            </div>
+            <p className="text-xs font-bold uppercase tracking-wider text-on-surface">No personalised jerseys saved yet</p>
+            <p className="text-[11px] text-on-surface-variant max-w-sm">
+              Visit any official Partnership Jersey page and click &quot;Personalise&quot; to print your squad name &amp; number and save it here.
+            </p>
+            <Link
+              href="/collections/all"
+              className="mt-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline"
+            >
+              Browse Partnership Jerseys →
+            </Link>
+          </div>
+        )}
+      </section>
 
       {/* Delete Account Modal */}
       <AnimatePresence>

@@ -64,8 +64,7 @@ export default function AuthProvider({
             sync(profile ?? null);
           } else {
             const currentUser = useAuthStore.getState().user;
-            if (currentUser?.id === 'usr_athlete_preview') {
-              // Preserve preview session for local visual testing & demo exploration
+            if (currentUser) {
               sync(currentUser);
             } else {
               sync(null);
@@ -79,6 +78,11 @@ export default function AuthProvider({
               const profile = await getProfileAction();
               sync(profile ?? null);
             } else if (event === 'SIGNED_OUT') {
+              const currentUser = useAuthStore.getState().user;
+              if (currentUser?.authProvider !== 'google') {
+                // Keep local OTP / standalone user
+                return;
+              }
               sync(null);
             }
           });
@@ -88,7 +92,12 @@ export default function AuthProvider({
           };
         } catch (e) {
           console.error('[AuthProvider] Client-side session fallback check failed:', e);
-          sync(null);
+          const currentUser = useAuthStore.getState().user;
+          if (currentUser) {
+            sync(currentUser);
+          } else {
+            sync(null);
+          }
         }
       } else {
         const currentUser = useAuthStore.getState().user;

@@ -102,10 +102,12 @@ export async function signUpWithEmailAction(
     }
 
     const supabase = await createClient();
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://playr.in';
     const { data, error } = await supabase.auth.signUp({
       email: normalized,
       password,
       options: {
+        emailRedirectTo: `${siteUrl}/auth/callback?next=/account`,
         data: {
           full_name: fullName?.trim() || '',
         },

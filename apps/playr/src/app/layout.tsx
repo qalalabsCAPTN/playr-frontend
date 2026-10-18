@@ -34,6 +34,15 @@ export const metadata: Metadata = {
     title: 'playR | Luxury Sportwear & Performance Gear',
     description: 'High-performance athletic gear, official IPL & MLC merchandise, and technical streetwear apparel.',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+      { url: '/favicon.png', type: 'image/png', sizes: '200x200' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/icon.png',
+  },
 };
 
 export default function RootLayout({
