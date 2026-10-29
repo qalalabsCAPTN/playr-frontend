@@ -21,7 +21,7 @@ const faqs = [
       },
       {
         q: "What are the shipping charges?",
-        a: "Free shipping on all orders above ₹999. A flat ₹79 fee applies on orders below ₹999."
+        a: "Free shipping on all orders above ₹999. A flat ₹199 fee applies on orders below ₹999 (Free delivery on orders ₹999+)."
       },
     ]
   },

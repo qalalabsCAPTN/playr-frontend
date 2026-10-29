@@ -1,170 +1,270 @@
-"use client"
+import React from 'react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ShieldCheck, Award, Zap, Globe, MapPin, Mail, Phone, ExternalLink } from 'lucide-react';
 
-import React, { useEffect, useRef, useState } from "react"
-import { CMSService, CMSAboutPageData } from "@playr/nectar-core"
+export const metadata: Metadata = {
+  title: 'About Us — playR',
+  description: 'Learn about playR, our brand proposition, journey, partnerships with IPL teams (CSK, MI, SRH, GT, LSG), and our global omni-channel presence.',
+  alternates: {
+    canonical: '/about',
+  },
+};
+
+const timelineData = [
+  {
+    year: 'Nov 2021',
+    title: 'Launch of playR Apparel',
+    desc: 'Kitting & Clothing Partner: Bihar Cricket Association (BCA).'
+  },
+  {
+    year: 'Jan 2022',
+    title: 'Launch of playR Cricket Gear',
+    desc: 'Mumbai Indians (MI) Exclusive Player Wear Replica License (International Market).'
+  },
+  {
+    year: 'Apr 2022',
+    title: 'Launch of playR Bicycles & Accessories',
+    desc: 'Mumbai Indians (MI) Global Exclusive Cricket Gear License Merchandise.'
+  },
+  {
+    year: 'Jan 2023',
+    title: 'Chennai Super Kings (CSK) Partnership',
+    desc: 'CSK Exclusive Global Player Wear Merchandise Partner.'
+  },
+  {
+    year: 'Feb 2023',
+    title: 'Rajasthan Royals & GMR Legends League',
+    desc: 'Rajasthan Royals (RR) Exclusive Player Wear Partner; GMR Legends League Exclusive Equipment Supplier.'
+  },
+  {
+    year: 'Mar 2023',
+    title: 'B2B Division & Punjab Kings',
+    desc: 'Launch of playR B2B Corporate Sales Division; Punjab Kings (PBKS) Global Exclusive Cricket Gear License Merchandise.'
+  },
+  {
+    year: 'Jan 2024',
+    title: 'Kolkata Knight Riders & PBKS',
+    desc: 'Punjab Kings (PBKS) & Kolkata Knight Riders (KKR) Exclusive Player Wear Merchandise Partner.'
+  },
+  {
+    year: 'Feb 2024',
+    title: 'D2C & Quick Commerce Rollout',
+    desc: 'Launch of playR D2C Ecommerce Marketplace & nationwide Quick Commerce distribution.'
+  },
+  {
+    year: 'Feb 2025',
+    title: 'Gujarat Titans & Pickleball League',
+    desc: 'Gujarat Titans (GT) Global Exclusive Player Wear Partner; Pickleball Association: Bengaluru Jawans & Chennai Super Champs.'
+  },
+  {
+    year: 'Mar 2025',
+    title: 'Sunrisers Hyderabad Partnership',
+    desc: 'Sunrisers Hyderabad (SRH) Global Exclusive Fan Jersey Merchandise Partner.'
+  },
+  {
+    year: 'Jun 2025',
+    title: 'UP Yoddhas (Pro Kabaddi)',
+    desc: 'UP Yoddhas (UPY) Kitting, Clothing & Merchandise Partner.'
+  },
+  {
+    year: 'Nov 2025',
+    title: 'Global Cricket Tournaments & Leagues',
+    desc: 'Dubai Capitals Kitting Supplier; Alleppey Ripples Kitting & Clothing Supplier; BnW Legends Cup & OGPL Clothing Supplier.'
+  },
+  {
+    year: '2026',
+    title: 'STREET playR & Fitness Gear',
+    desc: 'Upcoming launches: Gym & Fitness Gear, Pickleball Lines, STREET playR Luxury Streetwear, Swimming Gear, and Lucknow Super Giants (LSG).'
+  }
+];
 
 export default function AboutPage() {
-  const observerRef = useRef<IntersectionObserver | null>(null)
-  const [data, setData] = useState<CMSAboutPageData | null>(null)
-
-  useEffect(() => {
-    CMSService.getAboutPageBlocks().then(setData)
-  }, [])
-
-  useEffect(() => {
-    if (!data) return;
-
-    observerRef.current = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('opacity-100', 'translate-y-0')
-          entry.target.classList.remove('opacity-0', 'translate-y-10')
-        }
-      })
-    }, { threshold: 0.1 })
-
-    const elements = document.querySelectorAll('.animate-on-scroll')
-    elements.forEach(el => {
-      observerRef.current?.observe(el)
-    })
-
-    return () => {
-      if (observerRef.current) observerRef.current.disconnect()
-    }
-  }, [data])
-
-  if (!data) return <div className="min-h-screen bg-background"></div>;
-
-  const { hero, brandStory } = data;
-
   return (
-    <div className="bg-background min-h-screen">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--fg)] pt-32 pb-24 px-4 sm:px-6 lg:px-12 max-w-6xl mx-auto">
       {/* Hero Section */}
-      <section className="relative w-full h-[80vh] flex items-center overflow-hidden bg-on-surface">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
-        </div>
-        <div className="relative z-10 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          {hero.badge && (
-            <div className="inline-block px-4 py-1 bg-action-yellow text-on-surface rounded-full mb-6 font-label-bold uppercase">
-              {hero.badge}
-            </div>
-          )}
-          <h1 className="font-headline-xl text-5xl md:text-7xl text-white mb-8 tracking-tighter leading-tight font-black">
-            {hero.heading1}<br/>{hero.heading2}
-          </h1>
-          <p className="font-body-lg text-white/90 max-w-xl mb-10 leading-relaxed text-lg">
-            {hero.description}
+      <section className="mb-20 text-center max-w-4xl mx-auto">
+        <span className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.3em] mb-3 block">
+          Official Brand Story
+        </span>
+        <h1 className="font-black text-5xl sm:text-6xl md:text-7xl uppercase tracking-tighter text-[var(--fg)] mb-6 leading-tight">
+          About playR
+        </h1>
+        <p className="text-[var(--muted)] text-base sm:text-lg leading-relaxed max-w-2xl mx-auto">
+          playR is built to equip the Player with high-performance tools, world-class athletic teamwear, and authentic sportswear engineered to excel on the field and rule the street.
+        </p>
+      </section>
+
+      {/* Brand Proposition / Pillars */}
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
+        <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--chip)] flex items-center justify-center mb-6 text-[var(--fg)] font-black text-lg">
+            01
+          </div>
+          <h3 className="text-lg font-black uppercase tracking-tight mb-2">Player First</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+            Equip the Player with the right tools to excel in their field through advanced ergonomic engineering and zero-compromise materials.
           </p>
-          <button className="px-10 py-5 bg-action-yellow text-on-surface font-black uppercase text-label-bold rounded-lg hover:scale-105 transition-transform active:scale-95 shadow-xl tracking-widest">
-            {hero.primaryCta.label}
-          </button>
+        </div>
+
+        <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--chip)] flex items-center justify-center mb-6 text-[var(--fg)] font-black text-lg">
+            02
+          </div>
+          <h3 className="text-lg font-black uppercase tracking-tight mb-2">LET&apos;S PLAY</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+            Encourage a healthier, more meaningful life through sports, inspiring a global community to embrace active movement.
+          </p>
+        </div>
+
+        <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--chip)] flex items-center justify-center mb-6 text-[var(--fg)] font-black text-lg">
+            03
+          </div>
+          <h3 className="text-lg font-black uppercase tracking-tight mb-2">Omni-Channel</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+            Value-driven offerings and effortless accessibility across 150+ offline stores, major marketplaces, quick-commerce, and global shipping.
+          </p>
         </div>
       </section>
 
-      {/* Brand Story Section */}
-      <section className="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          <div className="order-2 lg:order-1">
-            <h2 className="font-headline-xl text-4xl mb-12 uppercase tracking-tight font-black text-on-surface">{brandStory.heading}</h2>
-            <div className="space-y-10">
-              {brandStory.timeline.map((item, idx) => (
-                <div key={idx} className="flex gap-6 items-start group">
-                  <span className="font-headline-xl text-5xl text-outline-variant group-hover:text-primary transition-colors">{item.year}</span>
-                  <div>
-                    <h3 className="font-headline-md text-2xl mb-2 font-bold text-on-surface">{item.title}</h3>
-                    <p className="text-secondary font-body-md leading-relaxed">{item.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="order-1 lg:order-2">
-            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] shadow-2xl bg-surface-container border border-outline-variant/30">
-              <div className="absolute inset-0 flex items-center justify-center text-secondary">
-                <span className="material-symbols-outlined text-6xl">photo_camera</span>
-              </div>
-            </div>
-          </div>
+      {/* Vision & Mission */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
+        <div className="p-10 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2 block">Our Vision</span>
+          <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">Empower Every Player</h2>
+          <p className="text-sm text-[var(--muted)] leading-relaxed">
+            To inspire and empower individuals to lead healthier, more meaningful lives through sports, providing apparel, equipment, and accessories that enrich and elevate everyday life.
+          </p>
+        </div>
+
+        <div className="p-10 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2 block">Our Mission</span>
+          <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight mb-4">Authenticity &amp; Innovation</h2>
+          <ul className="space-y-3 text-sm text-[var(--muted)]">
+            <li className="flex items-start gap-2">
+              <span className="text-[var(--accent)] font-bold">✓</span>
+              <span>Foster a global community that embraces an active lifestyle while staying true to authenticity and innovation.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[var(--accent)] font-bold">✓</span>
+              <span>Craft value- and performance-driven products that seamlessly integrate the comfort and style of the Player.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-[var(--accent)] font-bold">✓</span>
+              <span>Promote emerging athletic talent and community service through continuous education across TEAM playR.</span>
+            </li>
+          </ul>
         </div>
       </section>
 
-      {/* Mission & Vision: Bento Layout */}
-      <section className="py-24 bg-surface-container-low border-y border-outline-variant/20">
-        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full">
-            <div className="bg-surface-container-lowest p-12 rounded-3xl flex flex-col justify-between group hover:bg-on-surface transition-all duration-500 border border-outline-variant/30 shadow-sm hover:shadow-2xl">
-              <div>
-                <span className="material-symbols-outlined text-4xl text-primary mb-6 group-hover:text-action-yellow transition-colors">visibility</span>
-                <h2 className="font-headline-xl text-4xl mb-6 group-hover:text-white transition-colors font-black tracking-tight">{brandStory.vision.heading}</h2>
-                <p className="font-body-lg text-secondary group-hover:text-white/80 transition-colors leading-relaxed text-lg">
-                  {brandStory.vision.description}
-                </p>
-              </div>
-              <div className="mt-12 h-1 bg-surface-container-highest w-full relative overflow-hidden rounded-full">
-                <div className="absolute inset-0 bg-action-yellow w-0 group-hover:w-full transition-all duration-700"></div>
-              </div>
-            </div>
-            
-            <div className="bg-primary p-12 rounded-3xl flex flex-col justify-between group hover:shadow-2xl transition-all duration-500 border border-primary-fixed/20 shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-10 transform translate-x-4 -translate-y-4">
-                <span className="material-symbols-outlined text-9xl text-white">rocket_launch</span>
-              </div>
-              <div className="relative z-10">
-                <span className="material-symbols-outlined text-4xl text-action-yellow mb-6">rocket_launch</span>
-                <h2 className="font-headline-xl text-4xl mb-6 text-white font-black tracking-tight">{brandStory.mission.heading}</h2>
-                <div className="space-y-6">
-                  <p className="font-body-lg text-white font-bold border-l-4 border-action-yellow pl-6 text-lg leading-relaxed">
-                    {brandStory.mission.description1}
-                  </p>
-                  <p className="font-body-lg text-white/80 text-lg leading-relaxed">
-                    {brandStory.mission.description2}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+      {/* Our Journey Timeline */}
+      <section className="mb-24">
+        <div className="text-center mb-16">
+          <span className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.3em] mb-2 block">
+            Milestones &amp; Evolution
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">Our Journey</h2>
         </div>
-      </section>
 
-      {/* Values Section */}
-      <section className="py-24 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto overflow-hidden">
-        <div className="text-center mb-20 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          <h2 className="font-headline-xl text-4xl uppercase tracking-tight font-black text-on-surface">Our Core Values</h2>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          
-          {brandStory.coreValues.map((value, idx) => (
-            <div key={idx} className={`relative p-10 border rounded-3xl group hover:-translate-y-2 transition-transform duration-500 ${idx === 1 ? 'bg-on-surface border-on-surface shadow-xl' : 'bg-surface-container-lowest border-outline-variant/30 shadow-sm hover:shadow-xl'}`}>
-              <div className={`absolute -top-8 left-1/2 -translate-x-1/2 w-16 h-16 flex items-center justify-center rounded-full shadow-lg ${idx === 1 ? 'bg-action-yellow text-on-surface font-black' : 'bg-on-surface text-action-yellow'}`}>
-                <span className="material-symbols-outlined">{value.icon}</span>
+        <div className="space-y-6 max-w-4xl mx-auto">
+          {timelineData.map((item, idx) => (
+            <div key={idx} className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8 p-6 bg-[var(--panel)] border border-[var(--border)] rounded-2xl hover:border-[var(--fg)] transition-all">
+              <div className="sm:w-36 shrink-0">
+                <span className="text-xs font-black uppercase tracking-widest text-[var(--accent)] bg-[var(--chip)] px-3 py-1.5 rounded-full inline-block">
+                  {item.year}
+                </span>
               </div>
-              <h3 className={`font-headline-md text-2xl text-center mt-6 mb-4 font-bold ${idx === 1 ? 'text-white' : 'text-on-surface'}`}>{value.title}</h3>
-              <p className={`text-center font-body-md leading-relaxed ${idx === 1 ? 'text-white/70' : 'text-secondary'}`}>{value.description}</p>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-[var(--fg)] mb-1">{item.title}</h3>
+                <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">{item.desc}</p>
+              </div>
             </div>
           ))}
-
         </div>
       </section>
 
-      {/* Partners Section */}
-      <section className="py-20 bg-on-surface text-white">
-        <div className="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto animate-on-scroll opacity-0 translate-y-10 transition-all duration-1000">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-12">
-            <div className="max-w-xs text-center md:text-left">
-              <h2 className="font-headline-md text-3xl mb-2 font-black tracking-tighter">GLOBAL PARTNERS</h2>
-              <p className="font-label-bold text-sm text-white/50 uppercase tracking-widest">OFFICIAL MERCHANDISE SUPPLIERS</p>
+      {/* Official Team Partnerships */}
+      <section className="mb-24 p-10 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+        <div className="text-center mb-10 max-w-2xl mx-auto">
+          <span className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.3em] mb-2 block">
+            Official Alliances
+          </span>
+          <h2 className="text-3xl font-black uppercase tracking-tight mb-3">Partnering with Champions</h2>
+          <p className="text-xs sm:text-sm text-[var(--muted)]">
+            playR proudly partners with premier Indian and international cricket franchises, leagues, and tournaments.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-center">
+          {[
+            { team: 'Chennai Super Kings (CSK)', role: 'Exclusive Merchandise Partner 2023–2027' },
+            { team: 'Mumbai Indians (MI)', role: 'Exclusive Replica & Gear Partner 2022–2024' },
+            { team: 'Sunrisers Hyderabad (SRH)', role: 'Global Fan Jersey Partner 2025–2026' },
+            { team: 'Gujarat Titans (GT)', role: 'Global Player Wear Partner 2025' },
+            { team: 'Lucknow Super Giants (LSG)', role: 'Official Merchandise Partner 2026' },
+            { team: 'Kolkata Knight Riders (KKR)', role: 'Exclusive Player Wear Partner 2024' },
+            { team: 'Punjab Kings (PBKS)', role: 'Exclusive Merchandise Partner 2023–2024' },
+            { team: 'Rajasthan Royals (RR)', role: 'Exclusive Player Wear Partner 2023–2024' },
+            { team: 'UP Yoddhas (Pro Kabaddi)', role: 'Kitting & Merchandise Partner 2025–2026' },
+            { team: 'Dubai Capitals', role: 'Official Kitting Supplier 2025' },
+            { team: 'Bengaluru Jawans & Chennai Super Champs', role: 'Pickleball League Partners 2025–2026' },
+            { team: 'Seattle Orcas (MLC)', role: 'Exclusive Apparel Partner' },
+          ].map((item, idx) => (
+            <div key={idx} className="p-5 bg-[var(--chip)] rounded-2xl border border-[var(--border)] flex flex-col justify-center">
+              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wide mb-1 text-[var(--fg)]">{item.team}</h4>
+              <p className="text-[11px] text-[var(--muted)] leading-tight">{item.role}</p>
             </div>
-            <div className="flex flex-wrap justify-center gap-12 opacity-60">
-              {brandStory.partners.map(partner => (
-                <div key={partner} className="font-headline-xl text-5xl tracking-widest font-black hover:text-action-yellow hover:opacity-100 transition-all cursor-default">
-                  {partner}
-                </div>
-              ))}
-            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Omni-Channel & Global Footprint */}
+      <section className="mb-24 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <Globe className="w-8 h-8 text-[var(--accent)] mb-4" />
+          <h3 className="text-xl font-black uppercase tracking-tight mb-3">Omni-Channel Distribution</h3>
+          <div className="space-y-3 text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+            <p><strong>Offline Retail:</strong> 150+ partner retail stores across India, stadium concessionaires, and dedicated brand counters.</p>
+            <p><strong>E-Commerce Marketplaces:</strong> Official brand stores on Amazon, Flipkart, Myntra, AJIO, and Nykaa.</p>
+            <p><strong>Quick Commerce:</strong> Same-day athletic essentials delivered through Blinkit, Swiggy Instamart, BigBasket, and Zepto.</p>
+          </div>
+        </div>
+
+        <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl">
+          <ShieldCheck className="w-8 h-8 text-[var(--accent)] mb-4" />
+          <h3 className="text-xl font-black uppercase tracking-tight mb-3">Global Presence</h3>
+          <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed mb-4">
+            Active distribution operations and international athlete shipments across:
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {['India', 'United States', 'Middle East', 'United Kingdom', 'South Africa', 'East Asia', 'Australia'].map((c, i) => (
+              <span key={i} className="px-3 py-1 rounded-full bg-[var(--chip)] border border-[var(--border)] text-xs font-bold">
+                {c}
+              </span>
+            ))}
           </div>
         </div>
       </section>
-    </div>
-  )
+
+      {/* Registered Office & Trademark Notice */}
+      <section className="p-8 bg-[var(--chip)] border border-[var(--border)] rounded-3xl text-center max-w-3xl mx-auto text-xs text-[var(--muted)] space-y-3">
+        <p className="font-bold text-[var(--fg)]">
+          playR is a registered trademark of iCOREts Private Limited
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-left pt-2">
+          <div>
+            <span className="font-bold uppercase tracking-widest text-[10px] block mb-1">Operations Office</span>
+            <p>HOUSE playR, #320, 100 Feet Road, Ghitorni, New Delhi – 110030, India</p>
+            <p className="mt-1"><strong>GST:</strong> 07AAECI1569D1ZQ</p>
+          </div>
+          <div>
+            <span className="font-bold uppercase tracking-widest text-[10px] block mb-1">Registered Office</span>
+            <p>Studio 150, Satguru Nanak Industrial Estate, Jay Coach, Goregaon East, Mumbai – 400063, Maharashtra, India</p>
+            <p className="mt-1"><strong>Inquiries:</strong> info@playr.in | support@playr.in</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
 }

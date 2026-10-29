@@ -48,3 +48,4 @@ db_store.json
 # Scratch dumps
 scripts/*.html
 scripts/*.txt
+scripts/cloud_sql/

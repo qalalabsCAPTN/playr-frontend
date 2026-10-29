@@ -11,8 +11,6 @@ import BestSellerCollectionsSection from '@/components/bluorng/BestSellerCollect
 import TestimonialsSection from '@/components/bluorng/TestimonialsSection';
 import BrandVideoSection from '@/components/bluorng/BrandVideoSection';
 import RecentlyVisited from '@/components/bluorng/RecentlyVisited';
-import SeoBlock from '@/components/bluorng/SeoBlock';
-import NewsletterSection from '@/components/bluorng/NewsletterSection';
 import { getCollectionProducts, products } from '@/lib/bluorng-data';
 
 export default function HomePage() {
@@ -49,18 +47,17 @@ export default function HomePage() {
         products={newArrivals}
         title="New Arrivals"
         moreHref="/collections/new-in"
-        boxed={true}
       />
 
       {/* Section 3: Shop by category: (1x4) (4:3 aspect ratio), 4:3 Category cards, (Auto Scroll + Scrolling option) total 10 cards (boxed) */}
       <CategorySlider />
 
-      {/* Section 4: 1x2 video + image box overlayed with a button that can be hyperlinked (Customisation of jersey) */}
+      {/* Section 4: 1 section divided into 2 image columns and one button on the right side (Customisation of jersey) */}
       <JerseyCustomizationSection
-        videoSrc="/videos/jersey-custom.mp4"
-        imageSrc="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/1_a7d3a318-96f0-4525-a1b5-0d4974c9baa4.jpg?v=1756796308"
-        videoHref="/collections/csk"
-        imageHref="/collections/jersey"
+        leftImageSrc="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/1_a7d3a318-96f0-4525-a1b5-0d4974c9baa4.jpg?v=1756796308"
+        rightImageSrc="https://cdn.shopify.com/s/files/1/0679/5939/0427/files/csk_web_banner__jpg.jpg"
+        ctaHref="/collections/csk"
+        ctaText="Customise Jersey Now"
       />
 
       {/* Section 5: Official collaboration: 1:1 banner of IPL collaboration */}
@@ -98,10 +95,8 @@ export default function HomePage() {
         ctaHref="/about"
       />
 
-      {/* Auxiliary Storefront Support Blocks */}
+      {/* Recently Visited */}
       <RecentlyVisited />
-      <SeoBlock />
-      <NewsletterSection />
     </div>
   );
 }

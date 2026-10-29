@@ -103,7 +103,7 @@ export default function IPLCollabSection() {
 
   return (
     <section
-      className="panel mx-3 md:mx-6 p-4 md:p-6 rounded-2xl bg-[var(--panel)] border border-[var(--line)] shadow-sm my-6 select-none"
+      className="my-6 mx-3 md:mx-6 px-1 select-none"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
       onTouchStart={() => setIsPaused(true)}
@@ -126,7 +126,7 @@ export default function IPLCollabSection() {
             onClick={() => scrollByDirection('left')}
             className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-200 ${
               canScrollLeft
-                ? 'border-[var(--line)] bg-[var(--page-bg)] text-[var(--fg)] hover:scale-105 active:scale-95 shadow-sm'
+                ? 'border-[var(--line)] bg-[var(--panel)] text-[var(--fg)] hover:scale-105 active:scale-95 shadow-sm'
                 : 'border-[var(--line)] opacity-40 text-[var(--muted)] cursor-not-allowed'
             }`}
             aria-label="Previous partner"
@@ -136,7 +136,7 @@ export default function IPLCollabSection() {
           <button
             type="button"
             onClick={() => scrollByDirection('right')}
-            className="w-9 h-9 rounded-full flex items-center justify-center border border-[var(--line)] bg-[var(--page-bg)] text-[var(--fg)] hover:scale-105 active:scale-95 shadow-sm transition-all duration-200"
+            className="w-9 h-9 rounded-full flex items-center justify-center border border-[var(--line)] bg-[var(--panel)] text-[var(--fg)] hover:scale-105 active:scale-95 shadow-sm transition-all duration-200"
             aria-label="Next partner"
           >
             →
@@ -144,7 +144,7 @@ export default function IPLCollabSection() {
         </div>
       </div>
 
-      {/* 1:1 Banner Slider of IPL Collaboration */}
+      {/* 1:1 Banner Slider of IPL Collaboration (No White Outer Box) */}
       <div
         ref={scrollRef}
         className="flex gap-4 md:gap-5 overflow-x-auto scroll-smooth pb-2 scrollbar-none snap-x snap-mandatory"

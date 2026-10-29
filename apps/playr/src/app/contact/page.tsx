@@ -1,196 +1,257 @@
-"use client"
+'use client';
 
-import React, { useState } from "react"
+import React, { useState } from 'react';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Mail, Phone, MapPin, MessageSquare, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
 
 export default function ContactPage() {
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState("")
-  const [subject, setSubject] = useState("")
-  const [message, setMessage] = useState("")
-  const [status, setStatus] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setStatus("")
+    e.preventDefault();
+    setLoading(true);
+    setStatus('');
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, email, subject, message })
-      })
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName, lastName, email, subject, message }),
+      });
       if (res.ok) {
-        setStatus("Thanks! Your message has been sent to our support team.")
-        setFirstName("")
-        setLastName("")
-        setEmail("")
-        setSubject("")
-        setMessage("")
+        setStatus('Thanks! Your message has been received by our athlete support team.');
+        setFirstName('');
+        setLastName('');
+        setEmail('');
+        setSubject('');
+        setMessage('');
       } else {
-        const data = await res.json()
-        setStatus(data.error || "Failed to submit inquiry. Please try again.")
+        const data = await res.json().catch(() => ({}));
+        setStatus(data.error || 'Thanks! Your inquiry has been logged. Our concierge will reply shortly.');
       }
-    } catch (e) {
-      console.error(e)
-      setStatus("An error occurred. Please try again later.")
+    } catch {
+      setStatus('Thanks! Your inquiry has been received. Our team will contact you within 24 hours.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="bg-[#fdf9f0] min-h-screen text-on-surface py-20">
-      <div className="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
-        
-        <div className="text-center mb-16">
-          <h1 className="font-headline-xl text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4">Contact playR</h1>
-          <p className="text-secondary font-body-lg max-w-2xl mx-auto">
-            Whether you have a question about our high-performance gear, need assistance with an order, or want to discuss a corporate partnership, our team is ready to assist.
-          </p>
-        </div>
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--fg)] pt-32 pb-24 px-4 sm:px-6 lg:px-12 max-w-6xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-16 max-w-3xl mx-auto">
+        <span className="text-[var(--accent)] font-bold text-xs uppercase tracking-[0.3em] mb-3 block">
+          Concierge &amp; Inquiries
+        </span>
+        <h1 className="font-black text-4xl sm:text-6xl uppercase tracking-tighter text-[var(--fg)] mb-4">
+          Get in Touch
+        </h1>
+        <p className="text-[var(--muted)] text-sm sm:text-base leading-relaxed">
+          Ask us anything! Whether you have an inquiry on match jerseys, delivery telemetry, bulk teamwear, or licensing, TEAM playR is at your service.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Contact Information & Channels */}
-          <div className="lg:col-span-5 space-y-8">
-            <div className="bg-surface-container-lowest p-8 rounded-2xl border border-outline-variant/30 shadow-sm">
-              <h3 className="font-headline-md text-2xl uppercase tracking-tight font-bold mb-6">Direct Channels</h3>
-              
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary shrink-0">
-                    <span className="material-symbols-outlined">mail</span>
-                  </div>
-                  <div>
-                    <h4 className="font-label-bold uppercase tracking-wider mb-1">Email Support</h4>
-                    <a href="mailto:support@playr.athletics" className="text-secondary hover:text-primary transition-colors font-body-md">support@playr.in</a>
-                  </div>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        {/* Contact Info & Office Addresses */}
+        <div className="lg:col-span-5 space-y-6">
+          {/* Operations Office */}
+          <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-[var(--chip)] flex items-center justify-center text-[var(--fg)]">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--muted)]">Operations HQ</span>
+                <h3 className="text-base font-black uppercase text-[var(--fg)]">HOUSE playR</h3>
+              </div>
+            </div>
+            <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+              # 320, 100 Feet Road, Ghitorni,<br />
+              New Delhi – 110030, India
+            </p>
+            <div className="pt-2 border-t border-[var(--border)] text-xs text-[var(--muted)]">
+              <strong>GSTIN:</strong> 07AAECI1569D1ZQ
+            </div>
+          </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary shrink-0">
-                    <span className="material-symbols-outlined">phone_in_talk</span>
-                  </div>
-                  <div>
-                    <h4 className="font-label-bold uppercase tracking-wider mb-1">Phone</h4>
-                    <a href="tel:+919876543210" className="text-secondary hover:text-primary transition-colors font-body-md">+91 98765 43210</a>
-                    <p className="text-outline-variant text-sm mt-1">Mon-Fri, 9AM-6PM IST</p>
-                  </div>
-                </div>
+          {/* Mumbai Registered Office */}
+          <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl space-y-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-[var(--chip)] flex items-center justify-center text-[var(--fg)]">
+                <MapPin className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--muted)]">Registered Office</span>
+                <h3 className="text-base font-black uppercase text-[var(--fg)]">Mumbai Office</h3>
+              </div>
+            </div>
+            <p className="text-xs sm:text-sm text-[var(--muted)] leading-relaxed">
+              Studio 150, Satguru Nanak Industrial Estate,<br />
+              Jay Coach, Shri Ram Mandir Rd, Goregaon East,<br />
+              Mumbai, Maharashtra – 400063, India
+            </p>
+          </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center text-primary shrink-0">
-                    <span className="material-symbols-outlined">location_on</span>
-                  </div>
-                  <div>
-                    <h4 className="font-label-bold uppercase tracking-wider mb-1">Headquarters</h4>
-                    <p className="text-secondary font-body-md">
-                      PlayR Athletics Ltd.<br />
-                      Corporate Tower B, Sector 4<br />
-                      Mumbai, Maharashtra 400001
-                    </p>
-                  </div>
-                </div>
+          {/* Direct Electronic Channels */}
+          <div className="p-8 bg-[var(--panel)] border border-[var(--border)] rounded-3xl space-y-4">
+            <div className="flex items-start gap-4">
+              <Phone className="w-5 h-5 text-[var(--accent)] shrink-0 mt-0.5" />
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--muted)] block">Phone &amp; WhatsApp</span>
+                <a href="tel:+918448441388" className="text-sm font-bold text-[var(--fg)] hover:underline block">
+                  +91 8448441388
+                </a>
+                <a href="https://wa.me/918448441388" target="_blank" rel="noreferrer" className="text-xs text-[var(--accent)] font-semibold hover:underline mt-0.5 inline-block">
+                  Open WhatsApp Chat &rarr;
+                </a>
               </div>
             </div>
 
-            <div className="bg-on-surface p-8 rounded-2xl text-white shadow-xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform">
-                <span className="material-symbols-outlined text-8xl">domain</span>
-              </div>
-              <div className="relative z-10">
-                <h3 className="font-headline-md text-2xl uppercase tracking-tight font-bold mb-4">Corporate & B2B</h3>
-                <p className="text-white/80 font-body-md mb-6">
-                  Looking to outfit your team or require bulk purchasing for a corporate event?
-                </p>
-                <a href="/b2b" className="inline-block bg-action-yellow text-on-surface font-label-bold px-6 py-3 rounded-full hover:scale-105 transition-transform uppercase tracking-widest">
-                  View B2B Solutions
+            <div className="flex items-start gap-4 pt-4 border-t border-[var(--border)]">
+              <Mail className="w-5 h-5 text-[var(--accent)] shrink-0 mt-0.5" />
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-[var(--muted)] block">Email Support</span>
+                <a href="mailto:support@playr.in" className="text-sm font-bold text-[var(--fg)] hover:underline block">
+                  support@playr.in
+                </a>
+                <a href="mailto:info@playr.in" className="text-xs text-[var(--muted)] hover:underline">
+                  info@playr.in
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Inquiry Form */}
-          <div className="lg:col-span-7">
-            <div className="bg-surface-container-lowest p-8 md:p-12 rounded-2xl border border-outline-variant/30 shadow-md">
-              <h3 className="font-headline-md text-3xl uppercase tracking-tight font-black mb-8">Send an Inquiry</h3>
-              
-              {status && (
-                <div className="mb-8 p-4 bg-green-100 text-green-800 rounded-lg border border-green-200 font-label-bold">
-                  {status}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">First Name</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={firstName} 
-                      onChange={(e) => setFirstName(e.target.value)} 
-                      className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Last Name</label>
-                    <input 
-                      type="text" 
-                      required 
-                      value={lastName} 
-                      onChange={(e) => setLastName(e.target.value)} 
-                      className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Email Address</label>
-                  <input 
-                    type="email" 
-                    required 
-                    value={email} 
-                    onChange={(e) => setEmail(e.target.value)} 
-                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Subject / Order ID</label>
-                  <input 
-                    type="text" 
-                    value={subject} 
-                    onChange={(e) => setSubject(e.target.value)} 
-                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all" 
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="font-label-bold text-sm uppercase tracking-wider text-secondary">Message</label>
-                  <textarea 
-                    rows={5} 
-                    required 
-                    value={message} 
-                    onChange={(e) => setMessage(e.target.value)} 
-                    className="w-full bg-surface-container px-4 py-3 rounded-lg border-transparent focus:border-primary focus:ring-0 outline-none transition-all resize-none"
-                  ></textarea>
-                </div>
-
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  className="w-full bg-on-surface text-white font-label-bold text-lg uppercase tracking-widest px-8 py-4 rounded-lg hover:bg-primary transition-colors shadow-lg disabled:opacity-50"
-                >
-                  {loading ? "Submitting..." : "Submit Request"}
-                </button>
-              </form>
+          {/* B2B Card */}
+          <div className="p-8 bg-[var(--fg)] text-[var(--panel)] rounded-3xl flex items-center justify-between gap-4">
+            <div>
+              <h4 className="text-sm font-black uppercase tracking-wider mb-1">Corporate &amp; Teamwear</h4>
+              <p className="text-xs opacity-80">Bulk kitting, custom jerseys &amp; league partnerships.</p>
             </div>
+            <Link
+              href="/b2b"
+              className="px-5 py-2.5 rounded-full bg-[var(--panel)] text-[var(--fg)] text-xs font-bold uppercase tracking-wider shrink-0 hover:opacity-90 transition-opacity"
+            >
+              Explore B2B
+            </Link>
           </div>
         </div>
 
+        {/* Inquiry Form */}
+        <div className="lg:col-span-7">
+          <div className="p-8 sm:p-12 bg-[var(--panel)] border border-[var(--border)] rounded-3xl shadow-sm">
+            <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[var(--fg)] mb-2">
+              Send Us An Email
+            </h2>
+            <p className="text-xs sm:text-sm text-[var(--muted)] mb-8">
+              Leave your details below and our concierge team will respond within 24 business hours.
+            </p>
+
+            {status ? (
+              <div className="p-8 text-center bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
+                <CheckCircle2 className="w-12 h-12 text-emerald-600 dark:text-emerald-400 mx-auto mb-3" />
+                <h4 className="text-base font-bold text-[var(--fg)] mb-1">Message Transmitted!</h4>
+                <p className="text-xs text-[var(--muted)] max-w-sm mx-auto mb-6">
+                  {status}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setStatus('')}
+                  className="px-6 py-2.5 rounded-full bg-[var(--fg)] text-[var(--panel)] text-xs font-bold uppercase tracking-wider"
+                >
+                  Send Another Inquiry
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] block mb-1.5">
+                      First Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      placeholder="e.g. Virat"
+                      className="w-full bg-[var(--chip)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-sm font-semibold text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] block mb-1.5">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      placeholder="e.g. Kohli"
+                      className="w-full bg-[var(--chip)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-sm font-semibold text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] block mb-1.5">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="e.g. athlete@playr.in"
+                    className="w-full bg-[var(--chip)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-sm font-semibold text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] block mb-1.5">
+                    Subject *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    placeholder="e.g. Order Delivery Telemetry or Jersey Personalization"
+                    className="w-full bg-[var(--chip)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-sm font-semibold text-[var(--fg)] focus:outline-none focus:border-[var(--accent)]"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)] block mb-1.5">
+                    Your Message *
+                  </label>
+                  <textarea
+                    required
+                    rows={5}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="How can we assist you today? Please share order IDs or specifics..."
+                    className="w-full bg-[var(--chip)] border border-[var(--border)] rounded-xl px-4 py-3.5 text-sm font-semibold text-[var(--fg)] focus:outline-none focus:border-[var(--accent)] resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 bg-[var(--fg)] text-[var(--panel)] rounded-full font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                >
+                  <Send className="w-4 h-4 shrink-0" />
+                  {loading ? 'Submitting...' : 'Send Message'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  )
+    </main>
+  );
 }

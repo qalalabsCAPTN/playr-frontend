@@ -43,6 +43,40 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', '@playr/ui'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/shop',
+        destination: '/collections',
+        permanent: true,
+      },
+      {
+        source: '/entering-street-playR',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/entering-street-playr',
+        destination: '/',
+        permanent: true,
+      },
+      {
+        source: '/track',
+        destination: '/track-shipment',
+        permanent: true,
+      },
+      {
+        source: '/catalog',
+        destination: '/catalogue',
+        permanent: true,
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
