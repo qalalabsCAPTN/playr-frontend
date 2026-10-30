@@ -1,2 +1,3 @@
 - [[playr-client-feedback]] — resolution of CSAT feedback for playR.in (PDP layout, Lookbook, dark mode chips, tenant isolation)
 - [[gcr-deployment]] — GCR / Cloud Run deployment prerequisites (Easebuzz, Uniware, and SMTP settings)
+- [[catalog-taxonomy-cloudsql]] — master product catalog and Cloud SQL schemas mapped to website sports taxonomy

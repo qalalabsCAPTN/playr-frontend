@@ -48,4 +48,5 @@ db_store.json
 # Scratch dumps
 scripts/*.html
 scripts/*.txt
-scripts/cloud_sql/
+scripts/cloud_sql/*.csv
+scripts/cloud_sql/seed_products.sql

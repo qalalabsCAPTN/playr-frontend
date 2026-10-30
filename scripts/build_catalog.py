@@ -8,7 +8,7 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 
 SHOPIFY_CACHE = os.path.join(SCRIPT_DIR, 'shopify_live_products.json')
-EXCEL_PRODUCT_PATH = r'C:\Users\aashi\Downloads\playR new website product.xlsx'
+EXCEL_PRODUCT_PATH = r'C:\Users\aashi\Downloads\Location SummaryFINAL (1).xlsx'
 EXCEL_LISTINGS_PATH = r'C:\Users\aashi\Downloads\playR Website listings - sport.xlsx'
 OUTPUT_TS_PATH = os.path.join(PROJECT_ROOT, 'apps', 'playr', 'src', 'lib', 'sku-catalog.ts')
 BLUORNG_DATA_PATH = os.path.join(PROJECT_ROOT, 'apps', 'playr', 'src', 'lib', 'bluorng-data.ts')
@@ -22,20 +22,21 @@ def clean_str(val):
     if pd.isna(val) or val is None:
         return ''
     s = str(val).strip()
-    s = s.replace('\ufffd', "'").replace('', "'")
+    s = s.replace('\ufffd', "'").replace('’', "'").replace('‘', "'")
     s = s.replace('\r\n', '\n').replace('\r', '\n')
     return s
 
 def clean_title(val):
     s = clean_str(val)
-    # Title casing cleanup if ALL CAPS
     if s.isupper() and len(s) > 4:
         s = s.title()
     return s
 
 # Load live shopify products
-with open(SHOPIFY_CACHE, 'r', encoding='utf-8') as f:
-    shopify_prods = json.load(f)
+shopify_prods = []
+if os.path.exists(SHOPIFY_CACHE):
+    with open(SHOPIFY_CACHE, 'r', encoding='utf-8') as f:
+        shopify_prods = json.load(f)
 
 shopify_by_sku = {}
 shopify_by_title = {}
@@ -121,14 +122,25 @@ for _, row in df.iterrows():
     
     handle = slugify(code)
     
+    brand = clean_str(row.get('Brand'))
+    func_str = clean_str(row.get('Function Sport'))
+    if not func_str and ('SO' in sku or 'SEATTLE' in brand.upper()):
+        func_str = 'CRICKET, RUNNING and TRAINING, Lifestyle After Sports'
+
+    avail_qty = 0
+    try:
+        raw_qty = row.get('Available Qty')
+        if pd.notna(raw_qty):
+            avail_qty = int(float(raw_qty))
+    except:
+        avail_qty = 0
+    
     if handle not in products_dict:
         # Collect base fields
         title = clean_title(row.get('Title'))
         cat1 = clean_str(row.get('Category 1'))
         cat2 = clean_str(row.get('Category 2'))
         cat3 = clean_str(row.get('Category 3'))
-        func_str = clean_str(row.get('Function Sport'))
-        brand = clean_str(row.get('Brand'))
         gender = clean_str(row.get('Gender'))
         age = clean_str(row.get('Age group'))
         
@@ -168,13 +180,21 @@ for _, row in df.iterrows():
             'details': bullets,
             'drive_link': drive_link,
             'colors': set(),
-            'skus': set()
+            'sizes': set(),
+            'skus': set(),
+            'total_available': 0
         }
     
+    products_dict[handle]['total_available'] += avail_qty
+
     col = clean_str(row.get('Colour'))
     if col and col != 'nan':
         products_dict[handle]['colors'].add(col)
     
+    sz = clean_str(row.get('Size'))
+    if sz and sz != 'nan':
+        products_dict[handle]['sizes'].add(sz)
+
     s = clean_str(row.get('SKU'))
     if s and s != 'nan':
         products_dict[handle]['skus'].add(s)
@@ -197,6 +217,7 @@ for handle, p in products_dict.items():
     
     # Collections list
     collections_set = set()
+    collections_set.add('all-products')
     
     # Primary Category
     if p['cat1']:
@@ -288,6 +309,8 @@ for handle, p in products_dict.items():
             'https://cdn.shopify.com/s/files/1/0679/5939/0427/files/Artboard6.png?v=1782909214'
         ]
     
+    is_sold_out = p['total_available'] <= 0
+
     item = {
         'handle': handle,
         'title': p['title'],
@@ -299,6 +322,8 @@ for handle, p in products_dict.items():
         'description': p['description'] if p['description'] else f"{p['title']} by playR.",
         'details': p['details'] if p['details'] else [p['title']],
         'colors': sorted(list(p['colors'])) if p['colors'] else None,
+        'sizes': sorted(list(p['sizes'])) if p['sizes'] else None,
+        'soldOut': True if is_sold_out else None,
         'placeholder': is_placeholder if is_placeholder else None
     }
     output_products.append(item)
@@ -309,22 +334,9 @@ print(f"Products with real images: {matched_images_count} / {len(output_products
 
 # Write sku-catalog.ts
 lines = []
-lines.append("// Generated playR full product catalog from 'playR new website product.xlsx'")
+lines.append("// Generated playR full product catalog from 'Location SummaryFINAL (1).xlsx'")
 lines.append("// Conforming to 'playR Website listings - sport.xlsx' taxonomy")
-lines.append("export interface BluorngProduct {");
-lines.append("  handle: string;");
-lines.append("  title: string;");
-lines.append("  price: number;");
-lines.append("  compareAt: number | null;");
-lines.append("  type: string;");
-lines.append("  collections: string[];");
-lines.append("  images: string[];");
-lines.append("  description: string;");
-lines.append("  details: string[];");
-lines.append("  colors?: string[];");
-lines.append("  soldOut?: boolean;");
-lines.append("  placeholder?: boolean;");
-lines.append("}\n");
+lines.append("import { BluorngProduct } from './bluorng-data';\n")
 lines.append("export const skuCatalog: BluorngProduct[] = [")
 
 for p in output_products:
@@ -337,6 +349,10 @@ for p in output_products:
     lines.append(f"    images: {json.dumps(p['images'])},")
     if p.get('colors'):
         lines.append(f"    colors: {json.dumps(p['colors'])},")
+    if p.get('sizes'):
+        lines.append(f"    sizes: {json.dumps(p['sizes'])},")
+    if p.get('soldOut'):
+        lines.append("    soldOut: true,")
     if p.get('placeholder'):
         lines.append("    placeholder: true,")
     lines.append(f"    description: {json.dumps(p['description'])},")
